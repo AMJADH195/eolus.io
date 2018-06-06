@@ -105,6 +105,7 @@
                 border-radius: 3px;
                 margin: 0px;
                 padding: 5px;
+                overflow-x: auto;
                 max-width: calc(60rem - 10px);
             }
             .howto {
