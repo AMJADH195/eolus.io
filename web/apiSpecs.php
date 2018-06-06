@@ -5,6 +5,11 @@ Please constrain data requests as much as possible.  Don't use larger time inter
 Excessive usage, DDOS, and abuse of the API will be monitored.  eolus.io is hosted in the cloud.  All data is from the public domain.<br>
 <b>Data is currently limited to the lat/lon extents of Colorado.  Coverage will be expanded to the full model extents after successful verification and testing of the API.</b>
 </div>
+<br>
+<div class="howto">
+The API is accessible via GET parameters.  Example usage:<br>
+<pre class="example">http://eolus.io/?GetData&model=GFS&x=-105&y=39&end=24&outputs=tmp</pre>
+</div>
 
 <h3><a href='/?ListModels'>ListModels</a></h3>
 Emits a list of all possible weather models, their outputs, and related metadata.<br>

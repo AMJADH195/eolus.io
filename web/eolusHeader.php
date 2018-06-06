@@ -100,6 +100,17 @@
                 font-size: 0.8rem;
                 padding: 10px;
             }
+            .example {
+                background-color: #f8f8f8;
+                border-radius: 3px;
+                margin: 0px;
+                padding: 5px;
+                max-width: calc(60rem - 10px);
+            }
+            .howto {
+                font-size: 0.9rem;
+                color: #444;
+            }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
