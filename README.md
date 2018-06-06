@@ -12,28 +12,32 @@ The PHP API uses GDAL to read the model data from the raster cells.
 This is not incredibly fast, and I wonder if PostGIS would be a more efficient method -- I will explore this.
 
 ## Current Models
-Core Implementation = Most basic model data outputs, like temperature, precip, winds.
+Core implementation = Most basic model data outputs, like temperature, precip, winds.
 
 |Model|Status|Type|Timespan|Interval|Description|
 |----|----|----|----|----|----|
-| HIRESW-WRF | Core Implementation | Short Range | 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF)  Currently listed in the API as 'HIRESW' |
-| HIRESW-NMMB | NOT IMPLEMENTED YET |     |      |       |                                   |
-| HREF-MEAN | Core Implementation | Short Range | 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
-| HREF-PMMN | NOT IMPLEMENTED YET |   |        |                       |                                   |
-| HREF-AVRG | NOT IMPLEMENTED YET |   |        |                       |                                   |
-| RAP | WILL NOT BE IMPLEMENTED | | | | |
-| HRRR | WILL NOT BE IMPLEMENTED | | | | |
-| RTMA | WILL NOT BE IMPLEMENTED | | | | |
-| NAM 3km | Core Implementation | Short Range | 0-60hr    | 1hr | CONUS only |
-| NAM 12km | Core Implementation | Short-Medium Range | 0-84hr    | 3hr |  |
-| SREF | NOT IMPLEMENTED YET |  |  |  |  |
-| GFS | Core Implementation | Med-Long Range | 0-240hr | 1hr (3hr after 120) |  |
-| 557ww | NOT IMPLEMENTED YET |  |   |   |   |
-| NAEFS | NOT IMPLEMENTED YET |  |   |   |   |
-| CMC | WILL NOT BE IMPLEMENTED | | | | |
-| UKMET | NOT IMPLEMENTED YET | | | | |
-| GEFS | NOT IMPLEMENTED YET | | | | |
-| ECMWF | NOT IMPLEMENTED YET | | | | |
+| HIRESW-WRF | Core implementation | Short Range | 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF)  Currently listed in the API as 'HIRESW' |
+| HIRESW-NMMB | Not yet implemented |     |      |       |                                   |
+| HREF-MEAN | Core implementation | Short Range | 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
+| HREF-PMMN | Not yet implemented |   |        |                       |                                   |
+| HREF-AVRG | Not yet implemented |   |        |                       |                                   |
+| NAM 3km | Core implementation | Short Range | 0-60hr    | 1hr | CONUS only |
+| NAM 12km | Core implementation | Short-Medium Range | 0-84hr    | 3hr |  |
+| SREF | Not yet implemented |  |  |  |  |
+| GFS | Core implementation | Med-Long Range | 0-240hr | 1hr (3hr after 120) |  |
+| 557ww | Not yet implemented |  |   |   |   |
+| NAEFS | Not yet implemented |  |   |   |   |
+| UKMET | Not yet implemented | | | | |
+| GEFS | Not yet implemented | | | | |
+
+#### Will Not / No Plans to Implement:
+| Model | Reason |
+|-------|--------|
+| RAP | Included in HREF |
+| HRRR | Not worth the trouble, included in HREF |
+| RTMA | NDFD precursor |
+| CMC | Not a very good model, included in NAEFS |
+| ECMWF | Extremely expensive |
 
 ## Future Plans
  * Explore using PostGIS for raster storage and lookup.
