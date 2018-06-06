@@ -16,7 +16,7 @@ Core implementation = Most basic model data outputs, like temperature, precip, w
 
 |Model|Status|Type|Timespan|Interval|Description|
 |----|----|----|----|----|----|
-| HIRESW-WRF | Core implementation | Short Range | 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF)  Currently listed in the API as 'HIRESW' |
+| HIRESW-WRF | Core implementation | Short Range | 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF).  Currently listed in the API as 'HIRESW' |
 | HIRESW-NMMB | Not yet implemented |     |      |       |                                   |
 | HREF-MEAN | Core implementation | Short Range | 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
 | HREF-PMMN | Not yet implemented |   |        |                       |                                   |
