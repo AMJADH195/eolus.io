@@ -506,6 +506,119 @@ $models = array (
                 "Level" => "Surface"
             )
         )
+    ),
+    "SREF" => array (
+        "Folder" => "/wxdata/sref/",
+
+        "Name" => "Short-Range Ensemble Forecast (ARW, Control)",
+        "Resolution" => "12km",
+        "Timespan" => "0-87 hours",
+        "Forecast Interval" => "3 Hours",
+        "Update Rate" => "Every 6 hours",
+        "Agency" => "USA / NOAA / NCEP",
+        "Coverage" => "North America",        
+        "eolusVersion" => "0.9",
+        "eolusLastUpdated" => "June 7, 2018",
+        "Notes" => "",
+
+        "Model Outputs" => array (
+            "tmp" => array (
+                "File Prefix" => "tmp/SurfaceTemp",
+                "Name" => "Temperature",
+                "Units" => "Celsius",
+                "Level" => "Surface"
+            ),
+            "tcdc" => array (
+                "File Prefix" => "tcdc/CloudCover",
+                "Name" => "Total Cloud Cover",
+                "Units" => "Percent",
+                "Level" => "Entire Atmosphere"
+            ),
+            "apcp" => array (
+                "File Prefix" => "apcp/AccumPrecip",
+                "Name" => "Accumulated Precipitation",
+                "Units" => "Millimeters (kg/m^2)",
+                "Level" => "Surface"
+            ),
+            "vis" => array (
+                "File Prefix" => "vis/Visibility",
+                "Name" => "Visibility",
+                "Units" => "Meters",
+                "Level" => "Surface"
+            ),
+            "rh" => array (
+                "File Prefix" => "rh/Humidity",
+                "Name" => "Relative Humidity",
+                "Units" => "Percent (%)",
+                "Level" => "2m Above Ground"
+            ),
+            "pwat" => array (
+                "File Prefix" => "pwat/PWAT",
+                "Name" => "Precipitable Water",
+                "Units" => "Millimeters (kg/m^2)",
+                "Level" => "Entire Atmosphere"
+            ),
+            "cape" => array (
+                "File Prefix" => "cape/CAPE",
+                "Name" => "CAPE",
+                "Units" => "J/kg",
+                "Level" => "Surface"
+            ),
+            "cin" => array (
+                "File Prefix" => "cin/CIN",
+                "Name" => "CIN",
+                "Units" => "J/kg",
+                "Level" => "Surface"
+            ),
+            "4lftx" => array (
+                "File Prefix" => "4lftx/LiftedIndex",
+                "Name" => "Four-Layer Lifted Index",
+                "Units" => "Kelvin",
+                "Level" => "180-0mb Above Ground"
+            ),
+            "prate" => array (
+                "File Prefix" => "prate/PrecipRate",
+                "Name" => "Precipitation Rate",
+                "Units" => "Millimeters Per Second",
+                "Level" => "Surface"
+            ),
+            "ugrd" => array (
+                "File Prefix" => "ugrd/SurfaceWindU",
+                "Name" => "Wind U-Component",
+                "Units" => "Meters Per Second",
+                "Level" => "10m Above Ground"
+            ),
+            "vgrd" => array (
+                "File Prefix" => "vgrd/SurfaceWindV",
+                "Name" => "Wind V-Component",
+                "Units" => "Meters Per Second",
+                "Level" => "10m Above Ground"
+            ),
+            "csnow" => array (
+                "File Prefix" => "csnow/CatSnow",
+                "Name" => "Categorical Snow",
+                "Units" => "Boolean",
+                "Level" => "Surface"
+            ),
+            "cicep" => array (
+                "File Prefix" => "cicep/CatIcePellets",
+                "Name" => "Categorical Ice Pellets",
+                "Units" => "Boolean",
+                "Level" => "Surface"
+            ),
+            "cfrzr" => array (
+                "File Prefix" => "cfrzr/CatFrzRain",
+                "Name" => "Categorical Freezing Rain",
+                "Units" => "Boolean",
+                "Level" => "Surface"
+            ),
+            "crain" => array (
+                "File Prefix" => "crain/CatRain",
+                "Name" => "Categorical Rain",
+                "Units" => "Boolean",
+                "Level" => "Surface"
+            )
+        )
     )
 );
 

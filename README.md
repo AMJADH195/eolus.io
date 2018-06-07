@@ -14,21 +14,22 @@ This is not incredibly fast, and I wonder if PostGIS would be a more efficient m
 ## Current Models
 Core implementation = Most basic model data outputs, like temperature, precip, winds.
 
-|Model|Status|Type|Timespan|Interval|Description|
+|Model|Status|Type|Resolution|Timespan|Interval|Description|
 |----|----|----|----|----|----|
-| HIRESW-WRF | Core implementation | Short Range | 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF).  Currently listed in the API as 'HIRESW' |
-| HIRESW-NMMB | Not yet implemented |     |      |       |                                   |
-| HREF-MEAN | Core implementation | Short Range | 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
-| HREF-PMMN | Not yet implemented |   |        |                       |                                   |
-| HREF-AVRG | Not yet implemented |   |        |                       |                                   |
-| NAM 3km | Core implementation | Short Range | 0-60hr    | 1hr | CONUS only |
-| NAM 12km | Core implementation | Short-Medium Range | 0-84hr    | 3hr |  |
-| SREF | Not yet implemented |  |  |  |  |
-| GFS | Core implementation | Med-Long Range | 0-240hr | 1hr (3hr after 120) |  |
-| 557ww | Not yet implemented |  |   |   |   |
-| NAEFS | Not yet implemented |  |   |   |   |
-| UKMET | Not yet implemented | | | | |
-| GEFS | Not yet implemented | | | | |
+| HIRESW-WRF | Core implementation | Short Range |4.2km| 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF).  Currently listed in the API as 'HIRESW' |
+| HIRESW-NMMB | Not yet implemented |   |  |      |       |                                   |
+| HREF-MEAN | Core implementation | Short Range |~3km| 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
+| HREF-PMMN | Not yet implemented |   | |       |                       |                                   |
+| HREF-AVRG | Not yet implemented |   |  |      |                       |                                   |
+| NAM 3km | Core implementation | Short Range |~3km | 0-60hr    | 1hr | CONUS only |
+| NAM 12km | Core implementation | Short Range | 12km | 0-84hr    | 3hr | North America  |
+| SREF-ARW | Core+ implementation | Short Range | 12km | 0-87hr | 3hr  | North America.  ARW Control run. |
+| SREF-NMMB | Not yet implemented |  |  |  |  | |
+| GFS | Core implementation | Med-Long Range | 0.25deg | 0-240hr | 1hr (3hr after 120) |  |
+| 557ww | Not yet implemented |  |   |   |   | |
+| NAEFS | Not yet implemented |  |   |   |   | |
+| UKMET | Not yet implemented | | | | | |
+| GEFS | Not yet implemented | | | | | |
 
 #### Will Not / No Plans to Implement:
 | Model | Reason |

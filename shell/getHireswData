@@ -172,21 +172,41 @@ echo "------------"
 # you may need to look ahead a day to capture the actual UTC date.
 
 CHECKDATE=`date +%Y%m%d`
-CHECKTIME="12z"
+CHECKTIME="18"
+echo "Checking 18Z $CHECKDATE"
+check_if_data_exists $CHECKDATE $CHECKTIME
+
+CHECKDATE=`date +%Y%m%d`
+CHECKTIME="12"
 echo "Checking 12Z $CHECKDATE"
 check_if_data_exists $CHECKDATE $CHECKTIME
 
 CHECKDATE=`date +%Y%m%d`
-CHECKTIME="00z"
+CHECKTIME="06"
+echo "Checking 06Z $CHECKDATE"
+check_if_data_exists $CHECKDATE $CHECKTIME
+
+CHECKDATE=`date +%Y%m%d`
+CHECKTIME="00"
 echo "Checking 00Z $CHECKDATE"
 check_if_data_exists $CHECKDATE $CHECKTIME
 
 CHECKDATE=`date -d '-1 day' +%Y%m%d`
-CHECKTIME="12z"
+CHECKTIME="18"
+echo "Checking 18Z $CHECKDATE"
+check_if_data_exists $CHECKDATE $CHECKTIME
+
+CHECKDATE=`date -d '-1 day' +%Y%m%d`
+CHECKTIME="12"
 echo "Checking 12Z $CHECKDATE"
 check_if_data_exists $CHECKDATE $CHECKTIME
 
 CHECKDATE=`date -d '-1 day' +%Y%m%d`
-CHECKTIME="00z"
+CHECKTIME="06"
+echo "Checking 06Z $CHECKDATE"
+check_if_data_exists $CHECKDATE $CHECKTIME
+
+CHECKDATE=`date -d '-1 day' +%Y%m%d`
+CHECKTIME="00"
 echo "Checking 00Z $CHECKDATE"
 check_if_data_exists $CHECKDATE $CHECKTIME

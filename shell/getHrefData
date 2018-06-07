@@ -90,7 +90,7 @@ function download_and_convert {
 # for each specified parameter type (temp, wind, precip, etc.)
 function download_files {
 	echo "Downloading files."
-	for i in `seq -f %02g 01 36`;
+	for i in `seq -f %02g 00 36`;
         do
 		
 		FILENAME="href.t"
@@ -102,7 +102,7 @@ function download_files {
 		download_and_convert "var_APCP=on" "lev_surface=on" $2 $FILENAME $i "Precip Accum" "PrecipAccum" "/wxdata/href/apcp/" $1
 		download_and_convert "var_CAPE=on" "lev_surface=on" $2 $FILENAME $i "CAPE" "CAPE" "/wxdata/href/cape/" $1
 		download_and_convert "var_CIN=on" "lev_surface=on" $2 $FILENAME $i "CIN" "CIN" "/wxdata/href/cin/" $1
-		download_and_convert "var_TCDC=on" "all_lev=on" $2 $FILENAME $i "Cloud Cover" "CloudCover" "/wxdata/hiresw/tcdc/" $1
+		download_and_convert "var_TCDC=on" "all_lev=on" $2 $FILENAME $i "Cloud Cover" "CloudCover" "/wxdata/href/tcdc/" $1
 		download_and_convert "var_UGRD=on" "lev_925_mb=on" $2 $FILENAME $i "Wind U Component" "SurfaceWindU" "/wxdata/href/ugrd/" $1
 		download_and_convert "var_VGRD=on" "lev_925_mb=on" $2 $FILENAME $i "Wind V Component" "SurfaceWindV" "/wxdata/href/vgrd/" $1
 		download_and_convert "var_CSNOW=on" "lev_surface=on" $2 $FILENAME $i "Categorical Snow" "CatSnow" "/wxdata/href/csnow/" $1
