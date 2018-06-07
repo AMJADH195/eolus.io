@@ -6,23 +6,21 @@ Excessive usage, DDOS, and abuse of the API will be monitored.  eolus.io is host
 <b>Data is currently limited to the lat/lon extents of Colorado.  Coverage will be expanded to the full model extents after successful verification and testing of the API.</b>
 </div>
 <br>
-<div class="howto">
-The API is accessible via GET parameters.  Example usage:<br>
-<pre class="example">http://eolus.io/?GetData&model=GFS&x=-105&y=39&end=24&outputs=tmp</pre>
-</div>
-
 <h3><a href='/?ListModels'>ListModels</a></h3>
+<pre class="example">http://eolus.io/?ListModels</pre>
 Emits a list of all possible weather models, their outputs, and related metadata.<br>
 
 <table class="paramTable"><tr><td>Parameter</td><td>Description</td><td>Required?</td></tr>
 <tr><td>f</td><td>The desired output format, either 'json' or 'html.'  Defaults to html.</td><td>No</td></tr></table>
 
 <h3><a href='/?ListVersions'>ListVersions</a></h3>
+<pre class="example">http://eolus.io/?ListVersions</pre>
 Lists all the API versions that can be used for GetData, GetImage, and GetGeoLayer requests.<br>
 <table class="paramTable"><tr><td>Parameter</td><td>Description</td><td>Required?</td></tr>
 <tr><td>f</td><td>The desired output format, either 'json' or 'html.'  Defaults to html.</td><td>No</td></tr></table>
 
 <h3>GetData</h3>
+<pre class="example">http://eolus.io/?GetData&model=GFS&x=-105&y=39&end=24&outputs=tmp</pre>
 Returns a time series of raw weather model output data for a lat-lon point.<br>
 
 <table class="paramTable"><tr><td>Parameter</td><td>Description</td><td>Required?</td></tr>

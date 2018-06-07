@@ -101,11 +101,10 @@
                 padding: 10px;
             }
             .example {
-                background-color: #f8f8f8;
                 border-radius: 3px;
                 margin: 0px;
-                padding: 5px;
                 overflow-x: auto;
+                color: #0EB2EF;
                 max-width: calc(60rem - 10px);
             }
             .howto {
