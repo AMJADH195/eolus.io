@@ -15,7 +15,7 @@ This is not incredibly fast, and I wonder if PostGIS would be a more efficient m
 Core implementation = Most basic model data outputs, like temperature, precip, winds.
 
 |Model|Status|Type|Resolution|Timespan|Interval|Description|
-|----|----|----|----|----|----|
+|----|----|----|----|----|----|----|
 | HIRESW-WRF | Core implementation | Short Range |4.2km| 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF).  Currently listed in the API as 'HIRESW' |
 | HIRESW-NMMB | Not yet implemented |   |  |      |       |                                   |
 | HREF-MEAN | Core implementation | Short Range |~3km| 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
