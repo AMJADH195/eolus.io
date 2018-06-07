@@ -1,7 +1,7 @@
 <?php require ("./eolusHeader.php"); ?>
 
 <div class="usage">
-Please constrain data requests as much as possible.  Don't use larger time intervals than you need, and don't request model outputs that you wont use.  At some point API keys will be required to utilize the API. <br>
+Please constrain requests to only the time intervals and model outputs that you need.  At some point API keys will be required to utilize the API. <br>
 Excessive usage, DDOS, and abuse of the API will be monitored.  eolus.io is hosted in the cloud.  All data is from the public domain.<br>
 <b>Data is currently limited to the lat/lon extents of Colorado.  Coverage will be expanded to the full model extents after successful verification and testing of the API.</b>
 </div>
