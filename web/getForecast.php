@@ -8,7 +8,8 @@ require ("./versions.php"); // $versions variable is set here
 
 // Globals  -----------
 $outputFormat = "JSON";
-$outputMode = "MODEL";
+$outputMode = "";
+$outputName = "";
 $model = "";
 $starttime = 0;
 $endtime = 240;
@@ -31,12 +32,16 @@ $outputData = [];
 if (isset($_GET['ListModels'])) {
     $outputMode = "LISTMODELS";
     $outputFormat = "HTML";
+    $outputName = "models";
 } else if (isset($_GET['ListVersions'])) {
     $outputMode = "LISTVERSIONS";
     $outputFormat = "HTML";
+    $outputName = "versions";
 } else {
     // Validate inputs
     if (isset($_GET['GetData'])) {
+        $outputMode = "GETDATA";
+        $outputNAme = "wxdata";
         if (isset($_GET['model'])) {
             $model = $_GET['model'];
             if (isset ($_GET['v'])) {
@@ -245,24 +250,38 @@ $timeElapsed = ($calcEndTime - $calcStartTime)/1000 . " seconds";
 
 if ($outputFormat == "JSON") {
     if (!$error) {
-        echo json_encode ([
-            "version" => $version["Name"], 
-            "timeElapsed" => $timeElapsed,
-            "forecastInterval" => $timeInterval,
-            "wxdata" => $outputData
-        ]);
+        if ($outputMode == "GETDATA") {
+            echo json_encode ([
+                "version" => $version["Name"], 
+                "timeElapsed" => $timeElapsed,
+                "forecastInterval" => $timeInterval,
+                $outputName => $outputData
+            ]);
+        } else {
+            echo json_encode ([
+                "version" => $version["Name"], 
+                $outputName => $outputData
+            ]);
+        }
     } else {
         echo json_encode (["errors" => $outputData]);
     }
 } else {
     require ("./eolusHeader.php");
     echo "<pre>";
-    print_r ([
-        "version" => $version["Name"], 
-        "timeElapsed" => $timeElapsed,
-        "forecastInterval" => $timeInterval,
-        "wxdata" => $outputData
-    ]);
+    if ($outputMode == "GETDATA") {
+        print_r ([
+            "version" => $version["Name"], 
+            "timeElapsed" => $timeElapsed,
+            "forecastInterval" => $timeInterval,
+            $outputName => $outputData
+        ]);
+    } else {
+        print_r ([
+                "version" => $version["Name"], 
+                $outputName => $outputData
+            ]);
+    }
     echo "</pre>";
     require ("./eolusFooter.php");
 }
