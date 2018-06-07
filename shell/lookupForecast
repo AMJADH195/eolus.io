@@ -7,6 +7,7 @@
 # $4: Starting date. (YYYYMMDD)         ex: 20180601
 # $5: Starting time. (HH) - UTC         ex: 06
 # $6: Number of hours.                  ex: 48
+# $7: Hours between each forecast.      ex: 1
 
 LONGITUDE=$1
 LATITUDE=$2
@@ -14,8 +15,9 @@ FILEPREPEND=$3
 STARTDATE=$4
 STARTTIME=$5
 NUMHOURS=$6
+STEPSIZE=$7
 
-for i in `seq 0 $NUMHOURS`
+for i in `seq 0 $STEPSIZE $NUMHOURS`
 do
     NEWTIME=`date -d "$STARTDATE $STARTTIME +$i hours" +%Y%m%dT%H`
     NEWTIME+="0000000Z"

@@ -39,6 +39,8 @@ Returns a time series of raw weather model output data for a lat-lon point.<br>
 
 <tr><td>outputs</td><td>Comma-delimited model parameter outputs to include (see 'ListModels').  For example, "tmp,tcdc,snod" -- defaults to "all."</td><td>No</td></tr>
 
+<tr><td>interval</td><td>The number of hours between forecasts.  Must be an integer.  Defaults to 1.  Warning: This will have unintended consequences for models that don't have hourly forecasts -- if the final time interval does not align with the interval of model forecasts, no data will be returned.</td><td>No</td></tr>
+
 <tr><td>v</td><td>The API version to use.  Defaults to the latest version.</td><td>No</td></tr>
 
 </table>

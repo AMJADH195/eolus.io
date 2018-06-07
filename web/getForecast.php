@@ -12,7 +12,8 @@ $outputMode = "MODEL";
 $model = "";
 $starttime = 0;
 $endtime = 240;
-$version = $versions["alpha-01"];
+$timeInterval = 1;
+$version = $versions["alpha-02"];
 $error = false;
 $modelOutputs = ["ALL"];
 $calcStartTime = round (microtime(true) * 1000);
@@ -58,6 +59,18 @@ if (isset($_GET['ListModels'])) {
                     $modelOutputs = explode (",",$outputs);
                 }
             }
+
+            if (isset($_GET["interval"])) {
+                $timeInterval = $_GET["interval"];
+                if (!ctype_digit($timeInterval)) {
+                    array_push ($outputData, "ERROR: Interval must be a whole number.");
+                    $error = true;
+                } else if ($timeInterval < 1) {
+                    array_push ($outputData, "ERROR: Interval must 1 or greater.");
+                    $error = true;
+                }
+            }
+            $timeInterval = (int)$timeInterval;
         } else {
             array_push ($outputData, "ERROR: Model parameter is required.");
             $error = true;
@@ -185,28 +198,29 @@ function printForecastData () {
 }
 
 function retrieveData ($folder, $name, $prefix) {
-    global $x, $y, $starttime, $endtime;
+    global $x, $y, $starttime, $endtime, $timeInterval;
     $return = array();
     $fullPrefix = $folder . $prefix;
     $steps = $endtime - $starttime;
+    $stepSize = $timeInterval;
     $date = makeDate ($starttime);
     $time = makeTime ($starttime);
 
-    exec ("/wxdata/lookupForecast {$x} {$y} {$fullPrefix} {$date} {$time} {$steps}",$return);
+    exec ("/wxdata/lookupForecast {$x} {$y} {$fullPrefix} {$date} {$time} {$steps} {$stepSize}",$return);
     array_unshift($return, $name);
     return $return;
 }
 
 function packageData ($dataArray) {
-    global $outputData, $endtime, $starttime;
-    $steps = $endtime - $starttime;
+    global $outputData, $endtime, $starttime, $timeInterval;
+    $steps = ($endtime - $starttime) / $timeInterval;
     $labels = [];
     for ($i = 0; $i < count($dataArray); $i ++) {
         array_push ($labels, $dataArray[$i][0]);
     }
     for ($i = 1; $i <= $steps; $i++) {
         $dataItem = [];
-        $currentStep = $i + $starttime;
+        $currentStep = (($i - 1) * $timeInterval) + $starttime;
         $timestamp = makeDate ($currentStep) . "T" . makeTime ($currentStep) . "0000000Z";
         $dataItem["timestamp"] = $timestamp;
         for ($ii = 0; $ii < count($dataArray); $ii++) {
@@ -218,12 +232,12 @@ function packageData ($dataArray) {
 
 function makeDate ($i) {
     // pretty sure $today is NULL...
-    return date('Ymd', strtotime($today . " +" . $i . " hours"));
+    return date('Ymd', strtotime(" +" . $i . " hours"));
 }
 
 function makeTime ($i) {
     // pretty sure $today is NULL...
-    return date('H', strtotime($today . " +" . $i . " hours"));
+    return date('H', strtotime(" +" . $i . " hours"));
 }
 
 $calcEndTime = round (microtime(true) * 1000);
@@ -234,6 +248,7 @@ if ($outputFormat == "JSON") {
         echo json_encode ([
             "version" => $version["Name"], 
             "timeElapsed" => $timeElapsed,
+            "forecastInterval" => $timeInterval,
             "wxdata" => $outputData
         ]);
     } else {
@@ -245,6 +260,7 @@ if ($outputFormat == "JSON") {
     print_r ([
         "version" => $version["Name"], 
         "timeElapsed" => $timeElapsed,
+        "forecastInterval" => $timeInterval,
         "wxdata" => $outputData
     ]);
     echo "</pre>";
