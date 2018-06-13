@@ -16,18 +16,18 @@ Core implementation = Most basic model data outputs, like temperature, precip, w
 
 |Model|Status|Type|Resolution|Timespan|Interval|Description|
 |----|----|----|----|----|----|----|
-| HIRESW-WRF | Core implementation | Short Range |4.2km| 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF).  Currently listed in the API as 'HIRESW' |
+| HIRESW-WRF | Core implementation | Mesoscale |4.2km| 0-48hr | 1hr | AWIPS 4.2km CONUS ARW (NCAR Advanced Research WRF).  Currently listed in the API as 'HIRESW' |
 | HIRESW-NMMB | Not yet implemented |   |  |      |       |                                   |
-| HREF-MEAN | Core implementation | Short Range |~3km| 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
+| HREF-MEAN | Core implementation | Mesoscale, Ensemble |~3km| 0-36hr | 1hr | Mean-Weighted Ensemble.  Currently listed in the API as 'HREF' |
 | HREF-PMMN | Not yet implemented |   | |       |                       |                                   |
 | HREF-AVRG | Not yet implemented |   |  |      |                       |                                   |
-| NAM 3km | Core implementation | Short Range |~3km | 0-60hr    | 1hr | CONUS only |
-| NAM 12km | Core implementation | Short Range | 12km | 0-84hr    | 3hr | North America  |
-| SREF-ARW | Core+ implementation | Short Range | 12km | 0-87hr | 3hr  | North America.  ARW Control run. |
+| NAM 3km | Core implementation | Mesoscale |~3km | 0-60hr    | 1hr | CONUS only |
+| NAM 12km | Core implementation | Mesoscale | 12km | 0-84hr    | 3hr | North America  |
+| SREF-ARW | Core+ implementation | Mesoscale, Ensemble | 12km | 0-87hr | 3hr  | North America.  ARW Control run. |
 | SREF-NMMB | Not yet implemented |  |  |  |  | |
-| GFS | Core implementation | Med-Long Range | 0.25deg | 0-240hr | 1hr (3hr after 120) |  |
+| GFS | Core implementation | Global Numerical | 0.25deg | 0-240hr | 1hr (3hr after 120) |  |
 | 557ww | Not yet implemented |  |   |   |   | |
-| NAEFS | Not yet implemented |  |   |   |   | |
+| NAEFS | Full implementation | Global Numerical, Ensemble | 1deg  | 0-240hr | 6hr  | RH, PRES, DPT, TMP, TMAX, TMIN, UGRD, VGRD |
 | UKMET | Not yet implemented | | | | | |
 | GEFS | Not yet implemented | | | | | |
 
@@ -35,7 +35,7 @@ Core implementation = Most basic model data outputs, like temperature, precip, w
 | Model | Reason |
 |-------|--------|
 | RAP | Included in HREF |
-| HRRR | Not worth the trouble, included in HREF |
+| HRRR | Included in HREF |
 | RTMA | NDFD precursor |
 | CMC | Not a very good model, included in NAEFS |
 | ECMWF | Extremely expensive |

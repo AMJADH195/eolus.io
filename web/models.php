@@ -287,6 +287,71 @@ $models = array (
             )
         )
     ),
+    "NAEFS" => array (
+        "Folder" => "/wxdata/naefs/",
+
+        "Name" => "North American Ensemble Forecast System",
+        "Resolution" => "1x1deg",
+        "Timespan" => "0-240 hours",
+        "Forecast Interval" => "Every 6 Hours",
+        "Update Rate" => "Every 6 hours",
+        "Agency" => "NWS (USA) / MSC (CA) / NMSM (MX)",
+        "Coverage" => "Global?",        
+        "eolusVersion" => "1.0",
+        "eolusLastUpdated" => "June 13, 2018",
+        "Notes" => "",
+
+        "Model Outputs" => array (
+            "dpt" => array (
+                "File Prefix" => "dpt/Dewpoint",
+                "Name" => "Dewpoint",
+                "Units" => "Celsius",
+                "Level" => "2m Above Ground"
+            ),
+            "pres" => array (
+                "File Prefix" => "pres/Pressure",
+                "Name" => "Pressure",
+                "Units" => "Pascals",
+                "Level" => "All"
+            ),
+            "rh" => array (
+                "File Prefix" => "rh/RelativeHumidity",
+                "Name" => "Relative Humidity",
+                "Units" => "Percent",
+                "Level" => "2m Above Ground"
+            ),
+            "tmp" => array (
+                "File Prefix" => "tmp/SurfaceTemp",
+                "Name" => "Temperature",
+                "Units" => "Celsius",
+                "Level" => "2m Above Ground"
+            ),
+            "tmax" => array (
+                "File Prefix" => "tmax/TempMax",
+                "Name" => "Maximum Temperature",
+                "Units" => "Celsius",
+                "Level" => "2m Above Ground"
+            ),
+            "tmin" => array (
+                "File Prefix" => "tmin/TempMin",
+                "Name" => "Minimum Temperature",
+                "Units" => "Celsius",
+                "Level" => "2m Above Ground"
+            ),
+            "vgrd" => array (
+                "File Prefix" => "vgrd/SurfaceWindV",
+                "Name" => "Wind V-Component",
+                "Units" => "Meters Per Second",
+                "Level" => "10m Above Ground"
+            ),
+            "ugrd" => array (
+                "File Prefix" => "ugrd/SurfaceWindU",
+                "Name" => "Wind U-Component",
+                "Units" => "Meters Per Second",
+                "Level" => "10m Above Ground"
+            )
+        )
+    ),
     "NAM-NEST" => array (
         "Folder" => "/wxdata/namhres/",
 
