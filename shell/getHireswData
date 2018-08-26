@@ -18,7 +18,7 @@
 # to see what the last completed model run was.
 # Not elegant, but functional enough.
 function check_if_data_exists {
-	FILE="http://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.$1/hiresw.t$2.arw_5km.f48.conus.grib2"
+	FILE="http://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.$1/hiresw.t$2z.arw_5km.f48.conus.grib2"
 	echo "Endpoint: $FILE"
 
 	if curl --output /dev/null --silent --head --fail "$FILE"; then
