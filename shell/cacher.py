@@ -45,7 +45,10 @@ print ""
 # per directory (model output), and when all locations
 # have received data, the script will write the cache.json
 # to the folder.
+i = 1
+modelCount = len(model_dirs)
 for modelout in model_dirs:
+
     print "====="
     print "Getting data for " + modelout
     prefix = directory + "/" + modelout + "/" + settings["prefixes"][modelout]
@@ -55,10 +58,12 @@ for modelout in model_dirs:
     final_data = {}
     print ""
 
+    ii = 1
+    locationCount = len(data)
     # Loop through all locations and get the forecast
     for location in data:
         coords = data[location]["coords"]
-        print "--> Caching data for " + data[location]["name"]
+        print "--> Caching data for " + data[location]["name"] + " (" + str(i) + "/" + str(modelCount) + " | " + str(ii) + "/" + str(locationCount) + ")"
         model_data = subprocess.check_output([
             "/wxdata/lookupForecast",
             str(coords[0]),
@@ -71,6 +76,7 @@ for modelout in model_dirs:
         ])
 
         final_data[location] = model_data.splitlines()
+        ii += 1
 
     # Write the combined dictionary of forecast locations
     # for this model output to the directory
@@ -80,3 +86,4 @@ for modelout in model_dirs:
         f.write(json.dumps(final_data))
     print "====="
     print ""
+    i += 1
