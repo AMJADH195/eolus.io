@@ -21,7 +21,8 @@
         "tmax": "TempMax",
         "tmin": "TempMin",
         "ltng": "Lightning",
-        "pwat": "PWAT"
+        "pwat": "PWAT",
+        "vis": "Visibility"
     },
     "numhours": {
         "gfs": 240,
