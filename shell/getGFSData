@@ -124,6 +124,9 @@ function update_data {
 
 	find /wxdata/ -type f -mtime +1 -name '*.tif' -execdir rm -- '{}' \;
 
+	# Cache the data
+	python cacher.py --model gfs
+
 	# Exit script
 	echo "$1$2" > gfsLastUpdated.txt
 	echo "You're all clear kid, now let's blow this thing and go home."

@@ -142,6 +142,9 @@ function update_data {
 
 	find /wxdata/ -type f -mtime +1 -name '*.tif' -execdir rm -- '{}' \;
 
+	# Cache the data
+	python cacher.py --model namhres
+
 	# Exit script
 	echo "$1$2" > namHresLastUpdated.txt
 	echo "You're all clear kid, now let's blow this thing and go home."

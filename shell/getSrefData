@@ -127,6 +127,9 @@ function update_data {
 	find /wxdata/ -type f -mtime +1 -name '*.tif' -execdir rm -- '{}' \;
 	find /wxdata/ -type f -mtime +1 -name '*.grib2' -execdir rm -- '{}' \;
 
+	# Cache the data
+	python cacher.py --model sref
+
 	# Exit script
 	echo "$1$2" > srefLastUpdated.txt
 	echo "You're all clear kid, now let's blow this thing and go home."
