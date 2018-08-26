@@ -9,9 +9,6 @@
 #
 # Thomas Horner | thomas@14ersForecast.net
 #
-# Currently only loads NAM models.
-#
-# This is my first foray into actual Linux shell scripting.
 
 
 # Looks through the remote directory of GRIB files
