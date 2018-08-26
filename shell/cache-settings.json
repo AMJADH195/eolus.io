@@ -1,0 +1,35 @@
+{
+    "prefixes": {
+        "tmp": "SurfaceTemp",
+        "tcdc": "CloudCover",
+        "snod": "SnowDepth",
+        "prate": "PrecipRate",
+        "apcp": "PrecipAccum",
+        "cape": "CAPE",
+        "cin": "CIN",
+        "4lftx": "LiftedIndex",
+        "gust": "GustSpeed",
+        "ugrd": "SurfaceWindU",
+        "vgrd": "SurfaceWindV",
+        "csnow": "CatSnow",
+        "cicep": "CatIcePellets",
+        "cfrzr": "CatFrzRain",
+        "crain": "CatRain",
+        "dpt": "Dewpoint",
+        "pres": "Pressure",
+        "rh": "Relative Humidity",
+        "tmax": "TempMax",
+        "tmin": "TempMin",
+        "ltng": "Lightning",
+        "pwat": "PWAT"
+    },
+    "numhours": {
+        "gfs": 240,
+        "nam-nest": 60,
+        "nam": 84,
+        "hiresw": 48,
+        "href": 36,
+        "sref": 87,
+        "naefs": 240
+    }
+}
