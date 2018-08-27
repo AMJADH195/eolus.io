@@ -91,7 +91,7 @@ function download_files {
 		
 		FILENAME="hiresw.t"
 		FILENAME+=$1
-		FILENAME+=".arw_5km.f"
+		FILENAME+="z.arw_5km.f"
 		FILENAME+=$i
 		FILENAME+=".conus.grib2"
 		download_and_convert "var_TMP=on" "lev_surface=on" $2 $FILENAME $i "Surface Temp" "SurfaceTemp" "/wxdata/hiresw/tmp/" $1
