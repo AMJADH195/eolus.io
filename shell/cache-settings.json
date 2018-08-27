@@ -17,7 +17,7 @@
         "crain": "CatRain",
         "dpt": "Dewpoint",
         "pres": "Pressure",
-        "rh": "Relative Humidity",
+        "rh": "Humidity",
         "tmax": "TempMax",
         "tmin": "TempMin",
         "ltng": "Lightning",
