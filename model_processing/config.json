@@ -1,0 +1,36 @@
+{
+    "config": {
+        "tempDir": "./tempWxData/",
+        "bounds": {
+            "left": "249",
+            "right": "259",
+            "top": "41",
+            "bottom": "36"
+        },
+        "postgres": {
+            "host": "wxdata.postgres.database.azure.com",
+            "db": "weather_models",
+            "user": "eolus@wxdata"
+        },
+        "connectionProtocol": "http://",
+        "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/",
+        "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
+        "gribFilterExtension": ".pl?",
+        "gribFilterParams": "&all_lev=on&all_var=on&subregion="
+    },
+    "models": {
+        "href_mean": {
+            "lastUpdated": "",
+            "startTime": 1,
+            "endTime": 36,
+            "gribFilterName": "hrefconus",
+            "gribFilterFileStart": "href.t",
+            "gribFilterFileMiddle": "z.conus.mean.f",
+            "gribFilterFileEnd": ".grib2",
+            "gribFilterDirPrefix": "%2Fhref.",
+            "gribFilterDirSuffix": "%2Fensprod",
+            "nomadsPrefix": "hiresw/prod/href.",
+            "nomadsSuffix": "/ensprod/"
+        }
+    }
+}
