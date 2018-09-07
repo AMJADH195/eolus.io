@@ -36,7 +36,7 @@ for modelName, model in models.items():
     modelTimeTotalSeconds = 0
 
     # Look up to 24 hours back in time
-    for hourSubtract in range (0, 24):
+    for hourSubtract in range (0, 25):
         modelTime = now-timedelta(hours=hourSubtract)
 
         modelTimeTotalSeconds = time.mktime(modelTime.timetuple())
@@ -94,7 +94,7 @@ for modelName, model in modelsToUpdate.items():
     modelHour = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%H")
     modelDate = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%Y%m%d")
 
-    for modelTimestep in range (model["startTime"], model["endTime"]):
+    for modelTimestep in range (model["startTime"], model["endTime"]+1):
 
         fmtTimestep = str(modelTimestep).rjust (2, '0')
         # download every grib file from NOMADS grib filter
@@ -144,6 +144,7 @@ for modelName, model in modelsToUpdate.items():
 
         print "The file has been rewritten."
         print ""
+
         print "Loading into database..."
 
         os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
