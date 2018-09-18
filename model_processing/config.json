@@ -31,6 +31,19 @@
             "gribFilterDirSuffix": "%2Fensprod",
             "nomadsPrefix": "hiresw/prod/href.",
             "nomadsSuffix": "/ensprod/"
+        },
+        "gfs": {
+            "lastUpdate": "",
+            "startTime": 1,
+            "endTime": 384,
+            "gribFilterName": "gfs_0p25_1hr",
+            "gribFilterFileStart": "gfs.t",
+            "gribFilterFileMiddle": "z.pgrb2.0p25.anl.f",
+            "gribFilterFileEnd": "",
+            "gribFilterDirPrefix": "%2Fgfs.",
+            "gribFilterDirSuffix": "",
+            "nomadsPrefix": "gfs/prod/gfs.",
+            "nomadsSuffix": ""
         }
     }
 }
