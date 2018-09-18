@@ -25,6 +25,9 @@ for modelName, model in models.items():
     # model run format on NCEP is YYYYMMDDHH
     now = datetime.utcnow().replace(microsecond=0,second=0,minute=0)
 
+    if not model["enabled"]:
+        continue
+
     lastChecked = datetime.fromtimestamp (0)
 
     if model["lastUpdated"] != "":

@@ -31,7 +31,8 @@
             "gribFilterDirSuffix": "%2Fensprod",
             "nomadsPrefix": "hiresw/prod/href.",
             "nomadsSuffix": "/ensprod/",
-            "includeHourInPrefix": false
+            "includeHourInPrefix": false,
+            "enabled": false
         },
         "gfs": {
             "lastUpdated": "",
@@ -45,7 +46,8 @@
             "gribFilterDirSuffix": "",
             "nomadsPrefix": "gfs/prod/gfs.",
             "nomadsSuffix": "/",
-            "includeHourInPrefix": true
+            "includeHourInPrefix": true,
+            "enabled": true
         }
     }
 }
