@@ -47,7 +47,39 @@
             "nomadsPrefix": "gfs/prod/gfs.",
             "nomadsSuffix": "/",
             "includeHourInDir": true,
-            "enabled": true
+            "enabled": false
+        },
+        "hiresw_arw": {
+            "lastUpdated": "",
+            "enabled": false
+        },
+        "hiresw_nmmb": {
+            "lastUpdated": "",
+            "enabled": false
+        },
+        "naefs_bc_avg": {
+            "lastUpdated": "",
+            "enabled": false
+        },
+        "naefs_ndfd_avg": {
+            "lastUpdated": "",
+            "enabled": false
+        },
+        "nam12": {
+            "lastUpdated": "",
+            "enabled": false
+        },
+        "nam3": {
+            "lastUpdated": "",
+            "enabled": false
+        },
+        "sref_arw": {
+            "lastUpdated": "",
+            "enabled": false
+        },
+        "sref_nmb": {
+            "lastUpdated": "",
+            "enabled": false
         }
     }
 }
