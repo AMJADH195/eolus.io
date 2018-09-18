@@ -46,6 +46,10 @@ for modelName, model in models.items():
             print "No new model run has been found."
 
         timeString = modelTime.strftime ("%Y%m%d")
+        
+
+        if model["includeHourInPrefix"]:
+            timeString = modelTime.strftime ("%Y%m%d%H")
 
         print "Checking run for this datetime: " + timeString + " " + modelTime.strftime ("%H") + "Z"
 
@@ -171,3 +175,5 @@ for modelName, model in modelsToUpdate.items():
     print ""
 
 # Re-save the config json
+with open ('config.json') as f:
+    json.dump (data, f)
