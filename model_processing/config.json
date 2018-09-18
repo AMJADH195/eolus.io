@@ -30,20 +30,22 @@
             "gribFilterDirPrefix": "%2Fhref.",
             "gribFilterDirSuffix": "%2Fensprod",
             "nomadsPrefix": "hiresw/prod/href.",
-            "nomadsSuffix": "/ensprod/"
+            "nomadsSuffix": "/ensprod/",
+            "includeHourInPrefix": false
         },
         "gfs": {
-            "lastUpdate": "",
+            "lastUpdated": "",
             "startTime": 1,
             "endTime": 384,
             "gribFilterName": "gfs_0p25_1hr",
             "gribFilterFileStart": "gfs.t",
-            "gribFilterFileMiddle": "z.pgrb2.0p25.anl.f",
+            "gribFilterFileMiddle": "z.pgrb2.0p25.f",
             "gribFilterFileEnd": "",
             "gribFilterDirPrefix": "%2Fgfs.",
             "gribFilterDirSuffix": "",
             "nomadsPrefix": "gfs/prod/gfs.",
-            "nomadsSuffix": ""
+            "nomadsSuffix": "/",
+            "includeHourInPrefix": true
         }
     }
 }
