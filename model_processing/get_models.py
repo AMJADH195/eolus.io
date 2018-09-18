@@ -66,7 +66,7 @@ for modelName, model in models.items():
             ret = urllib2.urlopen(url)
 
             if ret.code == 200:
-                print "New model run found."
+                print " *** New model run found. ***"
                 modelsToUpdate[modelName] = model
                 break
 
