@@ -31,12 +31,12 @@
             "gribFilterDirSuffix": "%2Fensprod",
             "nomadsPrefix": "hiresw/prod/href.",
             "nomadsSuffix": "/ensprod/",
-            "includeHourInPrefix": false,
+            "includeHourInDir": false,
             "enabled": false
         },
         "gfs": {
             "lastUpdated": "",
-            "startTime": 1,
+            "startTime": 0,
             "endTime": 384,
             "gribFilterName": "gfs_0p25_1hr",
             "gribFilterFileStart": "gfs.t",
@@ -46,7 +46,7 @@
             "gribFilterDirSuffix": "",
             "nomadsPrefix": "gfs/prod/gfs.",
             "nomadsSuffix": "/",
-            "includeHourInPrefix": true,
+            "includeHourInDir": true,
             "enabled": true
         }
     }

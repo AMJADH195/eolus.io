@@ -50,8 +50,7 @@ for modelName, model in models.items():
 
         timeString = modelTime.strftime ("%Y%m%d")
         
-
-        if model["includeHourInPrefix"]:
+        if model["includeHourInDir"]:
             timeString = modelTime.strftime ("%Y%m%d%H")
 
         print "Checking run for this datetime: " + timeString + " " + modelTime.strftime ("%H") + "Z"
@@ -101,9 +100,13 @@ for modelName, model in modelsToUpdate.items():
     modelHour = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%H")
     modelDate = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%Y%m%d")
 
+    modelDirHour = ""
+    if model["includeHourInDir"]:
+        modelDirHour = modelHour
+
     for modelTimestep in range (model["startTime"], model["endTime"]+1):
 
-        fmtTimestep = str(modelTimestep).rjust (2, '0')
+        fmtTimestep = str(modelTimestep).rjust (len(str(model["endTime"])), '0')
         # download every grib file from NOMADS grib filter
         url = (config["connectionProtocol"] + config["gribFilterBaseUrl"] + model["gribFilterName"] +
             config["gribFilterExtension"] + "file=" + model["gribFilterFileStart"] + modelHour +
@@ -113,12 +116,18 @@ for modelName, model in modelsToUpdate.items():
             "&rightlon=" + config["bounds"]["right"] +
             "&toplat=" + config["bounds"]["top"] +
             "&bottomlat=" + config["bounds"]["bottom"] +
-            "&dir=" + model["gribFilterDirPrefix"] + modelDate + model["gribFilterDirSuffix"])
+            "&dir=" + model["gribFilterDirPrefix"] + modelDate + modelDirHour + model["gribFilterDirSuffix"])
 
         print "---------------"
         print "Downloading grib file for timestep " + fmtTimestep + "..."
 
-        gribFile = urllib2.urlopen (url)
+        try:
+            gribFile = urllib2.urlopen (url)
+        except:
+            print "URL error.  " + url
+            print "Could not get a model for this timestamp.  Moving to the next timestamp..."
+            continue
+
         filename = workingDir + modelName + "_" + modelDate + "_" + modelHour + "Z_f" + fmtTimestep
 
         with open (filename + ".grib2", 'wb') as outfile:
@@ -172,11 +181,15 @@ for modelName, model in modelsToUpdate.items():
 
 
         print "---------------"
+        print ""
 
     print "Done."
     print "============================="
     print ""
 
+print ""
+print ""
 # Re-save the config json
-with open ('config.json') as f:
+with open ('config.json', 'w') as f:
     json.dump (data, f)
+print "Config rewritten."
