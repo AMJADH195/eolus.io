@@ -83,6 +83,12 @@
         },
         "nam3": {
             "lastUpdated": "",
+            "startTime": 0,
+            "endTime": 60,
+            "gribFilterName": "nam_conusnest",
+            "gribFilename": "nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
+            "gribDirectory": "/nam.%D",
+            "baseDirectory": "nam/prod",
             "enabled": false
         },
         "sref_arw": {
