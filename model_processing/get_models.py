@@ -1,4 +1,6 @@
+import sys
 import os
+import os.path
 import json
 from datetime import datetime
 from datetime import timedelta
@@ -6,8 +8,14 @@ import time
 import pprint
 import urllib2
 
+if os.path.exists(".get_models_lockfile"):
+    print "Lock file exists, exiting."
+    sys.exit(0)
+
 with open ('config.json') as f:
     data = json.load(f)
+
+open ('.get_models_lockfile', 'a').close()
 
 config = data["config"]
 models = data["models"]
@@ -193,3 +201,6 @@ print ""
 with open ('config.json', 'w') as f:
     json.dump (data, f)
 print "Config rewritten."
+
+os.remove ('.get_models_lockfile')
+print "Lock file removed."
