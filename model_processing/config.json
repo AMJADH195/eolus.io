@@ -27,7 +27,7 @@
             "gribFilename": "href.t%Hz.conus.mean.f%T.grib2",
             "gribDirectory": "/href.%D/ensprod",
             "baseDirectory": "hiresw/prod",
-            "enabled": false
+            "enabled": true
         },
         "gfs": {
             "lastUpdated": "",
@@ -37,7 +37,7 @@
             "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
             "gribDirectory": "/gfs.%D%H",
             "baseDirectory": "gfs/prod",
-            "enabled": false
+            "enabled": true
         },
         "hiresw_arw": {
             "lastUpdated": "",
@@ -47,7 +47,7 @@
             "gribFilename": "hiresw.t%Hz.arw_5km.f%T.conus.grib2",
             "gribDirectory": "/hiresw.%D",
             "baseDirectory": "hiresw/prod",
-            "enabled": false
+            "enabled": true
         },
         "hiresw_nmmb": {
             "lastUpdated": "",
@@ -57,7 +57,7 @@
             "gribFilename": "hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
             "gribDirectory": "/hiresw.%D",
             "baseDirectory": "hiresw/prod",
-            "enabled": false
+            "enabled": true
         },
         "naefs_bc_avg": {
             "lastUpdated": "",
@@ -67,7 +67,7 @@
             "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
             "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
             "baseDirectory": "naefs/prod",
-            "enabled": false
+            "enabled": true
         },
         "naefs_ndfd_avg": {
             "lastUpdated": "",
@@ -77,7 +77,7 @@
             "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
             "baseDirectory": "naefs/prod",
-            "enabled": false
+            "enabled": true
         },
         "nam12": {
             "lastUpdated": "",
@@ -87,7 +87,7 @@
             "gribFilename": "nam.t%Hz.awphys%T.tm00.grib2",
             "gribDirectory": "/nam.%D",
             "baseDirectory": "nam/prod",
-            "enabled": false
+            "enabled": true
         },
         "nam3": {
             "lastUpdated": "",
@@ -97,7 +97,7 @@
             "gribFilename": "nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "gribDirectory": "/nam.%D",
             "baseDirectory": "nam/prod",
-            "enabled": false
+            "enabled": true
         },
         "sref_arw_ctl": {
             "lastUpdated": "",
@@ -107,7 +107,7 @@
             "gribFilename": "sref_arw.t%Hz.pgrb132.ctl.f%T.grib2",
             "gribDirectory": "/sref.%D/%H/pgrb",
             "baseDirectory": "sref/prod",
-            "enabled": false
+            "enabled": true
         },
         "sref_nmb_ctl": {
             "lastUpdated": "",
@@ -117,7 +117,7 @@
             "gribFilename": "sref_nmb.t%Hz.pgrb132.ctl.f%T.grib2",
             "gribDirectory": "/sref.%D/%H/pgrb",
             "baseDirectory": "sref/prod",
-            "enabled": false
+            "enabled": true
         }
     }
 }
