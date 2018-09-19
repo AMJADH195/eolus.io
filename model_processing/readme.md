@@ -1,3 +1,12 @@
+This script downloads a variety of weather models (if a new update is available) from NCEP NOMADS using their GRIB filter and uploads them to a Postgres, PostGIS database as rasters.
+
+The script works by reading a config JSON containing general configuration options and model-specific information.  The script checks if a newer model is available, compared to the last updated timestamp.  If so, the GRIB2 file is downloaded from NOMADS, warped to EPSG:4326 (using `gdalwarp` -- GeoTIFF format), then dumped as a SQL file (using `raster2pgsql`).  The timestamp of the model is injected into the SQL which is then executed.
+
+# Configuration
+The default config is set to download all models, **restricted to an area that encompasses the state of Colorado.**  It also connects to the eolus.io database by default (or it would, if you knew the password).
+
+These values need to be changed to be applicable to your database and geographical area.
+
 # Script Dependencies
 These dependencies are required on the machine that is running `get_models.py`.
 
