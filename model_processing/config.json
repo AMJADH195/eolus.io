@@ -51,11 +51,33 @@
         },
         "hiresw_arw": {
             "lastUpdated": "",
-            "enabled": false
+            "startTime": 0,
+            "endTime": 48,
+            "gribFilterName": "hiresconus",
+            "gribFilterFileStart": "hiresw.t",
+            "gribFilterFileMiddle": "z.arw_5km.f",
+            "gribFilterFileEnd": ".conus.grib2",
+            "gribFilterDirPrefix": "%2Fhiresw.",
+            "gribFilterDirSuffix": "",
+            "includeHourInDir": false,
+            "nomadsPrefix": "hiresw/prod/hiresw.",
+            "nomadsSuffix": "/",
+            "enabled": true
         },
         "hiresw_nmmb": {
             "lastUpdated": "",
-            "enabled": false
+            "startTime": 0,
+            "endTime": 48,
+            "gribFilterName": "hiresconus",
+            "gribFilterFileStart": "hiresw.t",
+            "gribFilterFileMiddle": "z.nmmb_5km.f",
+            "gribFilterFileEnd": ".conus.grib2",
+            "gribFilterDirPrefix": "%2Fhiresw.",
+            "gribFilterDirSuffix": "",
+            "includeHourInDir": false,
+            "nomadsPrefix": "hiresw/prod/hiresw.",
+            "nomadsSuffix": "/",
+            "enabled": true
         },
         "naefs_bc_avg": {
             "lastUpdated": "",
