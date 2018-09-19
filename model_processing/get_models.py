@@ -134,6 +134,8 @@ for modelName, model in modelsToUpdate.items():
         except:
             print "URL error.  " + url
             print "Could not get a model for this timestamp.  Moving to the next timestamp..."
+            print "---------------"
+            print ""
             continue
 
         filename = workingDir + modelName + "_" + modelDate + "_" + modelHour + "Z_f" + fmtTimestep
@@ -145,7 +147,7 @@ for modelName, model in modelsToUpdate.items():
         print ""
         print "Reprojecting and converting to GeoTIFF..."
         os.system ("gdalwarp " + filename + ".grib2 " + filename + ".tif" + " -q -t_srs EPSG:4326 -overwrite -multi --config CENTER_LONG 0 ")
-        
+        print "Filesize: " + str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."
         print ""
         print "Running raster2pgsql..."
         os.system ("raster2pgsql -a -s 4326 " + filename + ".tif" + " rasters." + modelName + " > " + filename + ".sql")
