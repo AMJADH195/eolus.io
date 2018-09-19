@@ -34,6 +34,8 @@ for modelName, model in models.items():
     now = datetime.utcnow().replace(microsecond=0,second=0,minute=0)
 
     if not model["enabled"]:
+        print "This model is disabled."
+        print "============================="
         continue
 
     lastChecked = datetime.fromtimestamp (0)
@@ -56,16 +58,15 @@ for modelName, model in models.items():
         if modelTimeTotalSeconds <= lastCheckedTotalSeconds:
             print "No new model run has been found."
 
-        timeString = modelTime.strftime ("%Y%m%d")
-        
-        if model["includeHourInDir"]:
-            timeString = modelTime.strftime ("%Y%m%d%H")
+        modelDate = modelTime.strftime ("%Y%m%d")
+        modelHour = modelTime.strftime ("%H")
+        gribFilename = model["gribFilename"].replace("%D",modelDate).replace("%H",modelHour).replace("%T",str(model["endTime"]))
 
-        print "Checking run for this datetime: " + timeString + " " + modelTime.strftime ("%H") + "Z"
+        print "Checking run for this datetime: " + modelDate + " " + modelHour + "Z"
 
-        url = (config["connectionProtocol"] + config["nomadsBaseUrl"] + model["nomadsPrefix"] +
-                timeString + model["nomadsSuffix"] + model["gribFilterFileStart"] + modelTime.strftime ("%H") +
-                model["gribFilterFileMiddle"] + str(model["endTime"]) + model["gribFilterFileEnd"])
+        fullDirectory = model["baseDirectory"] + model["gribDirectory"].replace("%D", modelDate).replace("%H", modelHour)
+
+        url = config["connectionProtocol"] + config["nomadsBaseUrl"] + fullDirectory + "/" + gribFilename
 
         print "Checking URL: " + url
 
@@ -108,23 +109,22 @@ for modelName, model in modelsToUpdate.items():
     modelHour = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%H")
     modelDate = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%Y%m%d")
 
-    modelDirHour = ""
-    if model["includeHourInDir"]:
-        modelDirHour = modelHour
-
     for modelTimestep in range (model["startTime"], model["endTime"]+1):
 
         fmtTimestep = str(modelTimestep).rjust (len(str(model["endTime"])), '0')
+
+        gribFilterFilename = model["gribFilename"].replace("%D",modelDate).replace("%H",modelHour).replace("%T",fmtTimestep)
+        gribDirectory = model["gribDirectory"].replace("%D",modelDate).replace("%H",modelHour).replace("%T",fmtTimestep)
+
         # download every grib file from NOMADS grib filter
         url = (config["connectionProtocol"] + config["gribFilterBaseUrl"] + model["gribFilterName"] +
-            config["gribFilterExtension"] + "file=" + model["gribFilterFileStart"] + modelHour +
-            model["gribFilterFileMiddle"] + fmtTimestep + model["gribFilterFileEnd"] +
+            config["gribFilterExtension"] + "file=" + gribFilterFilename +
             config["gribFilterParams"] + 
             "&leftlon=" + config["bounds"]["left"] +
             "&rightlon=" + config["bounds"]["right"] +
             "&toplat=" + config["bounds"]["top"] +
             "&bottomlat=" + config["bounds"]["bottom"] +
-            "&dir=" + model["gribFilterDirPrefix"] + modelDate + modelDirHour + model["gribFilterDirSuffix"])
+            "&dir=" + gribDirectory)
 
         print "---------------"
         print "Downloading grib file for timestep " + fmtTimestep + "..."

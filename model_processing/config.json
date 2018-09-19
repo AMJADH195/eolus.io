@@ -24,14 +24,9 @@
             "startTime": 1,
             "endTime": 36,
             "gribFilterName": "hrefconus",
-            "gribFilterFileStart": "href.t",
-            "gribFilterFileMiddle": "z.conus.mean.f",
-            "gribFilterFileEnd": ".grib2",
-            "gribFilterDirPrefix": "%2Fhref.",
-            "gribFilterDirSuffix": "%2Fensprod",
-            "nomadsPrefix": "hiresw/prod/href.",
-            "nomadsSuffix": "/ensprod/",
-            "includeHourInDir": false,
+            "gribFilename": "href.t%Hz.conus.mean.f%T.grib2",
+            "gribDirectory": "/href.%D/ensprod",
+            "baseDirectory": "hiresw/prod",
             "enabled": false
         },
         "gfs": {
@@ -39,14 +34,9 @@
             "startTime": 0,
             "endTime": 384,
             "gribFilterName": "gfs_0p25_1hr",
-            "gribFilterFileStart": "gfs.t",
-            "gribFilterFileMiddle": "z.pgrb2.0p25.f",
-            "gribFilterFileEnd": "",
-            "gribFilterDirPrefix": "%2Fgfs.",
-            "gribFilterDirSuffix": "",
-            "nomadsPrefix": "gfs/prod/gfs.",
-            "nomadsSuffix": "/",
-            "includeHourInDir": true,
+            "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
+            "gribDirectory": "/gfs.%D%H",
+            "baseDirectory": "gfs/prod",
             "enabled": false
         },
         "hiresw_arw": {
@@ -54,33 +44,27 @@
             "startTime": 0,
             "endTime": 48,
             "gribFilterName": "hiresconus",
-            "gribFilterFileStart": "hiresw.t",
-            "gribFilterFileMiddle": "z.arw_5km.f",
-            "gribFilterFileEnd": ".conus.grib2",
-            "gribFilterDirPrefix": "%2Fhiresw.",
-            "gribFilterDirSuffix": "",
-            "includeHourInDir": false,
-            "nomadsPrefix": "hiresw/prod/hiresw.",
-            "nomadsSuffix": "/",
-            "enabled": true
+            "gribFilename": "hiresw.t%Hz.arw_5km.f%T.conus.grib2",
+            "gribDirectory": "/hiresw.%D",
+            "baseDirectory": "hiresw/prod",
+            "enabled": false
         },
         "hiresw_nmmb": {
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 48,
             "gribFilterName": "hiresconus",
-            "gribFilterFileStart": "hiresw.t",
-            "gribFilterFileMiddle": "z.nmmb_5km.f",
-            "gribFilterFileEnd": ".conus.grib2",
-            "gribFilterDirPrefix": "%2Fhiresw.",
-            "gribFilterDirSuffix": "",
-            "includeHourInDir": false,
-            "nomadsPrefix": "hiresw/prod/hiresw.",
-            "nomadsSuffix": "/",
-            "enabled": true
+            "gribFilename": "hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
+            "gribDirectory": "/hiresw.%D",
+            "baseDirectory": "hiresw/prod",
+            "enabled": false
         },
         "naefs_bc_avg": {
             "lastUpdated": "",
+            "startTime": 3,
+            "endTime": 384,
+            "gribFilterName": "naefsbc",
+            "gribFilterFileStart": "",
             "enabled": false
         },
         "naefs_ndfd_avg": {
@@ -89,6 +73,12 @@
         },
         "nam12": {
             "lastUpdated": "",
+            "startTime": 0,
+            "endTime": 84,
+            "gribFilterName": "nam",
+            "gribFilename": "nam.t%Hz.awphys%T.tm00.grib2",
+            "gribDirectory": "/nam.%D",
+            "baseDirectory": "nam/prod",
             "enabled": false
         },
         "nam3": {
