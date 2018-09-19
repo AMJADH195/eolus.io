@@ -64,7 +64,9 @@
             "startTime": 3,
             "endTime": 384,
             "gribFilterName": "naefsbc",
-            "gribFilterFileStart": "",
+            "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
+            "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
+            "baseDirectory": "naefs/prod",
             "enabled": false
         },
         "naefs_ndfd_avg": {
