@@ -71,7 +71,13 @@
         },
         "naefs_ndfd_avg": {
             "lastUpdated": "",
-            "enabled": false
+            "startTime": 3,
+            "endTime": 384,
+            "gribFilterName": "naefsbc_ndgd",
+            "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
+            "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
+            "baseDirectory": "naefs/prod",
+            "enabled": true
         },
         "nam12": {
             "lastUpdated": "",
