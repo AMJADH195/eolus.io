@@ -21,6 +21,7 @@ config = data["config"]
 models = data["models"]
 
 modelsToUpdate = {}
+totalEnabledModels = 0
 
 # First, for each model, check the latest model run that exists on NCEP
 # against the last model run that was retrieved.
@@ -39,6 +40,7 @@ for modelName, model in models.items():
         continue
 
     lastChecked = datetime.fromtimestamp (0)
+    totalEnabledModels += 1
 
     if model["lastUpdated"] != "":
         lastChecked = datetime.utcfromtimestamp(model["lastUpdated"])
@@ -90,7 +92,7 @@ for modelName, model in models.items():
 print ""
 print ""
 print "All models have been checked for updates."
-print "Number of models needing updates: " + str(len(modelsToUpdate.items()))
+print "Number of models needing updates: " + str(len(modelsToUpdate.items())) + "/" + str(totalEnabledModels)
 print ""
 print ""
 # Parse the list of models needing updates
@@ -127,7 +129,7 @@ for modelName, model in modelsToUpdate.items():
             "&dir=" + gribDirectory)
 
         print "---------------"
-        print "Downloading grib file for timestep " + fmtTimestep + "..."
+        print "Downloading grib file for timestep " + fmtTimestep + "/" + str(model["endTime"]) + "..."
 
         try:
             gribFile = urllib2.urlopen (url)
