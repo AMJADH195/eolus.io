@@ -77,7 +77,7 @@
             "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
             "baseDirectory": "naefs/prod",
-            "enabled": true
+            "enabled": false
         },
         "nam12": {
             "lastUpdated": "",
@@ -99,12 +99,24 @@
             "baseDirectory": "nam/prod",
             "enabled": false
         },
-        "sref_arw": {
+        "sref_arw_ctl": {
             "lastUpdated": "",
+            "startTime": 0,
+            "endTime": 87,
+            "gribFilterName": "sref_132",
+            "gribFilename": "sref_arw.t%Hz.pgrb132.ctl.f%T.grib2",
+            "gribDirectory": "/sref.%D/%H/pgrb",
+            "baseDirectory": "sref/prod",
             "enabled": false
         },
-        "sref_nmb": {
+        "sref_nmb_ctl": {
             "lastUpdated": "",
+            "startTime": 0,
+            "endTime": 87,
+            "gribFilterName": "sref_132",
+            "gribFilename": "sref_nmb.t%Hz.pgrb132.ctl.f%T.grib2",
+            "gribDirectory": "/sref.%D/%H/pgrb",
+            "baseDirectory": "sref/prod",
             "enabled": false
         }
     }
