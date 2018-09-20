@@ -8,14 +8,16 @@ import time
 import pprint
 import urllib2
 
-if os.path.exists(".get_models_lockfile"):
+directory = os.path.dirname(os.path.realpath(__file__)) + "/"
+
+if os.path.exists(directory + "/.get_models_lockfile"):
     print "Lock file exists, exiting."
     sys.exit(0)
 
-with open ('config.json') as f:
+with open (directory + '/config.json') as f:
     data = json.load(f)
 
-open ('.get_models_lockfile', 'a').close()
+open (directory + '/.get_models_lockfile', 'a').close()
 
 config = data["config"]
 models = data["models"]
@@ -104,7 +106,7 @@ for modelName, model in modelsToUpdate.items():
     print "---------------"
     print ""
 
-    workingDir = config["tempDir"] + modelName + "/"
+    workingDir = directory + "/" + config["tempDir"] + modelName + "/"
     if not os.path.exists(workingDir):
         os.makedirs(workingDir)
 
@@ -202,9 +204,9 @@ for modelName, model in modelsToUpdate.items():
 print ""
 print ""
 # Re-save the config json
-with open ('config.json', 'w') as f:
+with open (directory + '/config.json', 'w') as f:
     json.dump (data, f)
 print "Config rewritten."
 
-os.remove ('.get_models_lockfile')
+os.remove (directory + '/.get_models_lockfile')
 print "Lock file removed."
