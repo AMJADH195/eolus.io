@@ -69,7 +69,7 @@
             "baseDirectory": "naefs/prod",
             "enabled": true
         },
-        "naefs_ndfd_avg": {
+        "naefs_ndgd_avg": {
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 384,
