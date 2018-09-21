@@ -61,6 +61,7 @@ for modelName, model in models.items():
 
         if modelTimeTotalSeconds <= lastCheckedTotalSeconds:
             print "No new model run has been found."
+            break
 
         modelDate = modelTime.strftime ("%Y%m%d")
         modelHour = modelTime.strftime ("%H")
@@ -80,12 +81,12 @@ for modelName, model in models.items():
             if ret.code == 200:
                 print " *** New model run found. ***"
                 modelsToUpdate[modelName] = model
+                model["lastUpdated"] = modelTimeTotalSeconds
                 break
 
         except:
             print "Not found."
 
-    model["lastUpdated"] = modelTimeTotalSeconds
     print "Last updated is now " + str(model["lastUpdated"])
 
     print "============================="
