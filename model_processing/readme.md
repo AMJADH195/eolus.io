@@ -41,3 +41,17 @@ CREATE RULE <MODELNAME>_Upsert AS ON INSERT TO <MODELNAME>
 The script creates a lockfile.  This allows the script to be scheduled to run many times per hour without duplicating efforts.
 
 Currently, this file does not get removed if the script crashes for some reason.  You may need to `rm .get_models_lockfile` if this occurs.
+
+# Sample Query
+'''
+WITH pt AS (SELECT ST_SetSRID(ST_Point(-105,39.7392),4326) geom)
+	SELECT
+		wxmodel.timestamp,
+		ST_NearestValue (wxmodel.rast, 1, geom) as dunno,
+		ST_NearestValue (wxmodel.rast, 2, geom) as dunno2,
+		ST_NearestValue (wxmodel.rast, 3, geom) as dunno3,
+		ST_NearestValue (wxmodel.rast, 4, geom) as dunno4
+	FROM pt p
+		LEFT JOIN rasters.gfs wxmodel ON (ST_Intersects(p.geom, wxmodel.rast))
+	WHERE wxmodel.timestamp >= now()
+'''
