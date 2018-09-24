@@ -17,6 +17,12 @@ if os.path.exists(directory + "/.get_models_lockfile"):
 with open (directory + '/config.json') as f:
     data = json.load(f)
 
+def write_to_log (message):
+    global config
+    with open (directory + "/" + config["logFile"], 'a+') as f:
+        timewrite = datetime.replace(microsecond=0).strftime ("%Y-%m-%d %H:%M:%S")
+        f.write ("[" + timewrite + "] " + message)
+
 open (directory + '/.get_models_lockfile', 'a').close()
 
 config = data["config"]
@@ -25,14 +31,17 @@ models = data["models"]
 modelsToUpdate = {}
 totalEnabledModels = 0
 
+write_to_log ("=======================")
+write_to_log ("Model processing start.")
+write_to_log ("-----------------------")
+
 # First, for each model, check the latest model run that exists on NCEP
 # against the last model run that was retrieved.
 for modelName, model in models.items():
-    
     print ""
     print "============================="
     print "Checking " + modelName + "..."
-
+    write_to_log ("")
     # model run format on NCEP is YYYYMMDDHH
     now = datetime.utcnow().replace(microsecond=0,second=0,minute=0)
 
@@ -61,6 +70,7 @@ for modelName, model in models.items():
 
         if modelTimeTotalSeconds <= lastCheckedTotalSeconds:
             print "No new model run has been found."
+            write_to_log ("Not updating " + modelName)
             break
 
         modelDate = modelTime.strftime ("%Y%m%d")
@@ -80,6 +90,7 @@ for modelName, model in models.items():
 
             if ret.code == 200:
                 print " *** New model run found. ***"
+                write_to_log ("Updating " + modelName + "... " + modelDate + modelHour + "Z")
                 modelsToUpdate[modelName] = model
                 model["lastUpdated"] = modelTimeTotalSeconds
                 break
@@ -151,7 +162,8 @@ for modelName, model in modelsToUpdate.items():
         print "Downloaded."
         print ""
         print "Reprojecting and converting to GeoTIFF..."
-        os.system ("gdalwarp " + filename + ".grib2 " + filename + ".tif" + " -q -t_srs EPSG:4326 -overwrite -multi --config CENTER_LONG 0 ")
+        os.system ("gdalwarp " + filename + ".grib2 " + filename + ".vrt -q -t_srs EPSG:4326 -multi --config CENTER_LONG 0")
+        os.system ("gdal_translate -co compress=lzw " + filename + ".vrt " + filename + ".tif")
         print "Filesize: " + str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."
         print ""
         print "Running raster2pgsql..."
@@ -201,6 +213,7 @@ for modelName, model in modelsToUpdate.items():
     print "Done."
     print "============================="
     print ""
+    write_to_log ("Finished updating " + modelName)
 
 print ""
 print ""
@@ -211,3 +224,6 @@ print "Config rewritten."
 
 os.remove (directory + '/.get_models_lockfile')
 print "Lock file removed."
+
+write_to_log ("Model processing complete.")
+write_to_log ("=======================\n")

@@ -2,8 +2,8 @@
     "config": {
         "tempDir": "./tempWxData/",
         "bounds": {
-            "left": "249",
-            "right": "259",
+            "left": "251.5",
+            "right": "255.5",
             "top": "41",
             "bottom": "36"
         },
@@ -12,6 +12,7 @@
             "db": "weather_models",
             "user": "eolus@wxdata"
         },
+        "logFile": "model_update.log",
         "connectionProtocol": "http://",
         "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/",
         "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
