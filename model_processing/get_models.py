@@ -21,7 +21,7 @@ def write_to_log (message):
     global config
     with open (directory + "/" + config["logFile"], 'a+') as f:
         timewrite = datetime.now().replace(microsecond=0).strftime ("%Y-%m-%d %H:%M:%S")
-        f.write ("[" + timewrite + "] " + message)
+        f.write ("[" + timewrite + "] " + message + "\n")
 
 open (directory + '/.get_models_lockfile', 'a').close()
 
