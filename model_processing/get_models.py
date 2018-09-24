@@ -41,7 +41,6 @@ for modelName, model in models.items():
     print ""
     print "============================="
     print "Checking " + modelName + "..."
-    write_to_log ("")
     # model run format on NCEP is YYYYMMDDHH
     now = datetime.utcnow().replace(microsecond=0,second=0,minute=0)
 
