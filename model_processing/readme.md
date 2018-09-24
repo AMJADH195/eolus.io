@@ -54,4 +54,6 @@ WITH pt AS (SELECT ST_SetSRID(ST_Point(-105,39.7392),4326) geom)
 	FROM pt p
 		LEFT JOIN rasters.gfs wxmodel ON (ST_Intersects(p.geom, wxmodel.rast))
 	WHERE wxmodel.timestamp >= now()
+	ORDER BY wxmodel.timestamp
+	LIMIT 120
 ```
