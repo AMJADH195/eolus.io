@@ -20,7 +20,7 @@ with open (directory + '/config.json') as f:
 def write_to_log (message):
     global config
     with open (directory + "/" + config["logFile"], 'a+') as f:
-        timewrite = datetime.replace(microsecond=0).strftime ("%Y-%m-%d %H:%M:%S")
+        timewrite = datetime.now().replace(microsecond=0).strftime ("%Y-%m-%d %H:%M:%S")
         f.write ("[" + timewrite + "] " + message)
 
 open (directory + '/.get_models_lockfile', 'a').close()
