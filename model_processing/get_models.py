@@ -63,7 +63,6 @@ for modelName, model in models.items():
     # Look up to 24 hours back in time
     for hourSubtract in range (0, 25):
         modelTime = now-timedelta(hours=hourSubtract)
-
         modelTimeTotalSeconds = time.mktime(modelTime.timetuple())
         lastCheckedTotalSeconds = time.mktime(lastChecked.timetuple())
 
@@ -77,9 +76,7 @@ for modelName, model in models.items():
         gribFilename = model["gribFilename"].replace("%D",modelDate).replace("%H",modelHour).replace("%T",str(model["endTime"]))
 
         print "Checking run for this datetime: " + modelDate + " " + modelHour + "Z"
-
         fullDirectory = model["baseDirectory"] + model["gribDirectory"].replace("%D", modelDate).replace("%H", modelHour)
-
         url = config["connectionProtocol"] + config["nomadsBaseUrl"] + fullDirectory + "/" + gribFilename
 
         print "Checking URL: " + url
@@ -102,7 +99,6 @@ for modelName, model in models.items():
         time.sleep (config["sleepTime"])
 
     print "Last updated is now " + str(model["lastUpdated"])
-
     print "============================="
     print ""
 
@@ -214,7 +210,6 @@ for modelName, model in modelsToUpdate.items():
         print ""
 
         print "Loading into database..."
-
         os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
 
         print ""
@@ -230,8 +225,6 @@ for modelName, model in modelsToUpdate.items():
 
         print ""
         print "Tasks complete, moving to next model timestep."
-
-
         print "---------------"
         print ""
 
@@ -240,8 +233,7 @@ for modelName, model in modelsToUpdate.items():
     print ""
     modelRun = datetime.fromtimestamp(model["lastUpdated"]).strftime ("%Y-%m-%d %H:00:00+00")
     finishTime = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
-    os.system ("psql -h " +
-write_to_log ("Model processing complete.") config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
+    os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
     write_to_log ("Finished updating " + modelName)
 
 print ""
@@ -250,7 +242,6 @@ print ""
 with open (directory + '/config.json', 'w') as f:
     json.dump (data, f)
 print "Config rewritten."
-write_to_log ("=======================\n")
 
 os.remove (directory + '/.get_models_lockfile')
 print "Lock file removed."
