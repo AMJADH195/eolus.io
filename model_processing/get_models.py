@@ -225,8 +225,7 @@ for modelName, model in modelsToUpdate.items():
             try:
                 if os.path.isfile(filePath):
                     os.unlink(filePath)
-            except 
-write_to_log ("Model processing complete.")Exception as e:
+            except Exception as e:
                 print(e)
 
         print ""
