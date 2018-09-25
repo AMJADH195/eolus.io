@@ -239,7 +239,7 @@ for modelName, model in modelsToUpdate.items():
     print "============================="
     print ""
     modelRun = datetime.fromtimestamp(model["lastUpdated"]).strftime ("%Y-%m-%d %H:00:00+00")
-    finishTime = datetime.utcnow().strftime ("%Y-%m-%d %H:00:00+00")
+    finishTime = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
     os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
     write_to_log ("Finished updating " + modelName)
 
