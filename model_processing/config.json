@@ -18,7 +18,7 @@
         "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
         "gribFilterExtension": ".pl?",
         "gribFilterParams": "&subregion=",
-        "sleepTime": 2
+        "sleepTime": 1
     },
     "models": {
         "href_mean": {
