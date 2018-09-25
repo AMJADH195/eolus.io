@@ -17,7 +17,7 @@
         "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/",
         "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
         "gribFilterExtension": ".pl?",
-        "gribFilterParams": "&all_lev=on&all_var=on&subregion="
+        "gribFilterParams": "&subregion="
     },
     "models": {
         "href_mean": {
@@ -33,7 +33,7 @@
         "gfs": {
             "lastUpdated": "",
             "startTime": 0,
-            "endTime": 384,
+            "endTime": 192,
             "gribFilterName": "gfs_0p25_1hr",
             "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
             "gribDirectory": "/gfs.%D%H",
@@ -63,7 +63,7 @@
         "naefs_bc_avg": {
             "lastUpdated": "",
             "startTime": 3,
-            "endTime": 384,
+            "endTime": 192,
             "gribFilterName": "naefsbc",
             "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
             "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
@@ -73,7 +73,7 @@
         "naefs_ndgd_avg": {
             "lastUpdated": "",
             "startTime": 3,
-            "endTime": 384,
+            "endTime": 192,
             "gribFilterName": "naefsbc_ndgd",
             "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
@@ -98,6 +98,33 @@
             "gribFilename": "nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "gribDirectory": "/nam.%D",
             "baseDirectory": "nam/prod",
+            "variables": [
+                "PRES",
+                "REFD", "REFC",
+                "RH", "PWAT",
+                "UGRD", "VGRD", "GUST",
+                "VIS", "TCDC",
+                "MSTAV",
+                "SNOWC", "SNOM", "WEASD", "SNOD",
+                "CPOFP",
+                "PRATE", "APCP",
+                "CSNOW", "CICEP", "CRAIN", "CFRZR",
+                "LFTX", "CAPE", "CIN", "4LFTX", 
+                "TMP", "DPT",
+                "LTNG"
+            ],
+            "levels": [
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "1 hybrid level",
+                "2 hybrid level",
+                "10 m above ground",
+                "80 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "max wind",
+                "surface"
+            ],
             "enabled": true
         },
         "sref_arw_ctl": {

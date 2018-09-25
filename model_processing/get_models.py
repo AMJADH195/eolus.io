@@ -131,10 +131,27 @@ for modelName, model in modelsToUpdate.items():
         gribFilterFilename = model["gribFilename"].replace("%D",modelDate).replace("%H",modelHour).replace("%T",fmtTimestep)
         gribDirectory = model["gribDirectory"].replace("%D",modelDate).replace("%H",modelHour).replace("%T",fmtTimestep)
 
+        extraParams = ""
+
+        if "variables" in model:
+            for variable in model["variables"]:
+                extraParams += "&var_" + variable + "=on"
+        else:
+            extraParams += "&all_var=on"
+            
+        if "levels" in model:
+            for level in model["levels"]:
+                levelName = level.replace (" ", "_")
+                extraParams += "&lev_" + levelName + "=on"
+        else:
+            extraParams += "&all_lev=on"
+
+
         # download every grib file from NOMADS grib filter
         url = (config["connectionProtocol"] + config["gribFilterBaseUrl"] + model["gribFilterName"] +
             config["gribFilterExtension"] + "file=" + gribFilterFilename +
             config["gribFilterParams"] + 
+            extraParams +
             "&leftlon=" + config["bounds"]["left"] +
             "&rightlon=" + config["bounds"]["right"] +
             "&toplat=" + config["bounds"]["top"] +
