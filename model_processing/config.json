@@ -17,10 +17,12 @@
         "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/",
         "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
         "gribFilterExtension": ".pl?",
-        "gribFilterParams": "&subregion="
+        "gribFilterParams": "&subregion=",
+        "sleepTime": 2
     },
     "models": {
         "href_mean": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -28,19 +30,105 @@
             "gribFilename": "href.t%Hz.conus.mean.f%T.grib2",
             "gribDirectory": "/href.%D/ensprod",
             "baseDirectory": "hiresw/prod",
-            "enabled": true
+            "variables": [
+                "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
+                "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
+                "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
+            ],
+            "levels": [
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "10 m above ground",
+                "80 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
+        },
+        "href_pmmn": {
+            "enabled": true,
+            "lastUpdated": "",
+            "startTime": 1,
+            "endTime": 36,
+            "gribFilterName": "hrefconus",
+            "gribFilename": "href.t%Hz.conus.pmmn.f%T.grib2",
+            "gribDirectory": "/href.%D/ensprod",
+            "baseDirectory": "hiresw/prod",
+            "variables": [
+                "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
+                "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
+                "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
+            ],
+            "levels": [
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "10 m above ground",
+                "80 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
+        },
+        "href_avrg": {
+            "enabled": true,
+            "lastUpdated": "",
+            "startTime": 1,
+            "endTime": 36,
+            "gribFilterName": "hrefconus",
+            "gribFilename": "href.t%Hz.conus.avrg.f%T.grib2",
+            "gribDirectory": "/href.%D/ensprod",
+            "baseDirectory": "hiresw/prod",
+            "variables": [
+                "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
+                "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
+                "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
+            ],
+            "levels": [
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "10 m above ground",
+                "80 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
+        },
+        "href_sprd": {
+            "enabled": true,
+            "lastUpdated": "",
+            "startTime": 1,
+            "endTime": 36,
+            "gribFilterName": "hrefconus",
+            "gribFilename": "href.t%Hz.conus.sprd.f%T.grib2",
+            "gribDirectory": "/href.%D/ensprod",
+            "baseDirectory": "hiresw/prod",
+            "variables": [
+                "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
+                "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
+                "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
+            ],
+            "levels": [
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "10 m above ground",
+                "80 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
         },
         "gfs": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 192,
             "gribFilterName": "gfs_0p25_1hr",
             "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
             "gribDirectory": "/gfs.%D%H",
-            "baseDirectory": "gfs/prod",
-            "enabled": true
+            "baseDirectory": "gfs/prod"
         },
         "hiresw_arw": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 48,
@@ -48,9 +136,27 @@
             "gribFilename": "hiresw.t%Hz.arw_5km.f%T.conus.grib2",
             "gribDirectory": "/hiresw.%D",
             "baseDirectory": "hiresw/prod",
-            "enabled": true
+            "variables": [
+                "4LFTX", "CAPE", "CIN", "LFTX",
+                "APCP", "CFRZR", "CICEP", "CRAIN", "CSNOW",
+                "REFC", "REFD",
+                "DPT", "TMP", "RH", "PWAT", "PRES",
+                "GUST", "UGRD", "VGRD",
+                "WEASD", "TCDC", "VIS"
+            ],
+            "levels": [
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "1 hybrid level",
+                "10 m above ground",
+                "80 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
         },
         "hiresw_nmmb": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 48,
@@ -58,39 +164,77 @@
             "gribFilename": "hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
             "gribDirectory": "/hiresw.%D",
             "baseDirectory": "hiresw/prod",
-            "enabled": true
+            "variables": [
+                "4LFTX", "CAPE", "CIN", "LFTX",
+                "APCP", "CFRZR", "CICEP", "CRAIN", "CSNOW",
+                "REFC", "REFD",
+                "DPT", "TMP", "RH", "PWAT", "PRES",
+                "GUST", "UGRD", "VGRD",
+                "WEASD", "TCDC", "VIS"
+            ],
+            "levels": [
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "1 hybrid level",
+                "10 m above ground",
+                "80 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
         },
         "naefs_bc_avg": {
+            "enabled": true,
+            "lastUpdated": "",
+            "startTime": 3,
+            "endTime": 192,
+            "gribFilterName": "naefsbc",
+            "gribFilename": "naefs_gespr.t%Hz.pgrb2a.0p50_bcf%T",
+            "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
+            "baseDirectory": "naefs/prod"
+        },
+        "naefs_bc_spr": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc",
             "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
             "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
-            "baseDirectory": "naefs/prod",
-            "enabled": true
+            "baseDirectory": "naefs/prod"
         },
         "naefs_ndgd_avg": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc_ndgd",
             "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
-            "baseDirectory": "naefs/prod",
-            "enabled": true
+            "baseDirectory": "naefs/prod"
+        },
+        "naefs_ndgd_spr": {
+            "enabled": true,
+            "lastUpdated": "",
+            "startTime": 3,
+            "endTime": 192,
+            "gribFilterName": "naefsbc_ndgd",
+            "gribFilename": "naefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
+            "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
+            "baseDirectory": "naefs/prod"
         },
         "nam12": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 84,
             "gribFilterName": "nam",
             "gribFilename": "nam.t%Hz.awphys%T.tm00.grib2",
             "gribDirectory": "/nam.%D",
-            "baseDirectory": "nam/prod",
-            "enabled": true
+            "baseDirectory": "nam/prod"
         },
         "nam3": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 60,
@@ -124,10 +268,10 @@
                 "entire atmosphere (considered as a single layer)",
                 "max wind",
                 "surface"
-            ],
-            "enabled": true
+            ]
         },
         "sref_arw_ctl": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 87,
@@ -135,9 +279,26 @@
             "gribFilename": "sref_arw.t%Hz.pgrb132.ctl.f%T.grib2",
             "gribDirectory": "/sref.%D/%H/pgrb",
             "baseDirectory": "sref/prod",
-            "enabled": true
+            "variables":[
+                "4LFTX", "ACPCP", "APCP", "CAPE",
+                "CFRZR", "CICE", "CICEP", "CIN", "CRAIN",
+                "CSNOW", "DPT", "ICEC", "LFTX",
+                "NCPCP", "PRATE", "PWAT", "REFC", "RETOP",
+                "RH", "SNOM", "SNOWC", "SNOWD", "TCDC", "TMP",
+                "UGRD", "VGRD", "VIS", "WEASD"
+            ],
+            "levels":[
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "1 hybrid level",
+                "10 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
         },
         "sref_nmb_ctl": {
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 87,
@@ -145,7 +306,23 @@
             "gribFilename": "sref_nmb.t%Hz.pgrb132.ctl.f%T.grib2",
             "gribDirectory": "/sref.%D/%H/pgrb",
             "baseDirectory": "sref/prod",
-            "enabled": true
+            "variables":[
+                "4LFTX", "ACPCP", "APCP", "CAPE",
+                "CFRZR", "CICE", "CICEP", "CIN", "CRAIN",
+                "CSNOW", "DPT", "ICEC", "LFTX",
+                "NCPCP", "PRATE", "PWAT", "REFC", "RETOP",
+                "RH", "SNOM", "SNOWC", "SNOWD", "TCDC", "TMP",
+                "UGRD", "VGRD", "VIS", "WEASD"
+            ],
+            "levels":[
+                "0-0.1 m below ground",
+                "2 m above ground",
+                "1 hybrid level",
+                "10 m above ground",
+                "cloud base",
+                "entire atmosphere (considered as a single layer)",
+                "surface"
+            ]
         }
     }
 }

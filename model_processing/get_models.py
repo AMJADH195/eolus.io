@@ -69,7 +69,7 @@ for modelName, model in models.items():
 
         if modelTimeTotalSeconds <= lastCheckedTotalSeconds:
             print "No new model run has been found."
-            write_to_log ("Not updating " + modelName)
+            write_to_log (modelName + ": No new run found.")
             break
 
         modelDate = modelTime.strftime ("%Y%m%d")
@@ -89,7 +89,7 @@ for modelName, model in models.items():
 
             if ret.code == 200:
                 print " *** New model run found. ***"
-                write_to_log ("Updating " + modelName + "... " + modelDate + modelHour + "Z")
+                write_to_log (modelName + ": New run found (" + modelDate + modelHour + "Z)")
                 modelsToUpdate[modelName] = model
                 model["lastUpdated"] = modelTimeTotalSeconds
                 break
@@ -99,7 +99,7 @@ for modelName, model in models.items():
 
         # Wait a bit between polling server,
         # per NCEP's usage guidelines.
-        time.sleep (5)
+        time.sleep (config["sleepTime"])
 
     print "Last updated is now " + str(model["lastUpdated"])
 
@@ -127,6 +127,8 @@ for modelName, model in modelsToUpdate.items():
 
     modelHour = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%H")
     modelDate = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%Y%m%d")
+
+    write_to_log ("Starting update for " + modelName)
 
     for modelTimestep in range (model["startTime"], model["endTime"]+1):
 
@@ -174,7 +176,7 @@ for modelName, model in modelsToUpdate.items():
             print ""
             # Wait a bit between polling server,
             # per NCEP's usage guidelines.
-            time.sleep (5)
+            time.sleep (config["sleepTime"])
             continue
  
         filename = workingDir + modelName + "_" + modelDate + "_" + modelHour + "Z_f" + fmtTimestep
@@ -236,6 +238,9 @@ for modelName, model in modelsToUpdate.items():
     print "Done."
     print "============================="
     print ""
+    modelRun = datetime.fromtimestamp(model["lastUpdated"]).strftime ("%Y-%m-%d %H:00:00+00")
+    finishTime = datetime.utcnow().strftime ("%Y-%m-%d %H:00:00+00")
+    os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
     write_to_log ("Finished updating " + modelName)
 
 print ""
