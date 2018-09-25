@@ -97,6 +97,10 @@ for modelName, model in models.items():
         except:
             print "Not found."
 
+        # Wait a bit between polling server,
+        # per NCEP's usage guidelines.
+        time.sleep (5)
+
     print "Last updated is now " + str(model["lastUpdated"])
 
     print "============================="
@@ -168,8 +172,11 @@ for modelName, model in modelsToUpdate.items():
             print "Could not get a model for this timestamp.  Moving to the next timestamp..."
             print "---------------"
             print ""
+            # Wait a bit between polling server,
+            # per NCEP's usage guidelines.
+            time.sleep (5)
             continue
-
+ 
         filename = workingDir + modelName + "_" + modelDate + "_" + modelHour + "Z_f" + fmtTimestep
 
         with open (filename + ".grib2", 'wb') as outfile:
