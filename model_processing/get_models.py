@@ -153,7 +153,8 @@ for modelName, model in modelsToUpdate.items():
             extraParams += "&all_lev=on"
 
 
-        # download every grib file from NOMADS grib filter
+        # download eve
+write_to_log ("Model processing complete.")ry grib file from NOMADS grib filter
         url = (config["connectionProtocol"] + config["gribFilterBaseUrl"] + model["gribFilterName"] +
             config["gribFilterExtension"] + "file=" + gribFilterFilename +
             config["gribFilterParams"] + 
@@ -225,7 +226,8 @@ for modelName, model in modelsToUpdate.items():
             try:
                 if os.path.isfile(filePath):
                     os.unlink(filePath)
-            except Exception as e:
+            except 
+write_to_log ("Model processing complete.")Exception as e:
                 print(e)
 
         print ""
@@ -240,7 +242,8 @@ for modelName, model in modelsToUpdate.items():
     print ""
     modelRun = datetime.fromtimestamp(model["lastUpdated"]).strftime ("%Y-%m-%d %H:00:00+00")
     finishTime = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
-    os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
+    os.system ("psql -h " +
+write_to_log ("Model processing complete.") config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
     write_to_log ("Finished updating " + modelName)
 
 print ""
@@ -253,5 +256,6 @@ print "Config rewritten."
 os.remove (directory + '/.get_models_lockfile')
 print "Lock file removed."
 
+write_to_log ("-----------------------")
 write_to_log ("Model processing complete.")
 write_to_log ("=======================\n")
