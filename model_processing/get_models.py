@@ -153,8 +153,7 @@ for modelName, model in modelsToUpdate.items():
             extraParams += "&all_lev=on"
 
 
-        # download eve
-write_to_log ("Model processing complete.")ry grib file from NOMADS grib filter
+        # download every grib file from NOMADS grib filter
         url = (config["connectionProtocol"] + config["gribFilterBaseUrl"] + model["gribFilterName"] +
             config["gribFilterExtension"] + "file=" + gribFilterFilename +
             config["gribFilterParams"] + 
@@ -252,6 +251,7 @@ print ""
 with open (directory + '/config.json', 'w') as f:
     json.dump (data, f)
 print "Config rewritten."
+write_to_log ("=======================\n")
 
 os.remove (directory + '/.get_models_lockfile')
 print "Lock file removed."
