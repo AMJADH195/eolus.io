@@ -13,16 +13,21 @@
             "user": "eolus@wxdata"
         },
         "logFile": "model_update.log",
-        "connectionProtocol": "http://",
-        "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/",
-        "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
-        "gribFilterExtension": ".pl?",
-        "gribFilterParams": "&subregion=",
+        "downloadTypes": {
+            "GRIBFILTER": {
+                "connectionProtocol": "http://",
+                "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/",
+                "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
+                "gribFilterExtension": ".pl?",
+                "gribFilterParams": "&subregion="
+            }
+        },
         "sleepTime": 1
     },
     "models": {
         "href_mean": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -30,6 +35,7 @@
             "gribFilename": "href.t%Hz.conus.mean.f%T.grib2",
             "gribDirectory": "/href.%D/ensprod",
             "baseDirectory": "hiresw/prod",
+            "filetype": "grib2",
             "variables": [
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
@@ -46,7 +52,8 @@
             ]
         },
         "href_pmmn": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled":false,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -54,6 +61,7 @@
             "gribFilename": "href.t%Hz.conus.pmmn.f%T.grib2",
             "gribDirectory": "/href.%D/ensprod",
             "baseDirectory": "hiresw/prod",
+            "filetype": "grib2",
             "variables": [
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
@@ -70,7 +78,8 @@
             ]
         },
         "href_avrg": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -78,6 +87,7 @@
             "gribFilename": "href.t%Hz.conus.avrg.f%T.grib2",
             "gribDirectory": "/href.%D/ensprod",
             "baseDirectory": "hiresw/prod",
+            "filetype": "grib2",
             "variables": [
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
@@ -94,7 +104,8 @@
             ]
         },
         "href_sprd": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -102,6 +113,7 @@
             "gribFilename": "href.t%Hz.conus.sprd.f%T.grib2",
             "gribDirectory": "/href.%D/ensprod",
             "baseDirectory": "hiresw/prod",
+            "filetype": "grib2",
             "variables": [
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
@@ -118,17 +130,20 @@
             ]
         },
         "gfs": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 192,
             "gribFilterName": "gfs_0p25_1hr",
             "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
             "gribDirectory": "/gfs.%D%H",
+            "filetype": "grib2",
             "baseDirectory": "gfs/prod"
         },
         "hiresw_arw": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 48,
@@ -136,6 +151,7 @@
             "gribFilename": "hiresw.t%Hz.arw_5km.f%T.conus.grib2",
             "gribDirectory": "/hiresw.%D",
             "baseDirectory": "hiresw/prod",
+            "filetype": "grib2",
             "variables": [
                 "4LFTX", "CAPE", "CIN", "LFTX",
                 "APCP", "CFRZR", "CICEP", "CRAIN", "CSNOW",
@@ -156,7 +172,8 @@
             ]
         },
         "hiresw_nmmb": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 48,
@@ -164,6 +181,7 @@
             "gribFilename": "hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
             "gribDirectory": "/hiresw.%D",
             "baseDirectory": "hiresw/prod",
+            "filetype": "grib2",
             "variables": [
                 "4LFTX", "CAPE", "CIN", "LFTX",
                 "APCP", "CFRZR", "CICEP", "CRAIN", "CSNOW",
@@ -184,27 +202,32 @@
             ]
         },
         "naefs_bc_avg": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc",
+            "filetype": "grib2",
             "gribFilename": "naefs_gespr.t%Hz.pgrb2a.0p50_bcf%T",
             "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
             "baseDirectory": "naefs/prod"
         },
         "naefs_bc_spr": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc",
+            "filetype": "grib2",
             "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
             "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
             "baseDirectory": "naefs/prod"
         },
         "naefs_ndgd_avg": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
@@ -214,31 +237,37 @@
             "baseDirectory": "naefs/prod"
         },
         "naefs_ndgd_spr": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc_ndgd",
+            "filetype": "grib2",
             "gribFilename": "naefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
             "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
             "baseDirectory": "naefs/prod"
         },
         "nam12": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 84,
             "gribFilterName": "nam",
+            "filetype": "grib2",
             "gribFilename": "nam.t%Hz.awphys%T.tm00.grib2",
             "gribDirectory": "/nam.%D",
             "baseDirectory": "nam/prod"
         },
         "nam3": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 60,
             "gribFilterName": "nam_conusnest",
+            "filetype": "grib2",
             "gribFilename": "nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "gribDirectory": "/nam.%D",
             "baseDirectory": "nam/prod",
@@ -271,7 +300,8 @@
             ]
         },
         "sref_arw_ctl": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 87,
@@ -279,6 +309,7 @@
             "gribFilename": "sref_arw.t%Hz.pgrb132.ctl.f%T.grib2",
             "gribDirectory": "/sref.%D/%H/pgrb",
             "baseDirectory": "sref/prod",
+            "filetype": "grib2",
             "variables":[
                 "4LFTX", "ACPCP", "APCP", "CAPE",
                 "CFRZR", "CICE", "CICEP", "CIN", "CRAIN",
@@ -298,7 +329,8 @@
             ]
         },
         "sref_nmb_ctl": {
-            "enabled": true,
+            "downloadType": "GRIBFILTER",
+            "enabled": false,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 87,
@@ -306,6 +338,7 @@
             "gribFilename": "sref_nmb.t%Hz.pgrb132.ctl.f%T.grib2",
             "gribDirectory": "/sref.%D/%H/pgrb",
             "baseDirectory": "sref/prod",
+            "filetype": "grib2",
             "variables":[
                 "4LFTX", "ACPCP", "APCP", "CAPE",
                 "CFRZR", "CICE", "CICEP", "CIN", "CRAIN",
@@ -323,6 +356,26 @@
                 "entire atmosphere (considered as a single layer)",
                 "surface"
             ]
+        },
+        "wpc_snow_25pct": {
+            "downloadType": "FILESERIES",
+            "enabled": true,
+            "interval": 6,
+            "startTime": 12,
+            "endTime": 72,
+            "filetype": "grib2",
+            "url": "ftp://ftp.hpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_25pt_%D%Hf0%T.grb",
+            "lastUpdated": ""
+        },
+        "wpc_snow_50pct": {
+            "downloadType": "FILESERIES",
+            "enabled": true,
+            "interval": 6,
+            "startTime": 12,
+            "endTime": 72,
+            "filetype": "grib2",
+            "url": "ftp://ftp.hpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_50pt_%D%Hf0%T.grb",
+            "lastUpdated": ""
         }
     }
 }
