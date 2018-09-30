@@ -1,5 +1,5 @@
 <?php require ("./eolusHeader.php"); ?>
-
+<!--
 <div class="usage">
 Please constrain requests to only the time intervals and model outputs that you need.  At some point API keys will be required to utilize the API. <br>
 Excessive usage, DDOS, and abuse of the API will be monitored.  eolus.io is hosted in the cloud.  All data is from the public domain.<br>
@@ -50,6 +50,6 @@ Returns a time series of raw weather model output data for a lat-lon point.<br>
 Coming soon!<br>
 
 <h3>GetGeoLayer</h3>
-Coming soon!<br>
+Coming soon!<br>-->
             <!-- <br><br>Todo: Add API key, add support for specifying which model outputs you want, add support for retrieving a specific API version. -->
 <?php require ("./eolusFooter.php"); ?>

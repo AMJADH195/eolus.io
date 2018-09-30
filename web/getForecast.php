@@ -1,289 +1,151 @@
 <?php
+require ("./models.php");
 
-// TODO!
-// Include timestamp of model run with all results!
+// Point this to the location of your credentials
+// file (if you want to use one).
+require ("../pgcredentials.php");
+$modelName = $_GET['model'];
+$bandStr = $_GET['bands'];
+$coordStr = $_GET['coords'];
+header('Content-type: application/json');
+$model = array();
+$limit = "120";
+/*
+    --- MAIN ---
+*/
 
-require ("./models.php");   // $models variable is set here
-require ("./versions.php"); // $versions variable is set here
+verify_params ();
 
-// Globals  -----------
-$outputFormat = "JSON";
-$outputMode = "";
-$outputName = "";
-$model = "";
-$starttime = 0;
-$endtime = 240;
-$timeInterval = 1;
-$version = $versions["alpha-02"];
-$error = false;
-$modelOutputs = ["ALL"];
-$calcStartTime = round (microtime(true) * 1000);
+if (!array_key_exists ($modelName,$models)) {
+    send_error("This model does not exist.");
+}
+else {
+    $model = $models[$modelName];
+    if (!$model["enabled"]) {
+        send_error("This model is disabled.");
+    }
+}
 
-$x = $_GET['x'];
-$y = $_GET['y'];
+$bands = explode (",",$bandStr);
+if (count($bands) < 1) {
+    send_error("`bands` parameter must be a comma-delimited list of band numbers.");
+}
 
-date_default_timezone_set("UTC"); 
-$now = time();
-$outputData = [];
-// ---------------------
+$coords = explode (",",$coordStr);
+if (count($coords) != 2) {
+    send_error ("`coords` parameter must be in the format `X,Y`");
+}
+if (!is_numeric($coords[0])) {
+    send_error ("X coordinate is not numeric.");
+}
+if (!is_numeric($coords[1])) {
+    send_error ("Y coordinate is not numeric.");
+}
 
-// Set output mode (default: MODEL) - 
-// either provides a list of models, or outputs the data
-if (isset($_GET['ListModels'])) {
-    $outputMode = "LISTMODELS";
-    $outputFormat = "HTML";
-    $outputName = "models";
-} else if (isset($_GET['ListVersions'])) {
-    $outputMode = "LISTVERSIONS";
-    $outputFormat = "HTML";
-    $outputName = "versions";
-} else {
-    // Validate inputs
-    if (isset($_GET['GetData'])) {
-        $outputMode = "GETDATA";
-        $outputNAme = "wxdata";
-        if (isset($_GET['model'])) {
-            $model = $_GET['model'];
-            if (isset ($_GET['v'])) {
-                $v = $_GET['v'];
-                $version = $versions[$v];
-                if (empty($version)) {
-                    array_push ($outputData, "ERROR: This API version ({$v}) does not exist.");
-                    $error = true;
-                }
-            }
+$conn = pg_connect("host={$pghost} port=5432 dbname={$pgdb} user={$pguser} password={$pgpass} sslmode=require");
+if (!$conn) {
+    send_error ("Could not connect to database.");
+}
 
-            if (empty($model)) {
-                array_push ($outputData, "ERROR: Model name is required.");
-                $error = true;
-            }
+$result = pg_query($conn, build_query());
+if (!$result) {
+    send_error ("Could not query the database.");
+}
 
-            if (isset($_GET["outputs"])) {
-                $outputs = strtolower($_GET['outputs']);
-                if ($outputs != "all") {
-                    $modelOutputs = explode (",",$outputs);
-                }
-            }
 
-            if (isset($_GET["interval"])) {
-                $timeInterval = $_GET["interval"];
-                if (!ctype_digit($timeInterval)) {
-                    array_push ($outputData, "ERROR: Interval must be a whole number.");
-                    $error = true;
-                } else if ($timeInterval < 1) {
-                    array_push ($outputData, "ERROR: Interval must 1 or greater.");
-                    $error = true;
-                }
-            }
-            $timeInterval = (int)$timeInterval;
-        } else {
-            array_push ($outputData, "ERROR: Model parameter is required.");
-            $error = true;
+
+$payload = array ();
+while ($row = pg_fetch_assoc($result)) {
+    array_push ($payload, $row);
+}
+send_success (array (
+    "modelValid" => "unknown",
+    "queryTime" => "unknown",
+    "wxdata" => $payload
+));
+
+
+/*
+    --- FUNCTIONS ---
+*/
+
+function send_response ($response) {
+    echo json_encode ($response);
+    die();
+}
+
+function send_error ($errorMessage) {
+    send_response (array (
+        "result" => "ERROR",
+        "error" => array (
+            "message" => $errorMessage
+        )
+    ));
+}
+
+function send_success ($payload) {
+    $resp = array (
+        "result" => "SUCCESS",
+        "response" => $payload
+    );
+    send_response ($resp);
+}
+
+function verify_params () {
+    global $modelName, $bandStr, $coordStr, $limit;
+
+    if (empty ($modelName)) {
+        send_error ("`model` parameter is required.");
+    }
+    if (empty ($bandStr)) {
+        send_error ("`bands` parameter is required.");
+    }
+    if (empty ($coordStr)) {
+        send_error ("`coords` parameter is required.");
+    }
+
+    if (!empty($_GET['limit'])) {
+        if (!is_numeric ($_GET['limit'])) {
+            send_error ("`limit` parameter must be numeric.");
         }
-    } else {
-        require ("./apiSpecs.php");
-        exit (0);
-    }
-
-    if (empty($x) || empty($y)) {
-        array_push ($outputData, "ERROR: x and y coordinates are required.");
-        $error = true;
-    }
-    else if ($x < -180) {
-        array_push ($outputData, "ERROR: x must be larger than or equal to -180.");
-        $error = true;
-    }
-    else if ($x > 180) {
-        array_push ($outputData, "ERROR: x must be less than or equal to 180.");
-        $error = true;
-    }
-    else if ($y < -90) {
-        array_push ($outputData, "ERROR: y must be larger than or equal to -90.");
-        $error = true;
-    }
-    else if ($y > 90) {
-        array_push ($outputData, "ERROR: y must be less than or equal to 90.");
-        $error = true;
-    }
-}
-
-// Set output format
-if (isset($_GET['f'])) {
-    $f = $_GET['f'];
-    if ($f == "html") {
-        $outputFormat = "HTML";
-    } else if ($f == "json") {
-        $outputFormat = "JSON";
-    } else {
-        array_push ($outputData, "ERROR: Unrecognized output format ({$f}).");
-        $error = true;
-    }
-}
-
-if ($outputFormat == "JSON") {
-    header('Content-type: application/json');
-}
-
-// Run the actual output generator
-if ($outputMode == "LISTMODELS") {
-    if (!$error) printModelList ();
-} else if ($outputMode == "LISTVERSIONS") {
-    if (!$error) printVersionList ();  
-} else {
-    // TODO!  Older versions of this function should have a separate
-    // require() based on the supplied version number.
-    if (!$error) printForecastData ();
-}
-
-// Prints a list of the models and their metadata
-function printModelList () {
-    global $models, $outputData;
-    $outputData = $models;
-}
-
-// Prints a list of all versions
-function printVersionList () {
-    global $versions, $outputData;
-    $outputData = $versions;
-}
-
-// Generates the model data for the specified location,
-// model, and timespan.
-function printForecastData () {
-    global $starttime, $endtime, $model, $models, $error, $modelOutputs, $outputData;
-
-    if (isset($_GET['start'])) {
-        $starttime = $_GET['start'];
-    }
-
-    $endtime = 240;
-    if (isset($_GET['end'])) {
-        $endtime = $_GET['end'];
-    }
-
-    $modelData = $models[$model];
-
-    if (empty($modelData)) {
-        array_push ($outputData, "ERROR: Model {$model} does not exist.");
-        $error = true;
-    }
-
-    if ($starttime > $endtime) {
-        array_push ($outputData, "ERROR: Start time cannot be larger than end time.");
-        $error = true;
-    }
-
-    if ($endtime > 240) {
-        array_push ($outputData, "ERROR: End time cannot be larger than 240.");
-        $error = true;
-    }
-
-    if ($starttime < -120) {
-        array_push ($outputData, "ERROR: Start time cannot be less than -120.");
-        $error = true;
-    }
-
-    
-    if (!$error) {
-
-        $modelDataPackage = [];
-        
-        foreach ($modelData["Model Outputs"] as $outputName => $outputSpecs) {
-            // Filter outputs to what was specified in &outputs=
-            if ($modelOutputs[0] == "ALL" || in_array($outputName, $modelOutputs)) {
-                foreach ($modelData["Model Outputs"][$outputName] as $outputSpec => $outputValue) {
-                    if ($outputSpec == "File Prefix") {
-                        array_push ($modelDataPackage, retrieveData ($modelData["Folder"], $outputName, $outputValue));
-                    }
-                }
-            }
+        $val = intval ($_GET['limit']);
+        if ($val < 1 || $val > 400) {
+            send_error ("`limit` parameter must be an integer between 1 and 400.");
         }
-        packageData ($modelDataPackage);
+        $limit = $_GET['limit'];
     }
 }
 
-function retrieveData ($folder, $name, $prefix) {
-    global $x, $y, $starttime, $endtime, $timeInterval;
-    $return = array();
-    $fullPrefix = $folder . $prefix;
-    $steps = $endtime - $starttime;
-    $stepSize = $timeInterval;
-    $date = makeDate ($starttime);
-    $time = makeTime ($starttime);
+function build_query () {
+    global $modelName, $coords, $bands, $limit;
 
-    exec ("/wxdata/lookupForecast {$x} {$y} {$fullPrefix} {$date} {$time} {$steps} {$stepSize}",$return);
-    array_unshift($return, $name);
-    return $return;
-}
+    $query = "WITH pt AS (SELECT ST_SetSRID(ST_Point(";
+    $query .= "{$coords[0]},{$coords[1]}";
+    $query .= "),4326) geom) ";
+    $query .= "SELECT wxmodel.timestamp";
 
-function packageData ($dataArray) {
-    global $outputData, $endtime, $starttime, $timeInterval;
-    $steps = ($endtime - $starttime) / $timeInterval;
-    $labels = [];
-    for ($i = 0; $i < count($dataArray); $i ++) {
-        array_push ($labels, $dataArray[$i][0]);
-    }
-    for ($i = 1; $i <= $steps; $i++) {
-        $dataItem = [];
-        $currentStep = (($i - 1) * $timeInterval) + $starttime;
-        $timestamp = makeDate ($currentStep) . "T" . makeTime ($currentStep) . "0000000Z";
-        $dataItem["timestamp"] = $timestamp;
-        for ($ii = 0; $ii < count($dataArray); $ii++) {
-            $dataItem[$labels[$ii]] = $dataArray[$ii][$i];
+    foreach ($bands as $band) {
+        $query .= ", ";
+        $bandParts = explode ("|", "$band");
+        if (count($bandParts) != 2) {
+            send_error ("Band error: All bands must be in format `band number|band name`");
         }
-        array_push ($outputData, $dataItem);
-    }
-}
-
-function makeDate ($i) {
-    // pretty sure $today is NULL...
-    return date('Ymd', strtotime(" +" . $i . " hours"));
-}
-
-function makeTime ($i) {
-    // pretty sure $today is NULL...
-    return date('H', strtotime(" +" . $i . " hours"));
-}
-
-$calcEndTime = round (microtime(true) * 1000);
-$timeElapsed = ($calcEndTime - $calcStartTime)/1000 . " seconds";
-
-if ($outputFormat == "JSON") {
-    if (!$error) {
-        if ($outputMode == "GETDATA") {
-            echo json_encode ([
-                "version" => $version["Name"], 
-                "timeElapsed" => $timeElapsed,
-                "forecastInterval" => $timeInterval,
-                $outputName => $outputData
-            ]);
-        } else {
-            echo json_encode ([
-                "version" => $version["Name"], 
-                $outputName => $outputData
-            ]);
+        $bandNumber = $bandParts[0];
+        if (!is_numeric ($bandNumber)) {
+            send_error ("Band error: all bands must be numeric values.");
         }
-    } else {
-        echo json_encode (["errors" => $outputData]);
+        $bandName = $bandParts[1];
+        if (strlen ($bandName) > 16 || !ctype_alnum($bandName)) {
+            send_error ("Band error: band name is not sensible.");
+        }
+
+        $query .= "ST_NearestValue (wxmodel.rast,{$bandNumber},geom) as {$bandName}";
     }
-} else {
-    require ("./eolusHeader.php");
-    echo "<pre>";
-    if ($outputMode == "GETDATA") {
-        print_r ([
-            "version" => $version["Name"], 
-            "timeElapsed" => $timeElapsed,
-            "forecastInterval" => $timeInterval,
-            $outputName => $outputData
-        ]);
-    } else {
-        print_r ([
-                "version" => $version["Name"], 
-                $outputName => $outputData
-            ]);
-    }
-    echo "</pre>";
-    require ("./eolusFooter.php");
+
+    $query .= " FROM pt p LEFT JOIN rasters.{$modelName} wxmodel ON (ST_Intersects(p.geom, wxmodel.rast))";
+    $query .= " WHERE wxmodel.timestamp >= now()::date - interval '3 hours' ORDER BY wxmodel.timestamp LIMIT {$limit}";
+
+    return $query;
 }
 
 ?>
