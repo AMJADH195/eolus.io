@@ -47,7 +47,6 @@
                 "10 m above ground",
                 "80 m above ground",
                 "cloud base",
-                "entire atmosphere (considered as a single layer)",
                 "surface"
             ]
         },
@@ -73,7 +72,6 @@
                 "10 m above ground",
                 "80 m above ground",
                 "cloud base",
-                "entire atmosphere (considered as a single layer)",
                 "surface"
             ]
         },
@@ -99,7 +97,6 @@
                 "10 m above ground",
                 "80 m above ground",
                 "cloud base",
-                "entire atmosphere (considered as a single layer)",
                 "surface"
             ]
         },
@@ -125,7 +122,6 @@
                 "10 m above ground",
                 "80 m above ground",
                 "cloud base",
-                "entire atmosphere (considered as a single layer)",
                 "surface"
             ]
         },
@@ -232,6 +228,7 @@
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc_ndgd",
+            "filetype": "grib2",
             "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
             "baseDirectory": "naefs/prod"
