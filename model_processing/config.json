@@ -27,7 +27,7 @@
     "models": {
         "href_mean": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -44,7 +44,7 @@
         },
         "href_pmmn": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -61,7 +61,7 @@
         },
         "href_avrg": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -78,7 +78,7 @@
         },
         "href_sprd": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 1,
             "endTime": 36,
@@ -95,7 +95,7 @@
         },
         "gfs": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 192,
@@ -107,7 +107,7 @@
         },
         "hiresw_arw": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 48,
@@ -137,7 +137,7 @@
         },
         "hiresw_nmmb": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 48,
@@ -167,7 +167,7 @@
         },
         "naefs_bc_avg": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
@@ -179,7 +179,7 @@
         },
         "naefs_bc_spr": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
@@ -191,7 +191,7 @@
         },
         "naefs_ndgd_avg": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
@@ -203,7 +203,7 @@
         },
         "naefs_ndgd_spr": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 3,
             "endTime": 192,
@@ -215,7 +215,7 @@
         },
         "nam12": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 84,
@@ -232,7 +232,7 @@
         },
         "nam3": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 60,
@@ -271,7 +271,7 @@
         },
         "sref_arw_ctl": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 87,
@@ -300,7 +300,7 @@
         },
         "sref_nmb_ctl": {
             "downloadType": "GRIBFILTER",
-            "enabled": false,
+            "enabled": true,
             "lastUpdated": "",
             "startTime": 0,
             "endTime": 87,
@@ -329,7 +329,7 @@
         },
         "wpc_snow_25pct": {
             "downloadType": "FILESERIES",
-            "enabled": false,
+            "enabled": true,
             "interval": 6,
             "startTime": 12,
             "endTime": 72,
@@ -339,7 +339,7 @@
         },
         "wpc_snow_50pct": {
             "downloadType": "FILESERIES",
-            "enabled": false,
+            "enabled": true,
             "interval": 6,
             "startTime": 12,
             "endTime": 72,
