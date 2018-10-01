@@ -40,14 +40,6 @@
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
                 "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
-            ],
-            "levels": [
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "10 m above ground",
-                "80 m above ground",
-                "cloud base",
-                "surface"
             ]
         },
         "href_pmmn": {
@@ -65,14 +57,6 @@
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
                 "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
-            ],
-            "levels": [
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "10 m above ground",
-                "80 m above ground",
-                "cloud base",
-                "surface"
             ]
         },
         "href_avrg": {
@@ -90,14 +74,6 @@
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
                 "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
-            ],
-            "levels": [
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "10 m above ground",
-                "80 m above ground",
-                "cloud base",
-                "surface"
             ]
         },
         "href_sprd": {
@@ -115,14 +91,6 @@
                 "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
                 "DPT", "MAXREF", "PWAT", "REFC", "REFD", "RETOP", "RH",
                 "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
-            ],
-            "levels": [
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "10 m above ground",
-                "80 m above ground",
-                "cloud base",
-                "surface"
             ]
         },
         "gfs": {
@@ -255,7 +223,12 @@
             "filetype": "grib2",
             "gribFilename": "nam.t%Hz.awphys%T.tm00.grib2",
             "gribDirectory": "/nam.%D",
-            "baseDirectory": "nam/prod"
+            "baseDirectory": "nam/prod",
+            "variables": [
+                "4LFTX", "ACPCP", "APCP", "CAPE", "CFRZR", "CICEP", "CIN", "CRAIN", "CSNOW",
+                "DPT", "GUST", "LFTX", "LTNG", "PRES", "PWAT", "REFC", "REFD", "RETOP", "RH",
+                "SNOD", "SNOWC", "TCDC", "TMP", "UGRD", "VGRD", "VIS", "WEASD"
+            ]
         },
         "nam3": {
             "downloadType": "GRIBFILTER",
