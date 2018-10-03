@@ -123,16 +123,6 @@
                 "DPT", "TMP", "RH", "PWAT", "PRES",
                 "GUST", "UGRD", "VGRD",
                 "WEASD", "TCDC", "VIS"
-            ],
-            "levels": [
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "1 hybrid level",
-                "10 m above ground",
-                "80 m above ground",
-                "cloud base",
-                "entire atmosphere (considered as a single layer)",
-                "surface"
             ]
         },
         "hiresw_nmmb": {
@@ -153,16 +143,6 @@
                 "DPT", "TMP", "RH", "PWAT", "PRES",
                 "GUST", "UGRD", "VGRD",
                 "WEASD", "TCDC", "VIS"
-            ],
-            "levels": [
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "1 hybrid level",
-                "10 m above ground",
-                "80 m above ground",
-                "cloud base",
-                "entire atmosphere (considered as a single layer)",
-                "surface"
             ]
         },
         "naefs_bc_avg": {
@@ -255,18 +235,6 @@
                 "LFTX", "CAPE", "CIN", "4LFTX", 
                 "TMP", "DPT",
                 "LTNG"
-            ],
-            "levels": [
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "1 hybrid level",
-                "2 hybrid level",
-                "10 m above ground",
-                "80 m above ground",
-                "cloud base",
-                "entire atmosphere (considered as a single layer)",
-                "max wind",
-                "surface"
             ]
         },
         "sref_arw_ctl": {
@@ -287,15 +255,6 @@
                 "NCPCP", "PRATE", "PWAT", "REFC", "RETOP",
                 "RH", "SNOM", "SNOWC", "SNOWD", "TCDC", "TMP",
                 "UGRD", "VGRD", "VIS", "WEASD"
-            ],
-            "levels":[
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "1 hybrid level",
-                "10 m above ground",
-                "cloud base",
-                "entire atmosphere (considered as a single layer)",
-                "surface"
             ]
         },
         "sref_nmb_ctl": {
@@ -316,15 +275,6 @@
                 "NCPCP", "PRATE", "PWAT", "REFC", "RETOP",
                 "RH", "SNOM", "SNOWC", "SNOWD", "TCDC", "TMP",
                 "UGRD", "VGRD", "VIS", "WEASD"
-            ],
-            "levels":[
-                "0-0.1 m below ground",
-                "2 m above ground",
-                "1 hybrid level",
-                "10 m above ground",
-                "cloud base",
-                "entire atmosphere (considered as a single layer)",
-                "surface"
             ]
         },
         "wpc_snow_25pct": {
@@ -352,7 +302,7 @@
             "enabled": true,
             "interval": 1,
             "startTime": 1,
-            "endTime": 120,
+            "endTime": 150,
             "filetype": "grib2",
             "url": "http://nomads.ncep.noaa.gov/pub/data/nccf/com/blend/prod/blend.%D/%H/grib2/blend.t%Hz.master.f%T.co.grib2",
             "lastUpdated": ""
