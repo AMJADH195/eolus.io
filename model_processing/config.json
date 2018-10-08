@@ -27,7 +27,7 @@
     },
     "models": {
         "gefs_ndgd_avg": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -39,7 +39,7 @@
             "lastUpdated": ""
         },
         "gefs_ndgd_spr": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -51,7 +51,7 @@
             "lastUpdated": ""
         },
         "gefs_pt5_avg": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -63,7 +63,7 @@
             "lastUpdated": ""
         },
         "gefs_pt5_spr": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -75,7 +75,7 @@
             "lastUpdated": ""
         },
         "gfs": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -87,7 +87,7 @@
             "lastUpdated": ""
         },
         "hiresw_arw": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 48,
             "downloadType": "GRIBFILTER",
@@ -123,7 +123,7 @@
             ]
         },
         "hiresw_nmmb": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 48,
             "downloadType": "GRIBFILTER",
@@ -159,7 +159,7 @@
             ]
         },
         "href_avrg": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -193,7 +193,7 @@
             ]
         },
         "href_mean": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -227,7 +227,7 @@
             ]
         },
         "href_pmmn": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -261,7 +261,7 @@
             ]
         },
         "href_sprd": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -295,7 +295,7 @@
             ]
         },
         "naefs_bc_avg": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -307,7 +307,7 @@
             "lastUpdated": ""
         },
         "naefs_bc_spr": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -319,7 +319,7 @@
             "lastUpdated": ""
         },
         "naefs_ndgd_avg": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -331,7 +331,7 @@
             "lastUpdated": ""
         },
         "naefs_ndgd_spr": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc_ndgd",
@@ -343,7 +343,7 @@
             "lastUpdated": ""
         },
         "nam3": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 60,
             "downloadType": "GRIBFILTER",
@@ -386,7 +386,7 @@
             ]
         },
         "nam12": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 84,
             "downloadType": "GRIBFILTER",
@@ -427,7 +427,7 @@
             ]
         },
         "nbm": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 1,
             "endTime": 150,
             "interval": 1,
@@ -437,7 +437,7 @@
             "lastUpdated": ""
         },
         "sref_arw_ctl": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 87,
             "downloadType": "GRIBFILTER",
@@ -479,7 +479,7 @@
             ]
         },
         "sref_nmb_ctl": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 0,
             "endTime": 87,
             "downloadType": "GRIBFILTER",
@@ -521,7 +521,7 @@
             ]
         },
         "wpc_snow_25pct": {
-            "enabled": false,
+            "enabled": true,
             "startTime": 12,
             "endTime": 72,
             "interval": 6,
