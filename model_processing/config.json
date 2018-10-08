@@ -13,7 +13,7 @@
         },
         "tempDir": "./tempWxData/",
         "logFile": "model_update.log",
-        "debug": true,
+        "debug": false,
         "sleepTime": 1,
         "downloadTypes": {
             "GRIBFILTER": {
