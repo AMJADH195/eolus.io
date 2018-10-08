@@ -19,14 +19,14 @@
                 "gribFilterExtension": ".pl?",
                 "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
                 "gribFilterParams": "&subregion=",
-                "connectionProtocol": "http: //",
+                "connectionProtocol": "http://",
                 "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/"
             }
         }
     },
     "models": {
         "gefs_ndgd_avg": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -38,7 +38,7 @@
             "lastUpdated": ""
         },
         "gefs_ndgd_spr": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -50,7 +50,7 @@
             "lastUpdated": ""
         },
         "gefs_pt5_avg": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -62,7 +62,7 @@
             "lastUpdated": ""
         },
         "gefs_pt5_spr": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -74,7 +74,7 @@
             "lastUpdated": ""
         },
         "gfs": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -86,7 +86,7 @@
             "lastUpdated": ""
         },
         "hiresw_arw": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 48,
             "downloadType": "GRIBFILTER",
@@ -122,7 +122,7 @@
             ]
         },
         "hiresw_nmmb": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 48,
             "downloadType": "GRIBFILTER",
@@ -158,7 +158,7 @@
             ]
         },
         "href_avrg": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -192,7 +192,7 @@
             ]
         },
         "href_mean": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -226,7 +226,7 @@
             ]
         },
         "href_pmmn": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -260,7 +260,7 @@
             ]
         },
         "href_sprd": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 1,
             "endTime": 36,
             "downloadType": "GRIBFILTER",
@@ -294,7 +294,7 @@
             ]
         },
         "naefs_bc_avg": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -306,7 +306,7 @@
             "lastUpdated": ""
         },
         "naefs_bc_spr": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -318,7 +318,7 @@
             "lastUpdated": ""
         },
         "naefs_ndgd_avg": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 3,
             "endTime": 192,
             "downloadType": "GRIBFILTER",
@@ -330,7 +330,7 @@
             "lastUpdated": ""
         },
         "naefs_ndgd_spr": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 3,
             "endTime": 192,
             "gribFilterName": "naefsbc_ndgd",
@@ -342,7 +342,7 @@
             "lastUpdated": ""
         },
         "nam3": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 60,
             "downloadType": "GRIBFILTER",
@@ -385,7 +385,7 @@
             ]
         },
         "nam12": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 84,
             "downloadType": "GRIBFILTER",
@@ -426,7 +426,7 @@
             ]
         },
         "nbm": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 1,
             "endTime": 150,
             "interval": 1,
@@ -436,7 +436,7 @@
             "lastUpdated": ""
         },
         "sref_arw_ctl": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 87,
             "downloadType": "GRIBFILTER",
@@ -478,7 +478,7 @@
             ]
         },
         "sref_nmb_ctl": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 0,
             "endTime": 87,
             "downloadType": "GRIBFILTER",
@@ -520,12 +520,12 @@
             ]
         },
         "wpc_snow_25pct": {
-            "enabled": true,
+            "enabled": false,
             "startTime": 12,
             "endTime": 72,
             "interval": 6,
             "downloadType": "FILESERIES",
-            "url": "ftp: //ftp.hpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_25pt_%D%Hf0%T.grb",
+            "url": "ftp://ftp.hpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_25pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "lastUpdated": ""
         },
@@ -535,7 +535,7 @@
             "endTime": 72,
             "interval": 6,
             "downloadType": "FILESERIES",
-            "url": "ftp: //ftp.hpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_50pt_%D%Hf0%T.grb",
+            "url": "ftp://ftp.hpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_50pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "lastUpdated": ""
         }
