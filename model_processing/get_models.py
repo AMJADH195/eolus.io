@@ -116,6 +116,18 @@ for modelName, model in models.items():
     modelTime = now
     modelTimeTotalSeconds = 0
 
+    # A list of the possible model run hours, e.g. 0, 6, 12, 18
+    # This is so that we only check for the existence of models
+    # that would exist in the first place -- instead of checking
+    # model run times that are never performed for a model
+    modelRunPossibilities = []
+    i = model["updateOffset"]
+    modelRunPossibilities.append (model["updateOffset"])
+    while i < 24:
+        i += model["updateFrequency"]
+        modelRunPossibilities.append (i)
+
+
     # Look up to 24 hours back in time
     for hourSubtract in range (0, 25):
         modelTime = now-timedelta(hours=hourSubtract)
@@ -129,6 +141,11 @@ for modelName, model in models.items():
 
         modelDate = modelTime.strftime ("%Y%m%d")
         modelHour = modelTime.strftime ("%H")
+
+        # If this hour does not correspond with the hours
+        # that the model is run at, skip it
+        if int(modelHour) not in modelRunPossibilities:
+            continue
 
         print "Checking run for this datetime: " + modelDate + " " + modelHour + "Z"
         
