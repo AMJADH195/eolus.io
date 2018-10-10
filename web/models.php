@@ -12,6 +12,18 @@ $models = array (
     "href_sprd" => array (
         "enabled" => true
     ),
+    "gefs_ndgd_avg" => array (
+        "enabled" => true
+    ),
+    "gefs_ndgd_spr" => array (
+        "enabled" => true
+    ),
+    "gefs_pt5_avg" => array (
+        "enabled" => true
+    ),
+    "gefs_pt5_spr" => array (
+        "enabled" => true
+    ),
     "gfs" => array (
         "enabled" => true
     ),
