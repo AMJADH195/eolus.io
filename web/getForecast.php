@@ -9,7 +9,7 @@ $bandStr = $_GET['bands'];
 $coordStr = $_GET['coords'];
 header('Content-type: application/json');
 $model = array();
-$limit = "120";
+$limit = "150";
 /*
     --- MAIN ---
 */

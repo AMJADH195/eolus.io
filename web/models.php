@@ -51,6 +51,9 @@ $models = array (
     "nam3" => array (
         "enabled" => true
     ),
+    "nbm" => array (
+        "enabled" => true
+    ),
     "sref_arw_ctl" => array (
         "enabled" => true
     ),

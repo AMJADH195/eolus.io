@@ -8,15 +8,6 @@ import time
 import pprint
 import urllib2
 
-directory = os.path.dirname(os.path.realpath(__file__)) + "/"
-
-if os.path.exists(directory + "/.get_models_lockfile"):
-    print "Lock file exists, exiting."
-    sys.exit(0)
-
-with open (directory + '/config.json') as f:
-    data = json.load(f)
-
 def write_to_log (message):
     global config
     with open (directory + "/" + config["logFile"], 'a+') as f:
@@ -77,10 +68,21 @@ def normalize_extents ():
 
     return [str(xmin), ymin, str(xmax), ymax]
 
-open (directory + '/.get_models_lockfile', 'a').close()
+
+directory = os.path.dirname(os.path.realpath(__file__)) + "/"
+
+if os.path.exists(directory + "/.get_models_lockfile"):
+    print "Lock file exists, exiting."
+    sys.exit(0)
+
+with open (directory + '/config.json') as f:
+    data = json.load(f)
 
 config = data["config"]
 models = data["models"]
+
+if not config["debug"]:
+    open (directory + '/.get_models_lockfile', 'a').close()
 
 modelsToUpdate = {}
 totalEnabledModels = 0
@@ -247,18 +249,21 @@ for modelName, model in modelsToUpdate.items():
         print ""
 
         print "Loading into database..."
-        os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
+        
+        if not config["debug"]:
+            os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
 
         print ""
         print "Deleting temp files..."
-
-        for aFile in os.listdir(workingDir):
-            filePath = os.path.join(workingDir, aFile)
-            try:
-                if os.path.isfile(filePath):
-                    os.unlink(filePath)
-            except Exception as e:
-                print(e)
+        
+        if not config["debug"]:
+            for aFile in os.listdir(workingDir):
+                filePath = os.path.join(workingDir, aFile)
+                try:
+                    if os.path.isfile(filePath):
+                        os.unlink(filePath)
+                except Exception as e:
+                    print(e)
 
         print ""
         print "Tasks complete, moving to next model timestep."
@@ -270,18 +275,23 @@ for modelName, model in modelsToUpdate.items():
     print ""
     modelRun = datetime.fromtimestamp(model["lastUpdated"]).strftime ("%Y-%m-%d %H:00:00+00")
     finishTime = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
-    os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
+
+    if not config["debug"]:
+        os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
+    
     write_to_log ("Finished updating " + modelName)
 
 print ""
 print ""
-# Re-save the config json
-with open (directory + '/config.json', 'w') as f:
-    json.dump (data, f)
-print "Config rewritten."
 
-os.remove (directory + '/.get_models_lockfile')
-print "Lock file removed."
+if not config["debug"]:
+    # Re-save the config json
+    with open (directory + '/config.json', 'w') as f:
+        json.dump (data, f)
+    print "Config rewritten."
+
+    os.remove (directory + '/.get_models_lockfile')
+    print "Lock file removed."
 
 write_to_log ("-----------------------")
 write_to_log ("Model processing complete.")
