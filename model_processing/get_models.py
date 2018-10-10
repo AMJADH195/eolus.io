@@ -7,6 +7,7 @@ from datetime import timedelta
 import time
 import pprint
 import urllib2
+import subprocess
 
 def write_to_log (message):
     global config
@@ -239,10 +240,32 @@ for modelName, model in modelsToUpdate.items():
         print "Downloaded."
         print ""
         print "Reprojecting and converting to GeoTIFF..."
-        os.system ("gdalwarp " + filename + "." + model["filetype"] + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0")
-        os.system ("gdal_translate -co compress=lzw " + filename + ".vrt " + filename + ".tif")
+
+        bandText = ""
+
+        # For looking up bands if the band numbers change for a model
+        if "bandsByMetadata" in model:
+            print " ---> Converting band information to JSON, to find which bands are needed."
+            modelJson = json.loads (subprocess.check_output("gdalinfo " + filename + "." + model["filetype"] + " -json"))
+            for band in modelJson["bands"]:
+                metadata = band["metadata"].itervalues().next()
+                element = metadata.get ("GRIB_ELEMENT")
+                name = metadata.get ("GRIB_SHORT_NAME")
+                for bandIdentifier in model["bandsByMetadata"]:
+                    bandElement = bandIdentifier[0]
+                    bandName = bandIdentifier[1]
+                    if bandElement == element and bandName == name:
+                        bandText += "-b " + str(band["band"]) + " "
+        
+        if "bands" in model:
+            for band in model["bands"]:
+                bandText += "-b " + str(band) + " "
+
+        os.system ("gdalwarp " + filename + "." + model["filetype"] + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
+        os.system ("gdal_translate -co compress=lzw " + bandText + filename + ".vrt " + filename + ".tif")
         print "Filesize: " + str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."
         print ""
+
         print "Running raster2pgsql..."
         os.system ("raster2pgsql -a -s 4326 " + filename + ".tif" + " rasters." + modelName + " > " + filename + ".sql")
 
@@ -256,7 +279,7 @@ for modelName, model in modelsToUpdate.items():
         timestamp = runTime.strftime ("%Y-%m-%d %H:00:00+00")
 
         print "Timestamp: " + timestamp
-
+        
         sql = sql.replace ('("rast") VALUES (', '("timestamp","rast") VALUES (\'' + timestamp + '\',')
 
         with open(filename + ".sql", 'w') as sqlFile:
@@ -295,6 +318,9 @@ for modelName, model in modelsToUpdate.items():
 
     if not config["debug"]:
         os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"INSERT INTO rasters.update_log VALUES ('" + modelName + "','" + modelRun + "','" + finishTime + "')\"")
+        os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"VACUUM ANALYZE rasters." + modelName + ";\"")
+        if config["deleteOldTimestamps"]:
+            os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"DELETE FROM rasters." + modelName + " WHERE timestamp < now()-'1 hour'::interval;\"")
     
     write_to_log ("Finished updating " + modelName)
 
