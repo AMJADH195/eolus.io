@@ -11,6 +11,9 @@ import subprocess
 
 def write_to_log (message):
     global config
+    if config["debug"]:
+        print "[LOGMESSAGE] " + message
+        return
     with open (directory + "/" + config["logFile"], 'a+') as f:
         timewrite = datetime.now().replace(microsecond=0).strftime ("%Y-%m-%d %H:%M:%S")
         f.write ("[" + timewrite + "] " + message + "\n")
@@ -96,8 +99,8 @@ write_to_log ("-----------------------")
 # against the last model run that was retrieved.
 for modelName, model in models.items():
     print ""
-    print "============================="
     print "Checking " + modelName + "..."
+    print "============================="
     # model run format on NCEP is YYYYMMDDHH
     now = datetime.utcnow().replace(microsecond=0,second=0,minute=0)
 
@@ -202,12 +205,15 @@ for modelName, model in modelsToUpdate.items():
     modelHour = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%H")
     modelDate = datetime.fromtimestamp (model["lastUpdated"]).strftime ("%Y%m%d")
 
+    numWarnings = 0
+    numErrors = 0 # TODO
+
     write_to_log ("Starting update for " + modelName)
 
     # maxTime can be used for debugging purposes to only grab a few model runs per model
     modelLoopEndTime = model["endTime"] + 1
     if config["maxTime"] > 0:
-        modelLoopEndtime = config["maxTime"]
+        modelLoopEndTime = config["maxTime"] + 1
 
     for modelTimestep in range (model["startTime"], modelLoopEndTime):
         fmtTimestep = str(modelTimestep).rjust (len(str(model["endTime"])), '0')
@@ -223,7 +229,7 @@ for modelName, model in modelsToUpdate.items():
             extent = "-te " + " ".join (normalize_extents())
         
         print "---------------"
-        print "Downloading grib file for timestep " + fmtTimestep + "/" + str(model["endTime"]) + "..."
+        print "Downloading grib file for timestep " + fmtTimestep + "/" + str(modelLoopEndTime - 1) + "..."
 
         try:
             gribFile = urllib2.urlopen (url)
@@ -249,21 +255,62 @@ for modelName, model in modelsToUpdate.items():
         bandText = ""
 
         # For looking up bands if the band numbers change for a model
-        if "bandsByMetadata" in model:
-            print " ---> Converting band information to JSON, to find which bands are needed."
-            modelJson = json.loads (subprocess.check_output("gdalinfo " + filename + "." + model["filetype"] + " -json"))
+        if "extractBandsByMetadata" in model:
+            # Copy the bands list so we can remove values as we find them
+            bandsList = model["extractBandsByMetadata"][:]
+            print " ---> Retrieving metadata in JSON form for band extraction."
+
+            # Get the metadata as a json and parse it
+            jsonStr = subprocess.check_output("gdalinfo " + filename + "." + model["filetype"] + " -json", shell=True)
+            # this fixes a bug in older GDAL versions that print this unsuppressable message
+            # (just for the HREF model, really) -- this can be removed at a later time
+            jsonStr = jsonStr.replace ("Warning: Master table version == 0, was experimental","")
+            jsonStr = jsonStr.replace ("I don't have a copy, and don't know where to get one", "")
+            jsonStr = jsonStr.replace ("Use meta data at your own risk.", "")
+            modelJson = json.loads (jsonStr)
+            
+            # We will use the order of bands in config's extractBandsByMetadata array
+            # as the final order of bands, so that if bands are jumbled up in various model runs
+            # (which they are), the output rasters all have them in the same order.
+            bandOrderedList = [None] * len(bandsList)
             for band in modelJson["bands"]:
                 metadata = band["metadata"].itervalues().next()
                 element = metadata.get ("GRIB_ELEMENT")
                 name = metadata.get ("GRIB_SHORT_NAME")
-                for bandIdentifier in model["bandsByMetadata"]:
+                for index, bandIdentifier in enumerate(model["extractBandsByMetadata"]):
                     bandElement = bandIdentifier[0]
                     bandName = bandIdentifier[1]
                     if bandElement == element and bandName == name:
-                        bandText += "-b " + str(band["band"]) + " "
-        
-        if "bands" in model:
-            for band in model["bands"]:
+                        if bandIdentifier in bandsList:
+                            bandsList.remove (bandIdentifier)
+                             # this is a -b string for gdal_translate
+                            bandOrderedList[index] = "-b " + str(band["band"]) + " "
+                        else:
+                            # Obviously...  this is a todo
+                            numWarnings += 1
+                            print " !!! WARNING : The same variable (" + bandElement + " @ " + bandName + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
+
+            # So, we've popped desired bands out of the list
+            # sometimes the initial model timestamp doesn't have all the variables
+            # (APCP comes to mind) so we should skip the entire thing lest
+            # band retrieval from the final raster in the future returns 
+            # unexpected values!
+            if len(bandsList) > 0:
+                numWarnings += 1
+                print " !!! WARNING: This run is missing required bands:"
+                for band in bandsList:
+                    print "     " + band[0] +" at level " + band[1]
+                print ""
+                continue
+            else:
+                # the order you arrange multiple -b flags for gdal_translate
+                # is the order of the raster's resulting bands
+                bandText = ''.join(bandOrderedList)
+
+        # Just look up bands directly by number -- this is super unsafe in regards to
+        # getting the correct bands and their order
+        elif "extractBands" in model:
+            for band in model["extractBands"]:
                 bandText += "-b " + str(band) + " "
 
         os.system ("gdalwarp " + filename + "." + model["filetype"] + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
@@ -297,6 +344,8 @@ for modelName, model in modelsToUpdate.items():
         
         if not config["debug"]:
             os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
+        else:
+            print "Skipped (DEBUG)"
 
         print ""
         print "Deleting temp files..."
@@ -309,6 +358,8 @@ for modelName, model in modelsToUpdate.items():
                         os.unlink(filePath)
                 except Exception as e:
                     print(e)
+        else:
+            print "Skipped (DEBUG)"
 
         print ""
         print "Tasks complete, moving to next model timestep."
@@ -327,7 +378,7 @@ for modelName, model in modelsToUpdate.items():
         if config["deleteOldTimestamps"]:
             os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"DELETE FROM rasters." + modelName + " WHERE timestamp < now()-'1 hour'::interval;\"")
     
-    write_to_log ("Finished updating " + modelName)
+    write_to_log ("Finished updating " + modelName + " | Err: " + str(numErrors) + " | Warn: " + str(numWarnings))
 
 print ""
 print ""
