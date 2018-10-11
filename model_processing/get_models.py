@@ -204,7 +204,12 @@ for modelName, model in modelsToUpdate.items():
 
     write_to_log ("Starting update for " + modelName)
 
-    for modelTimestep in range (model["startTime"], model["endTime"]+1):
+    # maxTime can be used for debugging purposes to only grab a few model runs per model
+    modelLoopEndTime = model["endTime"] + 1
+    if config["maxTime"] > 0:
+        modelLoopEndtime = config["maxTime"]
+
+    for modelTimestep in range (model["startTime"], modelLoopEndTime):
         fmtTimestep = str(modelTimestep).rjust (len(str(model["endTime"])), '0')
         url = ""
         # for gdalwarp -te extent clip parameter

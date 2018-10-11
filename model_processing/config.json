@@ -15,6 +15,7 @@
         "logFile": "model_update.log",
         "debug": false,
         "sleepTime": 1,
+        "maxTime": 0,
         "deleteOldTimestamps": true,
         "downloadTypes": {
             "GRIBFILTER": {
