@@ -377,6 +377,7 @@ for modelName, model in modelsToUpdate.items():
         os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"VACUUM ANALYZE rasters." + modelName + ";\"")
         if config["deleteOldTimestamps"]:
             os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"DELETE FROM rasters." + modelName + " WHERE timestamp < now()-'1 hour'::interval;\"")
+            os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"VACUUM ANALYZE rasters." + modelName + ";\"")
     
     write_to_log ("Finished updating " + modelName + " | Err: " + str(numErrors) + " | Warn: " + str(numWarnings))
 
