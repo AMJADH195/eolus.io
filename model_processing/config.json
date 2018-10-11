@@ -148,9 +148,9 @@
             "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
             "lastUpdated": "",
             "extractBandsByMetadata": [
-                ["TMP", "0-SFC"],
                 ["TMP", "2-HTGL"],
                 ["TMP", "80-HTGL"],
+                ["TMP", "0-SFC"],
                 ["DPT", "2-HTGL"],
                 ["RH", "2-HTGL"],
                 ["UGRD", "10-HTGL"],
@@ -221,8 +221,8 @@
             ],
             "extractBandsByMetadata": [
                 ["TMP", "2-HTGL"],
-                ["TMP", "0-SFC"],
                 ["TMP", "80-HTGL"],
+                ["TMP", "0-SFC"],
                 ["DPT", "2-HTGL"],
                 ["RH", "2-HTGL"],
                 ["UGRD", "10-HTGL"],
@@ -289,8 +289,8 @@
             ],
             "extractBandsByMetadata": [
                 ["TMP", "2-HTGL"],
-                ["TMP", "0-SFC"],
                 ["TMP", "80-HTGL"],
+                ["TMP", "0-SFC"],
                 ["DPT", "2-HTGL"],
                 ["RH", "2-HTGL"],
                 ["UGRD", "10-HTGL"],
@@ -638,8 +638,8 @@
             ],
             "extractBandsByMetadata": [
                 ["TMP", "2-HTGL"],
-                ["TMP", "0-SFC"],
                 ["TMP", "80-HTGL"],
+                ["TMP", "0-SFC"],
                 ["DPT", "2-HTGL"],
                 ["RH", "2-HTGL"],
                 ["UGRD", "10-HTGL"],
@@ -716,8 +716,8 @@
             ],
             "extractBandsByMetadata": [
                 ["TMP", "2-HTGL"],
-                ["TMP", "0-SFC"],
                 ["TMP", "80-HTGL"],
+                ["TMP", "0-SFC"],
                 ["DPT", "2-HTGL"],
                 ["RH", "2-HTGL"],
                 ["UGRD", "10-HTGL"],
