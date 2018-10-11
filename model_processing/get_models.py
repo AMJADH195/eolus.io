@@ -207,6 +207,7 @@ for modelName, model in modelsToUpdate.items():
 
     numWarnings = 0
     numErrors = 0 # TODO
+    numSkips = 0
 
     write_to_log ("Starting update for " + modelName)
 
@@ -301,6 +302,7 @@ for modelName, model in modelsToUpdate.items():
                 for band in bandsList:
                     print "     " + band[0] +" at level " + band[1]
                 print ""
+                numSkips += 1
                 continue
             else:
                 # the order you arrange multiple -b flags for gdal_translate
@@ -367,6 +369,7 @@ for modelName, model in modelsToUpdate.items():
         print ""
 
     print "Done."
+    print "Err: " + str(numErrors) + " | Skips: " + str(numErrors) + " | Warn: " + str(numWarnings)
     print "============================="
     print ""
     modelRun = datetime.fromtimestamp(model["lastUpdated"]).strftime ("%Y-%m-%d %H:00:00+00")
@@ -379,7 +382,7 @@ for modelName, model in modelsToUpdate.items():
             os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"DELETE FROM rasters." + modelName + " WHERE timestamp < now()-'1 hour'::interval;\"")
             os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -c \"VACUUM ANALYZE rasters." + modelName + ";\"")
     
-    write_to_log ("Finished updating " + modelName + " | Err: " + str(numErrors) + " | Warn: " + str(numWarnings))
+    write_to_log ("Finished updating " + modelName + " | Err: " + str(numErrors) + " | Skips: " + str(numErrors) + " | Warn: " + str(numWarnings))
 
 print ""
 print ""
