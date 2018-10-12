@@ -72,6 +72,11 @@ def normalize_extents ():
 
     return [str(xmin), ymin, str(xmax), ymax]
 
+try:
+    from osgeo import gdal, osr
+except:
+    print "Error: GDAL API is not installed for python."
+    sys.exit (1)
 
 directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 
@@ -253,70 +258,91 @@ for modelName, model in modelsToUpdate.items():
         print ""
         print "Reprojecting and converting to GeoTIFF..."
 
-        bandText = ""
+        warpFileType = model["filetype"]
 
-        # For looking up bands if the band numbers change for a model
+        '''
+            This is a super magical function that should probably be
+            actually made into a standalone function.
+
+            GRIB files generally don't have the same number of bands or
+            a consistent band order, even for the same model in one model run.
+            For instance, a model might have APCP01 in its f001 timestamp,
+            but have that in addition to APCP12 in its f012 timestamp.
+
+            In order for bands to have a consistency (for futuring querying of
+            the entire raster as a single Postgres column), we have to build our own
+            raster and slowly copy the bands over as we find them.  This was
+            previously done with gdal_translate's -b flag, but since -b cannot write
+            an empty band to the raster that would mean that any rasters missing a single
+            band would have to be skipped.  This is a problem for models like NBM,
+            which start dropping useful variables after f080 or so...  yet, still have useful
+            variables through their entire model run like TMP.  So, here we are.
+        '''
         if "extractBandsByMetadata" in model:
-            # Copy the bands list so we can remove values as we find them
-            bandsList = model["extractBandsByMetadata"][:]
-            print " ---> Retrieving metadata in JSON form for band extraction."
+            print " ---> Extracting specific bands."
+            warpFileType = "tif"
 
-            # Get the metadata as a json and parse it
-            jsonStr = subprocess.check_output("gdalinfo " + filename + "." + model["filetype"] + " -json", shell=True)
-            # this fixes a bug in older GDAL versions that print this unsuppressable message
-            # (just for the HREF model, really) -- this can be removed at a later time
-            jsonStr = jsonStr.replace ("Warning: Master table version == 0, was experimental","")
-            jsonStr = jsonStr.replace ("I don't have a copy, and don't know where to get one", "")
-            jsonStr = jsonStr.replace ("Use meta data at your own risk.", "")
-            modelJson = json.loads (jsonStr)
-            
-            # We will use the order of bands in config's extractBandsByMetadata array
-            # as the final order of bands, so that if bands are jumbled up in various model runs
-            # (which they are), the output rasters all have them in the same order.
-            bandOrderedList = [None] * len(bandsList)
-            for band in modelJson["bands"]:
-                metadata = band["metadata"].itervalues().next()
-                element = metadata.get ("GRIB_ELEMENT")
-                name = metadata.get ("GRIB_SHORT_NAME")
-                for index, bandIdentifier in enumerate(model["extractBandsByMetadata"]):
-                    bandElement = bandIdentifier[0]
-                    bandName = bandIdentifier[1]
-                    if bandElement == element and bandName == name:
-                        if bandIdentifier in bandsList:
-                            bandsList.remove (bandIdentifier)
-                             # this is a -b string for gdal_translate
-                            bandOrderedList[index] = "-b " + str(band["band"]) + " "
-                        else:
-                            # Obviously...  this is a todo
+            # Open the grib file and read the bands and SRS
+            gribFile = gdal.Open (filename + "." + model["filetype"])
+            gribSrs = osr.SpatialReference()
+            gribSrs.ImportFromWkt (gribFile.GetProjection())
+            geoTransform = gribFile.GetGeoTransform()
+            width = gribFile.RasterXSize
+            height = gribFile.RasterYSize
+            numSrcBands = gribFile.RasterCount
+
+            # Create an in-memory raster that we will write the desired bands to as we find them
+            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
+            newRaster.SetGeoTransform (geoTransform)
+
+            # For each band in the list, search through the bands of the raster for the match
+            # if not found, print a warning and write an empty band
+            for extractBand in model["extractBandsByMetadata"]:
+                extractBandElement = extractBand[0]
+                extractBandName = extractBand[1]
+                matched = False
+
+                for i in range (1, numSrcBands):
+                    band = gribFile.GetRasterBand(i)
+                    bandMetadata = band.GetMetadata()
+                    if (bandMetadata["GRIB_ELEMENT"] == extractBandElement and
+                        bandMetadata["GRIB_SHORT_NAME"] == extractBandName):
+
+                        # WE COULD JUST DO A BREAK HERE BUT -- this warning might be useful
+                        # so we're going to iterate the whole thing, even if a match is found
+                        # just to alert the user that they might not be getting the expected band
+                        if matched:
                             numWarnings += 1
-                            print " !!! WARNING : The same variable (" + bandElement + " @ " + bandName + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
+                            print " !!! WARNING : The same variable (" + extractBandElement + " @ " + extractBandName + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
+                        else:
+                            matched = True
+                            newBand = newRaster.GetRasterBand (newRaster.RasterCount)
+                            data = band.ReadAsArray()
+                            dataType = band.DataType
+                            newRaster.AddBand(dataType)
+                            newBand = newRaster.GetRasterBand (newRaster.RasterCount)
+                            newBand.WriteArray (data)
+                            newBand.FlushCache()
+                if not matched:
+                    numWarnings += 1
+                    print " !!! WARNING: This run is missing a desired band: " + extractBandElement + " @ " + extractBandName
+                    # Add an empty band to not upset the sacred order of raster bands
+                    # Careful with the type!  Tif driver gets angry if the types are different across bands
+                    newRaster.AddBand(gdal.GDT_Float64)
 
-            # So, we've popped desired bands out of the list
-            # sometimes the initial model timestamp doesn't have all the variables
-            # (APCP comes to mind) so we should skip the entire thing lest
-            # band retrieval from the final raster in the future returns 
-            # unexpected values!
-            if len(bandsList) > 0:
-                numWarnings += 1
-                print " !!! WARNING: This run is missing required bands:"
-                for band in bandsList:
-                    print "     " + band[0] +" at level " + band[1]
-                print ""
-                numSkips += 1
-                continue
-            else:
-                # the order you arrange multiple -b flags for gdal_translate
-                # is the order of the raster's resulting bands
-                bandText = ''.join(bandOrderedList)
+            newRaster.SetProjection (gribSrs.ExportToWkt())
+            outRaster = gdal.GetDriverByName('GTiff').CreateCopy (filename + ".tif", newRaster, 0)
 
-        # Just look up bands directly by number -- this is super unsafe in regards to
-        # getting the correct bands and their order
-        elif "extractBands" in model:
-            for band in model["extractBands"]:
-                bandText += "-b " + str(band) + " "
+            # This is important, or else gdalwarp and gdal_translate
+            # can't read the raster and you get an empty raster in the end
+            del newRaster
+            del outRaster
 
-        os.system ("gdalwarp " + filename + "." + model["filetype"] + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
-        os.system ("gdal_translate -co compress=lzw " + bandText + filename + ".vrt " + filename + ".tif")
+        # This could be replaced with gdal library commands but
+        # I'm lazy and the documentation is much nicer for the shell commands
+        # than it is for the API :)
+        os.system ("gdalwarp " + filename + "." + warpFileType + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
+        os.system ("gdal_translate -co compress=lzw " + filename + ".vrt " + filename + ".tif")
         print "Filesize: " + str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."
         print ""
 
