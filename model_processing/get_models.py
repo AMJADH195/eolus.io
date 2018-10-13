@@ -317,11 +317,11 @@ for modelName, model in modelsToUpdate.items():
                         else:
                             matched = True
                             newBand = newRaster.GetRasterBand (newRaster.RasterCount)
-                            data = band.ReadAsArray()
+                            bandData = band.ReadAsArray()
                             dataType = band.DataType
                             newRaster.AddBand(dataType)
                             newBand = newRaster.GetRasterBand (newRaster.RasterCount)
-                            newBand.WriteArray (data)
+                            newBand.WriteArray (bandData)
                             newBand.FlushCache()
                 if not matched:
                     numWarnings += 1
