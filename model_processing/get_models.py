@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from datetime import timedelta
 from datetime import tzinfo
+from dateutil.parser import parse
 import calendar
 import time
 import pprint
@@ -73,7 +74,7 @@ def check_if_model_needs_update (model_name):
     if fetch:
         model_db_timestamp = fetch[0]
         if model_db_timestamp:
-            model_timestamp = datetime.fromtimestamp(model_db_timestamp)
+            model_timestamp = parse(str(model_db_timestamp))
 
     print "Last checked: " + model_timestamp.strftime ("%Y %m %d %HZ")
 
