@@ -462,7 +462,6 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
 print "============================="
 print ""
-model_run = datetime.fromtimestamp(model["lastUpdated"]).strftime ("%Y-%m-%d %H:00:00+00")
 finish_time = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
 cur.execute ("UPDATE logging.model_status SET (end_time) = (%s) WHERE model = %s", (str(finish_time), model_name))
 conn.commit ()
