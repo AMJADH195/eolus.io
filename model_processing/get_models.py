@@ -470,4 +470,8 @@ conn.commit ()
 set_model_to_waiting (model_name)
 log ("Model processing completed successfully.".format(fmt_timestep),"INFO", model_name)
 
+log ("Cleaning up the database...", "INFO")
+cur.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '7 days'")
+conn.commit ()
+
 kill_script (0)
