@@ -15,6 +15,7 @@ import psycopg2
 
 model_time = 0      # The time applicable to the model run that will be processed
 model_name = ""     # The name of the model that will be processed
+last_checked_total_seconds = 0
 
 ZERO = timedelta(0)
 
@@ -60,7 +61,7 @@ def log (message, level, model=""):
 
 
 def check_if_model_needs_update (model_name):
-    global cur, models, model_time
+    global cur, models, model_time, last_checked_total_seconds
     # First, for each model, check the latest model run that exists on NCEP
     # against the last model run that was retrieved.
 
@@ -94,11 +95,12 @@ def check_if_model_needs_update (model_name):
         if i != 24: 
             model_run_possibilities.append (i)
 
+    last_checked_total_seconds = time.mktime(model_timestamp.timetuple())
+
     # Look up to 24 hours back in time
     for hour_subtract in range (0, 25):
         model_time = now-timedelta(hours=hour_subtract)
         model_time_total_seconds = time.mktime(model_time.timetuple())
-        last_checked_total_seconds = time.mktime(model_timestamp.timetuple())
 
         if model_time_total_seconds <= last_checked_total_seconds:
             print "No new model run has been found."
@@ -520,6 +522,10 @@ conn.commit ()
 
 set_model_to_waiting (model_name)
 log ("Model processing completed successfully.".format(fmt_timestep),"INFO", model_name)
+
+log ("Deleting old model run (rasters.{0}_{1}).".format (model_name,str(last_checked_total_seconds - config["maxModelAge"])), "INFO", model_name)
+cur.execute ("DROP TABLE rasters.{0}_{1}".format (model_name,str(last_checked_total_seconds - config["maxModelAge"])))
+conn.commit ()
 
 log ("Cleaning up the logs...", "INFO")
 cur.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '7 days'")
