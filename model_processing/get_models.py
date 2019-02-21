@@ -280,8 +280,7 @@ if not os.path.exists(working_dir):
     os.makedirs(working_dir)
 
 num_warnings = 0
-num_errors = 0 # TODO
-num_skips = 0
+num_errors = 0
 
 # maxTime can be used for debugging purposes to only grab a few model runs per model
 model_loop_end_time = model["endTime"] + 1
@@ -314,6 +313,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         grib_file = urllib2.urlopen (url)
     except:
         log ("Could not download grib file ({0}).  Skipping...".format (url), "WARN", model_name)
+        num_warnings += 1
         print "---------------"
         print ""
         # Wait a bit between polling server,
@@ -321,10 +321,23 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         time.sleep (config["sleepTime"])
         continue
 
-    filename = working_dir + model_name + "_" + model_date + "_" + model_hour + "Z_f" + fmt_timestep
+    filename = ""
+    
+    try:
+        filename = working_dir + model_name + "_" + model_date + "_" + model_hour + "Z_f" + fmt_timestep
 
-    with open (filename + "." + model["filetype"], 'wb') as outfile:
-        outfile.write (grib_file.read())
+        with open (filename + "." + model["filetype"], 'wb') as outfile:
+            outfile.write (grib_file.read())
+
+    except:
+        log ("Could not write grib file ({0}).".format (filename), "ERROR", model_name)
+        num_errors += 1
+        print "---------------"
+        print ""
+        # Wait a bit between polling server,
+        # per NCEP's usage guidelines.
+        time.sleep (config["sleepTime"])
+        continue
 
     log ("The grib file was downloaded successfully.", "INFO", model_name)
 
@@ -349,98 +362,131 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         variables through their entire model run like TMP.  So, here we are.
     '''
     if "extractBandsByMetadata" in model:
-        print " ---> Extracting specific bands."
-        warp_file_type = "tif"
+        try:
+            print " ---> Extracting specific bands."
+            warp_file_type = "tif"
 
-        # Open the grib file and read the bands and SRS
-        grib_file = gdal.Open (filename + "." + model["filetype"])
-        grib_srs = osr.SpatialReference()
-        grib_srs.ImportFromWkt (grib_file.GetProjection())
-        geo_transform = grib_file.GetGeoTransform()
-        width = grib_file.RasterXSize
-        height = grib_file.RasterYSize
-        num_src_bands = grib_file.RasterCount
+            # Open the grib file and read the bands and SRS
+            grib_file = gdal.Open (filename + "." + model["filetype"])
+            grib_srs = osr.SpatialReference()
+            grib_srs.ImportFromWkt (grib_file.GetProjection())
+            geo_transform = grib_file.GetGeoTransform()
+            width = grib_file.RasterXSize
+            height = grib_file.RasterYSize
+            num_src_bands = grib_file.RasterCount
 
-        # Create an in-memory raster that we will write the desired bands to as we find them
-        new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
-        new_raster.SetGeoTransform (geo_transform)
+            # Create an in-memory raster that we will write the desired bands to as we find them
+            new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
+            new_raster.SetGeoTransform (geo_transform)
 
-        # For each band in the list, search through the bands of the raster for the match
-        # if not found, print a warning and write an empty band
-        for extract_band in model["extractBandsByMetadata"]:
-            extract_band_element = extract_band[0]
-            extract_band_name = extract_band[1]
-            matched = False
+            # For each band in the list, search through the bands of the raster for the match
+            # if not found, print a warning and write an empty band
+            for extract_band in model["extractBandsByMetadata"]:
+                extract_band_element = extract_band[0]
+                extract_band_name = extract_band[1]
+                matched = False
 
-            for i in range (1, num_src_bands):
-                band = grib_file.GetRasterBand(i)
-                band_metadata = band.GetMetadata()
-                if (band_metadata["GRIB_ELEMENT"] == extract_band_element and
-                    band_metadata["GRIB_SHORT_NAME"] == extract_band_name):
+                for i in range (1, num_src_bands):
+                    band = grib_file.GetRasterBand(i)
+                    band_metadata = band.GetMetadata()
+                    if (band_metadata["GRIB_ELEMENT"] == extract_band_element and
+                        band_metadata["GRIB_SHORT_NAME"] == extract_band_name):
 
-                    # WE COULD JUST DO A BREAK HERE BUT -- this warning might be useful
-                    # so we're going to iterate the whole thing, even if a match is found
-                    # just to alert the user that they might not be getting the expected band
-                    if matched:
-                        num_warnings += 1
-                        print " !!! WARNING : The same variable (" + extract_band_element + " @ " + extract_band_name + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
-                    else:
-                        matched = True
-                        new_band = new_raster.GetRasterBand (new_raster.RasterCount)
-                        band_data = band.ReadAsArray()
-                        data_type = band.DataType
-                        new_raster.AddBand(data_type)
-                        new_band = new_raster.GetRasterBand (new_raster.RasterCount)
-                        new_band.WriteArray (band_data)
-                        new_band.FlushCache()
-            if not matched:
-                num_warnings += 1
-                print " !!! WARNING: This run is missing a desired band: " + extract_band_element + " @ " + extract_band_name
-                # Add an empty band to not upset the sacred order of raster bands
-                # Careful with the type!  Tif driver gets angry if the types are different across bands
-                new_raster.AddBand(gdal.GDT_Float64)
+                        # WE COULD JUST DO A BREAK HERE BUT -- this warning might be useful
+                        # so we're going to iterate the whole thing, even if a match is found
+                        # just to alert the user that they might not be getting the expected band
+                        if matched:
+                            num_warnings += 1
+                            print " !!! WARNING : The same variable (" + extract_band_element + " @ " + extract_band_name + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
+                        else:
+                            matched = True
+                            new_band = new_raster.GetRasterBand (new_raster.RasterCount)
+                            band_data = band.ReadAsArray()
+                            data_type = band.DataType
+                            new_raster.AddBand(data_type)
+                            new_band = new_raster.GetRasterBand (new_raster.RasterCount)
+                            new_band.WriteArray (band_data)
+                            new_band.FlushCache()
+                if not matched:
+                    num_warnings += 1
+                    print " !!! WARNING: This run is missing a desired band: " + extract_band_element + " @ " + extract_band_name
+                    # Add an empty band to not upset the sacred order of raster bands
+                    # Careful with the type!  Tif driver gets angry if the types are different across bands
+                    new_raster.AddBand(gdal.GDT_Float64)
 
-        new_raster.SetProjection (grib_srs.ExportToWkt())
-        out_raster = gdal.GetDriverByName('GTiff').CreateCopy (filename + ".tif", new_raster, 0)
+            new_raster.SetProjection (grib_srs.ExportToWkt())
+            out_raster = gdal.GetDriverByName('GTiff').CreateCopy (filename + ".tif", new_raster, 0)
 
-        log ("New raster created.", "INFO", model_name)
+            log ("New raster created.", "INFO", model_name)
 
-        # This is important, or else gdalwarp and gdal_translate
-        # can't read the raster and you get an empty raster in the end
-        del new_raster
-        del out_raster
+            # This is important, or else gdalwarp and gdal_translate
+            # can't read the raster and you get an empty raster in the end
+            del new_raster
+            del out_raster
+
+        except:
+            log ("Could not create new geotiff raster.", "ERROR", model_name)
+            num_errors += 1
+            print "---------------"
+            print ""
+            continue
 
     # This could be replaced with gdal library commands but
     # I'm lazy and the documentation is much nicer for the shell commands
     # than it is for the API :)
     log ("Beginning gdalwarp and gdal_translate.", "INFO", model_name)
-    os.system ("gdalwarp " + filename + "." + warp_file_type + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
-    os.system ("gdal_translate -co compress=lzw " + filename + ".vrt " + filename + ".tif")
+
+    try:
+        os.system ("gdalwarp " + filename + "." + warp_file_type + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
+        os.system ("gdal_translate -co compress=lzw " + filename + ".vrt " + filename + ".tif")
+        
+        log ("Raster finalized, running raster2pgsql.  Filesize: {0}".format(str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."), "INFO", model_name)
+        os.system ("raster2pgsql -a -s 4326 " + filename + ".tif" + " rasters." + model_name + "_" + str(int(calendar.timegm(model_time.utctimetuple()))) + " > " + filename + ".sql")
     
-    log ("Raster finalized, running raster2pgsql.  Filesize: {0}".format(str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."), "INFO", model_name)
-    os.system ("raster2pgsql -a -s 4326 " + filename + ".tif" + " rasters." + model_name + "_" + str(int(calendar.timegm(model_time.utctimetuple()))) + " > " + filename + ".sql")
-    
+    except:
+        log ("Could not warp/translate the new raster.", "ERROR", model_name)
+        num_errors += 1
+        print "---------------"
+        print ""
+        continue
+
     log ("Preparing SQL for data upload.", "INFO", model_name)
     sql = ""
-    with open(filename + ".sql") as sql_file:
-        sql = sql_file.read()
 
-    run_time = model_time+timedelta(hours=model_timestep)
-    timestamp = run_time.strftime ("%Y-%m-%d %H:00:00+00")
+    try:
+        with open(filename + ".sql") as sql_file:
+            sql = sql_file.read()
 
-    print "Timestamp: " + timestamp
-    
-    sql = sql.replace ('("rast") VALUES (', '("timestamp","rast") VALUES (\'' + timestamp + '\',')
+        run_time = model_time+timedelta(hours=model_timestep)
+        timestamp = run_time.strftime ("%Y-%m-%d %H:00:00+00")
 
-    with open(filename + ".sql", 'w') as sql_file:
-        sql_file.write (sql)
+        print "Timestamp: " + timestamp
+        
+        sql = sql.replace ('("rast") VALUES (', '("timestamp","rast") VALUES (\'' + timestamp + '\',')
+
+        with open(filename + ".sql", 'w') as sql_file:
+            sql_file.write (sql)
+
+    except:
+        log ("Could not modify SQL load query.", "ERROR", model_name)
+        num_errors += 1
+        print "---------------"
+        print ""
+        continue 
 
     log ("Loading the raster into the database.", "INFO", model_name)
     
-    if not config["debug"]:
-        os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
-    else:
-        print "Skipped (DEBUG)"
+    try:
+        if not config["debug"]:
+            os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
+        else:
+            print "Skipped (DEBUG)"
+    except:
+        log ("Could not load raster into database.", "ERROR", model_name)
+        num_errors += 1
+        print "---------------"
+        print ""
+        continue
 
     log ("Cleaning up temporary files.", "INFO", model_name)
     
@@ -455,8 +501,13 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     else:
         print "Skipped (DEBUG)"
 
-    cur.execute ("UPDATE logging.model_status SET (progress) = (%s) WHERE model = %s", (str((float(model_timestep)/float(model_loop_end_time - 1))*100), model_name))
-    conn.commit ()
+    try:
+        cur.execute ("UPDATE logging.model_status SET (progress) = (%s) WHERE model = %s", (str((float(model_timestep)/float(model_loop_end_time - 1))*100), model_name))
+        conn.commit ()
+    except:
+        log ("Could not update model status.", "WARN", model_name)
+        num_warnings += 1
+
     log ("Run {0} completed, moving to next timestamp.".format(fmt_timestep),"INFO", model_name)
     print "---------------"
     print ""
@@ -464,13 +515,13 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 print "============================="
 print ""
 finish_time = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
-cur.execute ("UPDATE logging.model_status SET (end_time) = (%s) WHERE model = %s", (str(finish_time), model_name))
+cur.execute ("UPDATE logging.model_status SET (end_time, warnings, errors) = (%s, %s, %s) WHERE model = %s", (str(finish_time), num_warnings, num_errors, model_name))
 conn.commit ()
 
 set_model_to_waiting (model_name)
 log ("Model processing completed successfully.".format(fmt_timestep),"INFO", model_name)
 
-log ("Cleaning up the database...", "INFO")
+log ("Cleaning up the logs...", "INFO")
 cur.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '7 days'")
 conn.commit ()
 
