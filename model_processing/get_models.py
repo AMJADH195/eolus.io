@@ -317,7 +317,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     t = Timer(0, None)
     try:
         grib_file = urllib2.urlopen (url)
-        t = Timer(60, close_file, [grib_file])
+        t = Timer(120, close_file, [grib_file])
         t.start()
     except:
         log ("Could not download grib file ({0}).  Skipping...".format (url), "WARN", model_name)
