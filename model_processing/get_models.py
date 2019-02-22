@@ -524,8 +524,8 @@ set_model_to_waiting (model_name)
 log ("Model processing completed successfully.".format(fmt_timestep),"INFO", model_name)
 
 if last_checked_total_seconds > 0:
-    log ("Deleting old model run (rasters.{0}_{1}).".format (model_name,str(last_checked_total_seconds - config["maxModelAge"])), "INFO", model_name)
-    cur.execute ("DROP TABLE rasters.{0}_{1}".format (model_name,str(last_checked_total_seconds - config["maxModelAge"])))
+    log ("Deleting old model run (rasters.{0}_{1}).".format (model_name,str(int(last_checked_total_seconds) - config["maxModelAge"])), "INFO", model_name)
+    cur.execute ("DROP TABLE rasters.{0}_{1}".format (model_name,str(int(last_checked_total_seconds) - config["maxModelAge"])))
     conn.commit ()
 
 log ("Cleaning up the logs...", "INFO")
