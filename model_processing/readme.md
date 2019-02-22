@@ -1,3 +1,14 @@
+# Model Processing New Process
+1. Script is run every five minutes, looks at models in config.json
+2. Script hits logging.model_status, finds first model that doesn't have status 'IN PROGRESS'
+3. Script compares timestamp from that column with the last model run available online
+4. If a newer model is available, changes STATUS back to IN PROGRESS and begins updating the data -- updates the timestamp
+5. All major log messages sent to logging.processing_logs
+
+
+
+
+
 This script downloads a variety of weather models (if a new update is available) from NCEP NOMADS using their GRIB filter and uploads them to a Postgres, PostGIS database as rasters.
 
 The script works by reading a config JSON containing general configuration options and model-specific information.  The script checks if a newer model is available, compared to the last updated timestamp.  If so, the GRIB2 file is downloaded from NOMADS, warped to EPSG:4326 (using `gdalwarp` -- GeoTIFF format), then dumped as a SQL file (using `raster2pgsql`).  The timestamp of the model is injected into the SQL which is then executed.
