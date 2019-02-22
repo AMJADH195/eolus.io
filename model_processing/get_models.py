@@ -12,6 +12,7 @@ import pprint
 import urllib2
 import subprocess
 import psycopg2
+from threading import Timer
 
 model_time = 0      # The time applicable to the model run that will be processed
 model_name = ""     # The name of the model that will be processed
@@ -35,6 +36,8 @@ def kill_script (exit_code):
     conn.close ()
     sys.exit (exit_code)
 
+def close_file (handle):
+    handle.close()
 
 def sql_connect():
     print "Connecting to db..."
@@ -311,8 +314,11 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     print "---------------"
     log ("Downloading grib file for timestep {0}/{1}.".format (fmt_timestep, str(model_loop_end_time - 1)), "INFO", model_name)
 
+    t = Timer(0, None)
     try:
         grib_file = urllib2.urlopen (url)
+        t = Timer(60, close_file, [grib_file])
+        t.start()
     except:
         log ("Could not download grib file ({0}).  Skipping...".format (url), "WARN", model_name)
         num_warnings += 1
@@ -330,6 +336,8 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
         with open (filename + "." + model["filetype"], 'wb') as outfile:
             outfile.write (grib_file.read())
+        
+        t.cancel()
 
     except:
         log ("Could not write grib file ({0}).".format (filename), "ERROR", model_name)
