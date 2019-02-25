@@ -12,7 +12,7 @@ import pprint
 import urllib2
 import subprocess
 import psycopg2
-from threading import Timer
+import requests
 
 model_time = 0      # The time applicable to the model run that will be processed
 model_name = ""     # The name of the model that will be processed
@@ -35,9 +35,6 @@ def kill_script (exit_code):
     cur.close ()
     conn.close ()
     sys.exit (exit_code)
-
-def close_file (handle):
-    handle.close()
 
 def sql_connect():
     print "Connecting to db..."
@@ -62,10 +59,9 @@ def log (message, level, model=""):
         cur.execute ("UPDATE logging.model_status SET (log) = (%s) WHERE model = %s", (print_str, model_name))
         conn.commit ()
 
-
 def check_if_model_needs_update (model_name):
     global cur, models, model_time, last_checked_total_seconds
-    # First, for each model, check the latest model run that exists on NCEP
+    # First, for each model, check the latest model run that efrom threading import Timern NCEP
     # against the last model run that was retrieved.
 
     # model run format on NCEP is YYYYMMDDHH
@@ -141,7 +137,6 @@ def check_if_model_needs_update (model_name):
         # Wait a bit between polling server,
         # per NCEP's usage guidelines.
         time.sleep (config["sleepTime"])
-
 
 def find_next_model_to_process ():
     time = datetime.now(utc).replace(microsecond=0)
@@ -314,11 +309,11 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     print "---------------"
     log ("Downloading grib file for timestep {0}/{1}.".format (fmt_timestep, str(model_loop_end_time - 1)), "INFO", model_name)
 
-    t = Timer(0, None)
     try:
-        grib_file = urllib2.urlopen (url)
-        t = Timer(120, close_file, [grib_file])
-        t.start()
+        if requests.head(url).response.status_code != 200:
+            raise Exception ("This file does not exist on the remote server.")
+            
+        grib_file = requests.get(url, allow_redirects=True)
     except:
         log ("Could not download grib file ({0}).  Skipping...".format (url), "WARN", model_name)
         num_warnings += 1
@@ -335,9 +330,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         filename = working_dir + model_name + "_" + model_date + "_" + model_hour + "Z_f" + fmt_timestep
 
         with open (filename + "." + model["filetype"], 'wb') as outfile:
-            outfile.write (grib_file.read())
-        
-        t.cancel()
+            outfile.write (grib_file.content)
 
     except:
         log ("Could not write grib file ({0}).".format (filename), "ERROR", model_name)
