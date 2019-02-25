@@ -311,6 +311,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
     try:
         if requests.head(url).response.status_code != 200:
+            log ("Grib retrieval for timestamp {0} failed with code {1}".format (str(fmt_timestep_), requests.head(url).response.status_code), "INFO", model_name)
             raise Exception ("This file does not exist on the remote server.")
 
         grib_file = requests.get(url, allow_redirects=True)
