@@ -310,13 +310,13 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     log ("Downloading grib file for timestep {0}/{1}.".format (fmt_timestep, str(model_loop_end_time - 1)), "INFO", model_name)
 
     try:
-        if requests.head(url).response.status_code != 200:
-            log ("Grib retrieval for timestamp {0} failed with code {1}".format (str(fmt_timestep_), requests.head(url).response.status_code), "INFO", model_name)
+        grib_file = requests.get(url, allow_redirects=True)
+        if grib_file.status_code != 200:
+            log ("Grib retrieval for timestamp {0} failed with code {1}".format (str(fmt_timestep_), grib_file.status_code), "INFO", model_name)
             raise Exception ("This file does not exist on the remote server.")
 
-        grib_file = requests.get(url, allow_redirects=True)
-    except:
-        log ("Could not download grib file ({0}).  Skipping...".format (str(fmt_timestep)), "WARN", model_name)
+    except Exception as e:
+        log ("Could not download grib file ({0}).  Skipping...".format (e), "WARN", model_name)
         num_warnings += 1
         print "---------------"
         print ""
