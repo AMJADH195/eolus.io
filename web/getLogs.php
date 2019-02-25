@@ -15,7 +15,7 @@ if (!$conn) {
         array_push ($modelStatus, $row);
     }
 
-    $processingLogsResult = pg_query($conn, "SELECT * FROM logging.processing_logs ORDER BY timestamp DESC LIMIT 1000");
+    $processingLogsResult = pg_query($conn, "SELECT * FROM logging.processing_logs ORDER BY timestamp DESC LIMIT 250");
     while ($row = pg_fetch_assoc($processingLogsResult)) {
         array_push ($processingLogs, $row);
     }
