@@ -312,10 +312,10 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     try:
         if requests.head(url).response.status_code != 200:
             raise Exception ("This file does not exist on the remote server.")
-            
+
         grib_file = requests.get(url, allow_redirects=True)
     except:
-        log ("Could not download grib file ({0}).  Skipping...".format (url), "WARN", model_name)
+        log ("Could not download grib file ({0}).  Skipping...".format (str(fmt_timestep)), "WARN", model_name)
         num_warnings += 1
         print "---------------"
         print ""
