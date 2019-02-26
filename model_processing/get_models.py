@@ -290,7 +290,7 @@ if config["maxTime"] > 0:
 table_name = model_name + '_' + str(int(calendar.timegm(model_time.utctimetuple())))
 log ("Creating table rasters." + table_name, "INFO", model_name)
 
-cur.execute ('CREATE TABLE rasters.' + table_name + '("timestamp" timestamp with time zone NOT NULL, rast raster, CONSTRAINT ' + table_name + '_pkey PRIMARY KEY ("timestamp"),CONSTRAINT enforce_srid_rast CHECK (st_srid(rast) = 4326)) WITH (OIDS=FALSE);')
+cur.execute ('CREATE TABLE rasters.' + table_name + '("timestamp" timestamp without time zone NOT NULL, rast raster, CONSTRAINT ' + table_name + '_pkey PRIMARY KEY ("timestamp"),CONSTRAINT enforce_srid_rast CHECK (st_srid(rast) = 4326)) WITH (OIDS=FALSE);')
 conn.commit ()
 
 for model_timestep in range (model["startTime"], model_loop_end_time):
