@@ -231,6 +231,22 @@ def normalize_extents ():
 
     return [str(xmin), ymin, str(xmax), ymax]
 
+def create_map_file (model_name, timestamp):
+    directory = os.path.dirname(os.path.realpath(__file__)) + "/"
+    replacements = {'[[[WMSNAME]]]':model_name, '[[[TABLENAME]]]':model_name + "_" + str(timestamp)}
+    with open (directory + '/template.map') as infile, open (directory + '/out.map', 'w') as outfile:
+        for line in infile:
+            for src, target in replacements.iteritems():
+                line = line.replace(src, target)
+            outfile.write(line)
+
+
+'''
+
+    -------- MAIN ---------
+
+
+'''
 try:
     from osgeo import gdal, osr
 except:
