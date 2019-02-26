@@ -12,6 +12,7 @@
             "left": "251.5"
         },
         "tempDir": "./tempWxData/",
+        "mapfileDir": "/map",
         "logFile": "model_update.log",
         "debug": false,
         "maxModelAge": 259200,
