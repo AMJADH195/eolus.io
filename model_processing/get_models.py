@@ -523,6 +523,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     log ("Run {0} completed, moving to next timestamp.".format(fmt_timestep),"INFO", model_name)
     print "---------------"
     print ""
+    time.sleep (config["sleepTime"])
 
 print "============================="
 print ""
