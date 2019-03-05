@@ -231,6 +231,15 @@ def normalize_extents ():
 
     return [str(xmin), ymin, str(xmax), ymax]
 
+def create_map_file (model_name, timestamp):
+    directory = os.path.dirname(os.path.realpath(__file__)) + "/"
+    replacements = {'[[[WMSNAME]]]':model_name, '[[[TABLENAME]]]':model_name + "_" + str(timestamp)}
+    with open (directory + '/template.map') as infile, open (config["mapfileDir"] + '/' + model_name + '_' + timestamp + '.map', 'w') as outfile:
+        for line in infile:
+            for src, target in replacements.iteritems():
+                line = line.replace(src, target)
+            outfile.write(line)
+
 '''
 
     -------- MAIN ---------
@@ -533,6 +542,13 @@ conn.commit ()
 
 set_model_to_waiting (model_name)
 log ("Model processing completed successfully.".format(fmt_timestep),"INFO", model_name)
+
+log ("Creating mapfile.", "INFO", model_name)
+
+try:
+    create_map_file (model_name , str(int(calendar.timegm(model_time.utctimetuple()))))
+except Exception as e:
+    log ("Could not create mapfile. {0}".format (e), "ERROR", model_name)
 
 if last_checked_total_seconds > 0:
     log ("Deleting old model run (rasters.{0}_{1}).".format (model_name,str(int(last_checked_total_seconds) - config["maxModelAge"])), "INFO", model_name)
