@@ -983,6 +983,7 @@
             "startTime": 0,
             "endTime": 0,
             "downloadType": "FILESERIES",
+            "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2"
         },
         "sref_spread": {
@@ -992,6 +993,7 @@
             "startTime": 0,
             "endTime": 0,
             "downloadType": "FILESERIES",
+            "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.spread_3hrly.grib2"
         },
         "sref_prob": {
@@ -1001,6 +1003,7 @@
             "startTime": 0,
             "endTime": 0,
             "downloadType": "FILESERIES",
+            "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.prob_3hrly.grib2"
         },
         "sref_arw_ctl": {
