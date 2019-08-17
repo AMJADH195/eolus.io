@@ -401,7 +401,7 @@
             ]
         },
         "hiresw_arw": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 0,
@@ -466,7 +466,7 @@
             ]
         },
         "hiresw_nmmb": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 0,
@@ -976,8 +976,35 @@
                 {"gribVar": "WindSpd", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"}
             ]
         },
-        "sref_arw_ctl": {
+        "sref_mean": {
             "enabled": true,
+            "updateFrequency": 6,
+            "updateOffset": 3,
+            "startTime": 0,
+            "endTime": 0,
+            "downloadType": "FILESERIES",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2"
+        },
+        "sref_spread": {
+            "enabled": true,
+            "updateFrequency": 6,
+            "updateOffset": 3,
+            "startTime": 0,
+            "endTime": 0,
+            "downloadType": "FILESERIES",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.spread_3hrly.grib2"
+        },
+        "sref_prob": {
+            "enabled": true,
+            "updateFrequency": 6,
+            "updateOffset": 3,
+            "startTime": 0,
+            "endTime": 0,
+            "downloadType": "FILESERIES",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.prob_3hrly.grib2"
+        },
+        "sref_arw_ctl": {
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 3,
             "startTime": 0,
@@ -1048,7 +1075,7 @@
             ]
         },
         "sref_nmb_ctl": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 3,
             "startTime": 0,
