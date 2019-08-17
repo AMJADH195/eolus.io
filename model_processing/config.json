@@ -253,7 +253,7 @@
     },
     "models": {
         "gefs_ndgd_avg": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -274,7 +274,7 @@
             ]
         },
         "gefs_ndgd_spr": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
@@ -295,7 +295,7 @@
             ]
         },
         "gefs_pt5_avg": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -325,7 +325,7 @@
             ]
         },
         "gefs_pt5_spr": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -355,7 +355,7 @@
             ]
         },
         "gfs": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -531,7 +531,7 @@
             ]
         },
         "href_avrg": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
@@ -571,7 +571,7 @@
             ]
         },
         "href_mean": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
@@ -621,7 +621,7 @@
             ]
         },
         "href_pmmn": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
@@ -661,7 +661,7 @@
             ]
         },
         "href_sprd": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
@@ -711,7 +711,7 @@
             ]
         },
         "naefs_bc_avg": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
@@ -732,7 +732,7 @@
             ]
         },
         "naefs_bc_spr": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
@@ -753,7 +753,7 @@
             ]
         },
         "naefs_ndgd_avg": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
@@ -775,7 +775,7 @@
             ]
         },
         "naefs_ndgd_spr": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
@@ -797,7 +797,7 @@
             ]
         },
         "nam3": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -876,7 +876,7 @@
             ]
         },
         "nam12": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -949,7 +949,7 @@
             ]
         },
         "nbm": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 1,
             "updateOffset": 0,
             "startTime": 1,
@@ -986,7 +986,7 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2"
         },
         "sref_spread": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 3,
             "startTime": 0,
@@ -995,7 +995,7 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.spread_3hrly.grib2"
         },
         "sref_prob": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 3,
             "startTime": 0,
@@ -1146,7 +1146,7 @@
             ]
         },
         "wpc_snow_25pct": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1160,7 +1160,7 @@
             ]
         },
         "wpc_snow_50pct": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
