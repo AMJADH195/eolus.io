@@ -13,6 +13,7 @@ import urllib2
 import subprocess
 import psycopg2
 import requests
+from shutil import copyfile
 
 model_time = 0      # The time applicable to the model run that will be processed
 model_name = ""     # The name of the model that will be processed
@@ -303,12 +304,12 @@ if config["maxTime"] > 0:
     model_loop_end_time = config["maxTime"] + 1
 
 table_name = model_name + '_' + str(int(calendar.timegm(model_time.utctimetuple())))
-log ("Creating table rasters." + table_name, "INFO", model_name)
+#log ("Creating table rasters." + table_name, "INFO", model_name)
 
-cur.execute ("DROP TABLE IF EXISTS rasters." + table_name)
-conn.commit ()
-cur.execute ('CREATE TABLE rasters.' + table_name + '("timestamp" timestamp without time zone NOT NULL, rast raster, CONSTRAINT ' + table_name + '_pkey PRIMARY KEY ("timestamp"),CONSTRAINT enforce_srid_rast CHECK (st_srid(rast) = 4326)) WITH (OIDS=FALSE);')
-conn.commit ()
+#cur.execute ("DROP TABLE IF EXISTS rasters." + table_name)
+#conn.commit ()
+#cur.execute ('CREATE TABLE rasters.' + table_name + '("timestamp" timestamp without time zone NOT NULL, rast raster, CONSTRAINT ' + table_name + '_pkey PRIMARY KEY ("timestamp"),CONSTRAINT enforce_srid_rast CHECK (st_srid(rast) = 4326)) WITH (OIDS=FALSE);')
+#conn.commit ()
 
 for model_timestep in range (model["startTime"], model_loop_end_time):
     fmt_timestep = str(model_timestep).rjust (len(str(model["endTime"])), '0')
@@ -460,9 +461,15 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     try:
         os.system ("gdalwarp " + filename + "." + warp_file_type + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
         os.system ("gdal_translate -co compress=lzw " + filename + ".vrt " + filename + ".tif")
+
+        directory = "/maps/" + model_name + "/" + model_date + "_" + model_hour + "/"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+            
+        copyfile (filename + ".tif", directory)
         
-        log ("Raster finalized, running raster2pgsql.  Filesize: {0}".format(str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."), "INFO", model_name)
-        os.system ("raster2pgsql -a -s 4326 " + filename + ".tif" + " rasters." + model_name + "_" + str(int(calendar.timegm(model_time.utctimetuple()))) + " > " + filename + ".sql")
+        #log ("Raster finalized, running raster2pgsql.  Filesize: {0}".format(str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."), "INFO", model_name)
+        #os.system ("raster2pgsql -a -s 4326 " + filename + ".tif" + " rasters." + model_name + "_" + str(int(calendar.timegm(model_time.utctimetuple()))) + " > " + filename + ".sql")
     
     except:
         log ("Could not warp/translate the new raster.", "ERROR", model_name)
@@ -471,7 +478,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         print ""
         continue
 
-    log ("Preparing SQL for data upload.", "INFO", model_name)
+    '''log ("Preparing SQL for data upload.", "INFO", model_name)
     sql = ""
 
     try:
@@ -508,7 +515,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         print "---------------"
         print ""
         continue
-
+'''
     log ("Cleaning up temporary files.", "INFO", model_name)
     
     if not config["debug"]:
