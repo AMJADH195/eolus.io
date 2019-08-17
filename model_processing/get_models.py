@@ -510,7 +510,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         print ""
         continue
 '''
-    log ("Copy file over to /map/ directory.")
+    log ("Copy file over to /map/ directory.", "INFO", model_name)
 
     directory = "/map/" + model_name + "/"
     if not os.path.exists(directory):
@@ -519,8 +519,8 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     infile = filename + ".tif"
     outfile = directory + model_name + "_" + model_date + "_" + model_hour + "t" + model_timestep + ".tif"
 
-    log ("Infile: " + infile)
-    log ("Outfile: " + outfile)
+    log ("Infile: " + infile, "INFO", model_name)
+    log ("Outfile: " + outfile, "INFO", model_name)
 
     copyfile (infile, outfile)
     
