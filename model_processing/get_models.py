@@ -517,7 +517,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         os.makedirs(directory)
 
     infile = filename + ".tif"
-    outfile = directory + model_name + "_" + model_date + "_" + model_hour + "t" + model_timestep + ".tif"
+    outfile = directory + model_name + "_" + str(model_date) + "_" + str(model_hour) + "t" + str(model_timestep) + ".tif"
 
     log ("Infile: " + infile, "INFO", model_name)
     log ("Outfile: " + outfile, "INFO", model_name)
