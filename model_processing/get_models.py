@@ -144,6 +144,8 @@ def find_next_model_to_process ():
     global models, config, conn, cur
     for model_name, model in models.items():
         if not model["enabled"]:
+            cur.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", ("DISABLED", None, 0, model_name)) 
+            conn.commit ()
             continue
 
         print ""
