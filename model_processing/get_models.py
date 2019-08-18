@@ -13,7 +13,7 @@ import urllib2
 import subprocess
 import psycopg2
 import requests
-from shutil import copyfile
+from shutil import copy
 
 model_time = 0      # The time applicable to the model run that will be processed
 model_name = ""     # The name of the model that will be processed
@@ -456,60 +456,19 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     # This could be replaced with gdal library commands but
     # I'm lazy and the documentation is much nicer for the shell commands
     # than it is for the API :)
+    
     log ("Beginning gdalwarp and gdal_translate.", "INFO", model_name)
 
     try:
-        os.system ("gdalwarp " + filename + "." + warp_file_type + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r average")
-        os.system ("gdal_translate -co compress=lzw " + filename + ".vrt " + filename + ".tif")
-        
-        #log ("Raster finalized, running raster2pgsql.  Filesize: {0}".format(str(os.path.getsize(filename + ".tif") * 0.000001) + "MB."), "INFO", model_name)
-        #os.system ("raster2pgsql -a -s 4326 " + filename + ".tif" + " rasters." + model_name + "_" + str(int(calendar.timegm(model_time.utctimetuple()))) + " > " + filename + ".sql")
+        os.system ("gdal_translate " + filename + "." + warp_file_type + " " + filename + ".tif")
     
     except:
-        log ("Could not warp/translate the new raster.", "ERROR", model_name)
+        log ("Could not translate the new raster.", "ERROR", model_name)
         num_errors += 1
         print "---------------"
         print ""
         continue
 
-    '''log ("Preparing SQL for data upload.", "INFO", model_name)
-    sql = ""
-
-    try:
-        with open(filename + ".sql") as sql_file:
-            sql = sql_file.read()
-
-        run_time = model_time+timedelta(hours=model_timestep)
-        timestamp = run_time.strftime ("%Y-%m-%d %H:00:00+00")
-
-        print "Timestamp: " + timestamp
-        
-        sql = sql.replace ('("rast") VALUES (', '("timestamp","rast") VALUES (\'' + timestamp + '\',')
-
-        with open(filename + ".sql", 'w') as sql_file:
-            sql_file.write (sql)
-
-    except:
-        log ("Could not modify SQL load query.", "ERROR", model_name)
-        num_errors += 1
-        print "---------------"
-        print ""
-        continue 
-
-    log ("Loading the raster into the database.", "INFO", model_name)
-    
-    try:
-        if not config["debug"]:
-            os.system ("psql -h " + config["postgres"]["host"] + " -d " + config["postgres"]["db"] + " -U " + config["postgres"]["user"] + " --set=sslmode=require -f " + filename + ".sql")
-        else:
-            print "Skipped (DEBUG)"
-    except:
-        log ("Could not load raster into database.", "ERROR", model_name)
-        num_errors += 1
-        print "---------------"
-        print ""
-        continue
-'''
     log ("Copy file over to /map/ directory.", "INFO", model_name)
 
     directory = "/map/" + model_name + "/"
@@ -517,12 +476,12 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         os.makedirs(directory)
 
     infile = filename + ".tif"
-    outfile = directory + model_name + "_" + str(model_date) + "_" + str(model_hour) + "t" + str(model_timestep) + ".tif"
+    outfile = directory + model_name + "_" + str(model_date) + "_" + str(model_hour) + "z_t" + str(model_timestep) + ".tif"
 
     log ("Infile: " + infile, "INFO", model_name)
     log ("Outfile: " + outfile, "INFO", model_name)
 
-    copyfile (infile, outfile)
+    copy (infile, outfile)
     
     log ("Cleaning up temporary files.", "INFO", model_name)
     
