@@ -949,7 +949,7 @@
             ]
         },
         "nbm": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 1,
             "updateOffset": 0,
             "startTime": 1,
@@ -1007,7 +1007,7 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.prob_3hrly.grib2"
         },
         "sref_arw_ctl": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 6,
             "updateOffset": 3,
             "startTime": 0,
