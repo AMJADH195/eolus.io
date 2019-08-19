@@ -18,6 +18,7 @@ from shutil import copy
 model_time = 0      # The time applicable to the model run that will be processed
 model_name = ""     # The name of the model that will be processed
 last_checked_total_seconds = 0
+fatal_error = False
 
 ZERO = timedelta(0)
 
@@ -175,9 +176,12 @@ def find_next_model_to_process ():
     return None
 
 def set_model_to_waiting (model_name):
-    global cur, conn
+    global cur, conn, fatal_error
     time = datetime.now(utc)
-    cur.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", ("WAITING", time, 100, model_name)) 
+    status = "WAITING"
+    if fatal_error:
+        status = "FAILED"
+    cur.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", (status, time, 100, model_name)) 
     conn.commit ()
 
 def make_grib_filter_url (model_date, model_hour, fmt_timestep):
@@ -441,6 +445,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
         except:
             log ("Could not create new geotiff raster.", "ERROR", model_name)
+            fatal_error = True
             num_errors += 1
             print "---------------"
             print ""
@@ -457,6 +462,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     
     except:
         log ("Could not translate the new raster.", "ERROR", model_name)
+        fatal_error = True
         num_errors += 1
         print "---------------"
         print ""
@@ -464,17 +470,26 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
     log ("Copy file over to /map/ directory.", "INFO", model_name)
 
-    directory = "/map/" + model_name + "/"
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    try:
+        directory = "/map/" + model_name + "/"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
-    infile = filename + ".tif"
-    outfile = directory + model_name + "_" + str(model_date) + "_" + str(model_hour) + "z_t" + str(model_timestep) + ".tif"
+        infile = filename + ".tif"
+        outfile = directory + model_name + "_" + str(model_date) + "_" + str(model_hour) + "z_t" + str(model_timestep) + ".tif"
 
-    log ("Infile: " + infile, "INFO", model_name)
-    log ("Outfile: " + outfile, "INFO", model_name)
+        log ("Infile: " + infile, "INFO", model_name)
+        log ("Outfile: " + outfile, "INFO", model_name)
 
-    copy (infile, outfile)
+        copy (infile, outfile)
+
+    except:
+        log ("Could not copy the new raster.", "ERROR", model_name)
+        fatal_error = True
+        num_errors += 1
+        print "---------------"
+        print ""
+        continue
     
     log ("Cleaning up temporary files.", "INFO", model_name)
     
