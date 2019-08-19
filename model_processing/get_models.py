@@ -71,11 +71,11 @@ def check_if_model_needs_update (model_name):
 
     model_timestamp = datetime.fromtimestamp (0)
 
-    cur.execute ("SELECT model_timestamp FROM logging.model_status WHERE model LIKE '" + model_name + "'")
+    cur.execute ("SELECT model_timestamp, status FROM logging.model_status WHERE model LIKE '" + model_name + "'")
     fetch = cur.fetchone()
     if fetch:
         model_db_timestamp = fetch[0]
-        if model_db_timestamp:
+        if model_db_timestamp and fetch[1] not "FAILED":
             model_timestamp = parse(str(model_db_timestamp))
 
     print "Last checked: " + model_timestamp.strftime ("%Y %m %d %HZ")
