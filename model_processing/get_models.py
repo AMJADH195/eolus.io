@@ -163,7 +163,7 @@ def find_next_model_to_process ():
 
         if result == None:
             should_update = check_if_model_needs_update (model_name)
-        elif result[1] == "WAITING":
+        elif result[1] == "WAITING" or result[1] == "FAILED":
             if check_if_model_needs_update (model_name):
                 should_update = True
             else:
