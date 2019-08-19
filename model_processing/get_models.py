@@ -33,6 +33,17 @@ class UTC(tzinfo):
 
 utc = UTC()
 
+class GdalErrorHandler(object):
+    def __init__(self):
+        self.err_level=gdal.CE_None
+        self.err_no=0
+        self.err_msg=''
+
+    def handler(self, err_level, err_no, err_msg):
+        self.err_level=err_level
+        self.err_no=err_no
+        self.err_msg=err_msg
+
 def kill_script (exit_code):
     global cur, conn
     cur.close ()
@@ -256,6 +267,9 @@ except:
     sys.exit (1)
 
 directory = os.path.dirname(os.path.realpath(__file__)) + "/"
+err=GdalErrorHandler()
+handler=err.handler
+gdal.PushErrorHandler(handler)
 gdal.UseExceptions()
 
 # Todo - catch this if the file doesn't exist
@@ -462,6 +476,9 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
         except Exception as e:
             log ("Could not create new geotiff raster.", "ERROR", model_name)
+            print str(err.err_level)
+            print str(err.err_no)
+            print str(err.err_msg)
             print (gdal.GetLastErrorMsg())
             print str(e)
             print e
