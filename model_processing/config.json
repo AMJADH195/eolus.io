@@ -819,7 +819,7 @@
             ]
         },
         "nbm": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 1,
             "updateOffset": 0,
             "startTime": 1,
