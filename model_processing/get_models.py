@@ -458,6 +458,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     log ("Beginning gdalwarp and gdal_translate.", "INFO", model_name)
 
     try:
+        os.system ("gdalwarp " + filename + "." + warp_file_type + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r lanczos -overwrite")
         os.system ("gdal_translate " + filename + "." + warp_file_type + " " + filename + ".tif")
     
     except:
