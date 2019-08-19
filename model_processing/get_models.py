@@ -422,15 +422,13 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         # Create an in-memory raster that we will write the desired bands to as we find them
         new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
         print " ---> Created, setting transform "
-        print str(geo_transform)
-        print str(grib_srs)
-        print str(width)
-        print str(height)
         new_raster.SetGeoTransform (list(geo_transform))
 
         # For each band in the list, search through the bands of the raster for the match
         # if not found, print a warning and write an empty band
         for extract_band in model["extractBandsByMetadata"]:
+            print model
+            print extract_band
             extract_band_element = extract_band[0]
             extract_band_name = extract_band[1]
             matched = False
