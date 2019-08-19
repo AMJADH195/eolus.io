@@ -75,7 +75,7 @@ def check_if_model_needs_update (model_name):
     fetch = cur.fetchone()
     if fetch:
         model_db_timestamp = fetch[0]
-        if model_db_timestamp and fetch[1] not "FAILED":
+        if model_db_timestamp and fetch[1] != "FAILED":
             model_timestamp = parse(str(model_db_timestamp))
 
     print "Last checked: " + model_timestamp.strftime ("%Y %m %d %HZ")
