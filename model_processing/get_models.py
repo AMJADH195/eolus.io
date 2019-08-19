@@ -19,6 +19,7 @@ model_time = 0      # The time applicable to the model run that will be processe
 model_name = ""     # The name of the model that will be processed
 last_checked_total_seconds = 0
 fatal_error = False
+already_failed = False
 
 ZERO = timedelta(0)
 
@@ -62,7 +63,7 @@ def log (message, level, model=""):
         conn.commit ()
 
 def check_if_model_needs_update (model_name):
-    global cur, models, model_time, last_checked_total_seconds
+    global cur, models, model_time, last_checked_total_seconds, already_failed
     # First, for each model, check the latest model run that efrom threading import Timern NCEP
     # against the last model run that was retrieved.
 
@@ -77,6 +78,8 @@ def check_if_model_needs_update (model_name):
         model_db_timestamp = fetch[0]
         if model_db_timestamp and fetch[1] != "FAILED":
             model_timestamp = parse(str(model_db_timestamp))
+        if fetch[1] == "FAILED":
+            already_failed = True
 
     print "Last checked: " + model_timestamp.strftime ("%Y %m %d %HZ")
 
@@ -532,6 +535,8 @@ conn.commit ()
 status = "COMPLETE"
 if fatal_error:
     status = "FAILED"
+if fatal_error and already_failed:
+    status = "PERMANENTLY FAILED"
 
 cur.execute ('UPDATE logging.run_status SET (time_end, result) = (%s, %s) WHERE model = %s AND model_timestamp = %s', (str(finish_time), status, model_name, model_time))
 conn.commit ()
