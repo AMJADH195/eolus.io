@@ -459,8 +459,11 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             del new_raster
             del out_raster
 
-        except:
+        except Exception as e:
             log ("Could not create new geotiff raster.", "ERROR", model_name)
+            print str(e)
+            print e
+            print e.message
             fatal_error = True
             num_errors += 1
             print "---------------"
