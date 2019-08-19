@@ -429,8 +429,6 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             # For each band in the list, search through the bands of the raster for the match
             # if not found, print a warning and write an empty band
             for extract_band in model["extractBandsByMetadata"]:
-                print model
-                print extract_band
                 extract_band_element = extract_band["gribVar"]
                 extract_band_name = extract_band["gribLevel"]
                 matched = False
