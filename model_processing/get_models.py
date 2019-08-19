@@ -405,89 +405,75 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         variables through their entire model run like TMP.  So, here we are.
     '''
     if "extractBandsByMetadata" in model:
-        try:
-            print " ---> Extracting specific bands."
-            warp_file_type = "tif"
 
-            # Open the grib file and read the bands and SRS
-            grib_file = gdal.Open (filename + "." + model["filetype"])
-            grib_srs = osr.SpatialReference()
-            grib_srs.ImportFromWkt (grib_file.GetProjection())
-            geo_transform = grib_file.GetGeoTransform()
-            width = grib_file.RasterXSize
-            height = grib_file.RasterYSize
-            num_src_bands = grib_file.RasterCount
+        print " ---> Extracting specific bands."
+        warp_file_type = "tif"
 
-            print " ---> Creating new raster in memory."
-            # Create an in-memory raster that we will write the desired bands to as we find them
-            new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
-            print " ---> Created, setting transform "
-            print str(geo_transform)
-            print str(grib_srs)
-            print str(width)
-            print str(height)
-            new_raster.SetGeoTransform (list(geo_transform))
+        # Open the grib file and read the bands and SRS
+        grib_file = gdal.Open (filename + "." + model["filetype"])
+        grib_srs = osr.SpatialReference()
+        grib_srs.ImportFromWkt (grib_file.GetProjection())
+        geo_transform = grib_file.GetGeoTransform()
+        width = grib_file.RasterXSize
+        height = grib_file.RasterYSize
+        num_src_bands = grib_file.RasterCount
 
-            # For each band in the list, search through the bands of the raster for the match
-            # if not found, print a warning and write an empty band
-            for extract_band in model["extractBandsByMetadata"]:
-                extract_band_element = extract_band[0]
-                extract_band_name = extract_band[1]
-                matched = False
+        print " ---> Creating new raster in memory."
+        # Create an in-memory raster that we will write the desired bands to as we find them
+        new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
+        print " ---> Created, setting transform "
+        print str(geo_transform)
+        print str(grib_srs)
+        print str(width)
+        print str(height)
+        new_raster.SetGeoTransform (list(geo_transform))
 
-                print " ---> Extracting band " + extract_band_name
-                for i in range (1, num_src_bands):
-                    band = grib_file.GetRasterBand(i)
-                    band_metadata = band.GetMetadata()
-                    if (band_metadata["GRIB_ELEMENT"] == extract_band_element and
-                        band_metadata["GRIB_SHORT_NAME"] == extract_band_name):
+        # For each band in the list, search through the bands of the raster for the match
+        # if not found, print a warning and write an empty band
+        for extract_band in model["extractBandsByMetadata"]:
+            extract_band_element = extract_band[0]
+            extract_band_name = extract_band[1]
+            matched = False
 
-                        # WE COULD JUST DO A BREAK HERE BUT -- this warning might be useful
-                        # so we're going to iterate the whole thing, even if a match is found
-                        # just to alert the user that they might not be getting the expected band
-                        if matched:
-                            num_warnings += 1
-                            print " !!! WARNING : The same variable (" + extract_band_element + " @ " + extract_band_name + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
-                        else:
-                            matched = True
-                            new_band = new_raster.GetRasterBand (new_raster.RasterCount)
-                            band_data = band.ReadAsArray()
-                            data_type = band.DataType
-                            new_raster.AddBand(data_type)
-                            new_band = new_raster.GetRasterBand (new_raster.RasterCount)
-                            new_band.WriteArray (band_data)
-                            new_band.FlushCache()
-                if not matched:
-                    num_warnings += 1
-                    print " !!! WARNING: This run is missing a desired band: " + extract_band_element + " @ " + extract_band_name
-                    # Add an empty band to not upset the sacred order of raster bands
-                    # Careful with the type!  Tif driver gets angry if the types are different across bands
-                    new_raster.AddBand(gdal.GDT_Float64)
+            print " ---> Extracting band " + extract_band_name
+            for i in range (1, num_src_bands):
+                band = grib_file.GetRasterBand(i)
+                band_metadata = band.GetMetadata()
+                if (band_metadata["GRIB_ELEMENT"] == extract_band_element and
+                    band_metadata["GRIB_SHORT_NAME"] == extract_band_name):
 
-            new_raster.SetProjection (grib_srs.ExportToWkt())
-            out_raster = gdal.GetDriverByName('GTiff').CreateCopy (filename + ".tif", new_raster, 0)
+                    # WE COULD JUST DO A BREAK HERE BUT -- this warning might be useful
+                    # so we're going to iterate the whole thing, even if a match is found
+                    # just to alert the user that they might not be getting the expected band
+                    if matched:
+                        num_warnings += 1
+                        print " !!! WARNING : The same variable (" + extract_band_element + " @ " + extract_band_name + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
+                    else:
+                        matched = True
+                        new_band = new_raster.GetRasterBand (new_raster.RasterCount)
+                        band_data = band.ReadAsArray()
+                        data_type = band.DataType
+                        new_raster.AddBand(data_type)
+                        new_band = new_raster.GetRasterBand (new_raster.RasterCount)
+                        new_band.WriteArray (band_data)
+                        new_band.FlushCache()
+            if not matched:
+                num_warnings += 1
+                print " !!! WARNING: This run is missing a desired band: " + extract_band_element + " @ " + extract_band_name
+                # Add an empty band to not upset the sacred order of raster bands
+                # Careful with the type!  Tif driver gets angry if the types are different across bands
+                new_raster.AddBand(gdal.GDT_Float64)
 
-            log ("New raster created.", "INFO", model_name)
+        new_raster.SetProjection (grib_srs.ExportToWkt())
+        out_raster = gdal.GetDriverByName('GTiff').CreateCopy (filename + ".tif", new_raster, 0)
 
-            # This is important, or else gdalwarp and gdal_translate
-            # can't read the raster and you get an empty raster in the end
-            del new_raster
-            del out_raster
+        log ("New raster created.", "INFO", model_name)
 
-        except Exception as e:
-            log ("Could not create new geotiff raster.", "ERROR", model_name)
-            print str(err.err_level)
-            print str(err.err_no)
-            print str(err.err_msg)
-            print (gdal.GetLastErrorMsg())
-            print str(e)
-            print e
-            print e.message
-            fatal_error = True
-            num_errors += 1
-            print "---------------"
-            print ""
-            continue
+        # This is important, or else gdalwarp and gdal_translate
+        # can't read the raster and you get an empty raster in the end
+        del new_raster
+        del out_raster
+
 
     # This could be replaced with gdal library commands but
     # I'm lazy and the documentation is much nicer for the shell commands
