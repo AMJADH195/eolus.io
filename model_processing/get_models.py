@@ -403,6 +403,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             height = grib_file.RasterYSize
             num_src_bands = grib_file.RasterCount
 
+            print " ---> Creating new raster in memory."
             # Create an in-memory raster that we will write the desired bands to as we find them
             new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
             new_raster.SetGeoTransform (geo_transform)
@@ -414,6 +415,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
                 extract_band_name = extract_band[1]
                 matched = False
 
+                print " ---> Extracting band " + extract_band_name
                 for i in range (1, num_src_bands):
                     band = grib_file.GetRasterBand(i)
                     band_metadata = band.GetMetadata()
