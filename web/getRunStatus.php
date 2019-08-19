@@ -11,7 +11,7 @@ if (!$conn) {
     $error = "Could not connect to database.";
 } else {
     $runsResult = pg_query($conn, "SELECT * FROM logging.run_status ORDER BY model ASC");
-    while ($row = pg_fetch_assoc($runResult)) {
+    while ($row = pg_fetch_assoc($runsResult)) {
         array_push ($modelStatus, $row);
     }
 }
