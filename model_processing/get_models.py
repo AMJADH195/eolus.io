@@ -531,7 +531,7 @@ status = "COMPLETE"
 if fatal_error:
     status = "FAILED"
 
-cur.execute ('UPDATE logging.run_status SET (end_time, result) = (%s, %s) WHERE model = %s AND model_timestamp = %s', (str(finish_time), status, model_name, model_time))
+cur.execute ('UPDATE logging.run_status SET (time_end, result) = (%s, %s) WHERE model = %s AND model_timestamp = %s', (str(finish_time), status, model_name, model_time))
 conn.commit ()
 
 set_model_to_waiting (model_name)
