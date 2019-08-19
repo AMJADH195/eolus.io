@@ -429,8 +429,8 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         for extract_band in model["extractBandsByMetadata"]:
             print model
             print extract_band
-            extract_band_element = extract_band[0]
-            extract_band_name = extract_band[1]
+            extract_band_element = extract_band["gribVar"]
+            extract_band_name = extract_band["gribLevel"]
             matched = False
 
             print " ---> Extracting band " + extract_band_name
