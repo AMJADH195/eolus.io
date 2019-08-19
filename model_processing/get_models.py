@@ -287,6 +287,8 @@ model_date = model_time.strftime ("%Y-%m-%d")
 log ("Model processing start: {0} {1}Z".format (model_date, model_hour), "INFO", model_name)
 cur.execute ("UPDATE logging.model_status SET (model_timestamp) = (%s) WHERE model = %s", (model_time, model_name))
 conn.commit ()
+cur.execute ('INSERT INTO logging.run_status (model, result, model_timestamp, fh_complete, time_start) VALUES (%s, %s, %s, 0, %s)', (model_name, "IN PROGRESS", model_time, 0, str(datetime.now(utc))))
+conn.commit ()
 
 working_dir = directory + "/" + config["tempDir"] + model_name + "/"
 if not os.path.exists(working_dir):
@@ -459,7 +461,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
     try:
         os.system ("gdalwarp " + filename + "." + warp_file_type + " " + filename + ".vrt -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r lanczos -overwrite")
-        os.system ("gdal_translate " + filename + "." + warp_file_type + " " + filename + ".tif")
+        os.system ("gdal_translate " + filename + ".vrt" + " " + filename + ".tif")
     
     except:
         log ("Could not translate the new raster.", "ERROR", model_name)
@@ -508,6 +510,8 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     try:
         cur.execute ("UPDATE logging.model_status SET (progress) = (%s) WHERE model = %s", (str((float(model_timestep)/float(model_loop_end_time - 1))*100), model_name))
         conn.commit ()
+        cur.execute ('UPDATE logging.run_status SET (fh_complete) = (%s) WHERE model = %s AND model_timestamp = %s', (model_timestep, model_name, model_time))
+        conn.commit ()
     except:
         log ("Could not update model status.", "WARN", model_name)
         num_warnings += 1
@@ -521,6 +525,13 @@ print "============================="
 print ""
 finish_time = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
 cur.execute ("UPDATE logging.model_status SET (end_time, warnings, errors) = (%s, %s, %s) WHERE model = %s", (str(finish_time), num_warnings, num_errors, model_name))
+conn.commit ()
+
+status = "COMPLETE"
+if fatal_error:
+    status = "FAILED"
+
+cur.execute ('UPDATE logging.run_status SET (end_time, result) = (%s, %s) WHERE model = %s AND model_timestamp = %s', (str(finish_time), status, model_name, model_time))
 conn.commit ()
 
 set_model_to_waiting (model_name)
