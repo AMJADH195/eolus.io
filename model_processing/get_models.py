@@ -184,6 +184,8 @@ def set_model_to_waiting (model_name):
     status = "WAITING"
     if fatal_error:
         status = "FAILED"
+    if fatal_error and already_failed:
+        status = "FAILED PERMANENTLY"
     cur.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", (status, time, 100, model_name)) 
     conn.commit ()
 
