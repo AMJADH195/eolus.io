@@ -287,6 +287,8 @@ model_date = model_time.strftime ("%Y-%m-%d")
 log ("Model processing start: {0} {1}Z".format (model_date, model_hour), "INFO", model_name)
 cur.execute ("UPDATE logging.model_status SET (model_timestamp) = (%s) WHERE model = %s", (model_time, model_name))
 conn.commit ()
+cur.execute ("DELETE logging.run_status WHERE model = %s AND model_timestamp = %s",(model_name, model_time))
+conn.commit ()
 cur.execute ('INSERT INTO logging.run_status (model, result, model_timestamp, fh_complete, time_start) VALUES (%s, %s, %s, 0, %s)', (model_name, "IN PROGRESS", model_time, str(datetime.now(utc))))
 conn.commit ()
 
