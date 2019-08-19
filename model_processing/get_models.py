@@ -407,13 +407,12 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             print " ---> Creating new raster in memory."
             # Create an in-memory raster that we will write the desired bands to as we find them
             new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
-            new_raster.SetProjection (grib_srs.ExportToWkt())
             print " ---> Created, setting transform "
             print str(geo_transform)
             print str(grib_srs)
             print str(width)
             print str(height)
-            new_raster.SetGeoTransform (geo_transform)
+            new_raster.SetGeoTransform (list(geo_transform))
 
             # For each band in the list, search through the bands of the raster for the match
             # if not found, print a warning and write an empty band
