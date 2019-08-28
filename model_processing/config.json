@@ -15,9 +15,10 @@
         "mapfileDir": "/map",
         "logFile": "model_update.log",
         "debug": false,
+        "resampling": "cubicspline",
         "sleepTime": 1,
         "maxTime": 0,
-        "imageWidth": 256,
+        "retentionDays": 2,
         "downloadTypes": {
             "GRIBFILTER": {
                 "gribFilterExtension": ".pl?",
@@ -323,6 +324,7 @@
             "updateOffset": 0,
             "startTime": 1,
             "endTime": 36,
+            "imageWidth": 256,
             "downloadType": "FILESERIES",
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.mean.f%T.grib2",
             "filetype": "grib2",
@@ -646,6 +648,7 @@
             "updateOffset": 3,
             "startTime": 0,
             "endTime": 0,
+            "imageWidth": 256,
             "downloadType": "FILESERIES",
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2"

@@ -39,7 +39,7 @@ The `gribVar` pertains to the `GRIB_ELEMENT` as reported by GDAL. the `gribLevel
 
  * psycopg2
  * requests
- * osgeo (gdal, osr)
+ * osgeo (gdal, osr) (`pip install GDAL`)
 
 # Configuration
 By default the configuration is close to what is used in production on eolus.io. Of note, the geopgraphic extent is set to roughly contain the state of Colorado. It also connects to the eolus.io database by default (or it would, if you knew the password).
@@ -136,18 +136,6 @@ All of these overwrite the setting in the config, if it exists.
  * `--forcemodel` Force run a model, ignore its enabled status (for dev purposes)
  * `--maxtime` Hard cutoff for forecast hour, so that the entire model run isn't processed (for dev purposes)
  * `--verbose` Disabled quiet mode for external calls (such as `gdalwarp`)
-
-# Dependencies
-These dependencies are required on the machine that is running `get_models.py`.
-
- * Python 2
- * GDAL/OGR
- * .pgpass file for connecting to your DB
- * Local filesystem access for the user running it
- 
- ## Optional, but useful dependencies
- 
- * MapServer, for actually making the models available on the web. See `eolus.map`
 
 # Creating the Postgres Tables
 See the sql dump for the schemas required for the tables. These need to go into the "logging" namespace.

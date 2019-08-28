@@ -1,25 +1,30 @@
-import sys
+import argparse
+import calendar
+import json
 import os
 import os.path
-import json
-from datetime import datetime
-from datetime import timedelta
-from datetime import tzinfo
-from dateutil.parser import parse
-import calendar
-import time
 import pprint
-import urllib2
 import subprocess
+import sys
+import time
+import urllib2
+from datetime import datetime, timedelta, tzinfo
+from shutil import copy
+
 import psycopg2
 import requests
-from shutil import copy
+from dateutil.parser import parse
 
 model_time = 0      # The time applicable to the model run that will be processed
 model_name = ""     # The name of the model that will be processed
 last_checked_total_seconds = 0
 fatal_error = False
 already_failed = False
+verbose = False
+ignoredb = False
+forcemodel = None
+conn = None
+curr = None
 
 ZERO = timedelta(0)
 
@@ -45,9 +50,10 @@ class GdalErrorHandler(object):
         self.err_msg=err_msg
 
 def kill_script (exit_code):
-    global cur, conn
-    cur.close ()
-    conn.close ()
+    global curr, conn
+    if not ignoredb:
+        curr.close ()
+        conn.close ()
     sys.exit (exit_code)
 
 def sql_connect():
@@ -60,21 +66,22 @@ def sql_connect():
         sslmode="require")
 
 def log (message, level, model=""):
-    global cur, conn
+    global curr, conn
     time = datetime.now(utc)
     print_time = time.strftime ("%Y-%m-%d %H:%M:%S")
     print_str = "[" + level + "] | " + print_time + " | " + model + " | " + message
     print print_str
 
-    cur.execute ("INSERT INTO logging.processing_logs (timestamp, model, level, message) VALUES (%s, %s, %s, %s)", (str(time), model, level, message ))
-    conn.commit ()
-
-    if model:
-        cur.execute ("UPDATE logging.model_status SET (log) = (%s) WHERE model = %s", (print_str, model_name))
+    if not ignoredb:
+        curr.execute ("INSERT INTO logging.processing_logs (timestamp, model, level, message) VALUES (%s, %s, %s, %s)", (str(time), model, level, message ))
         conn.commit ()
 
+        if model:
+            curr.execute ("UPDATE logging.model_status SET (log) = (%s) WHERE model = %s", (print_str, model_name))
+            conn.commit ()
+
 def check_if_model_needs_update (model_name):
-    global cur, models, model_time, last_checked_total_seconds, already_failed
+    global curr, models, model_time, last_checked_total_seconds, already_failed
     # First, for each model, check the latest model run that efrom threading import Timern NCEP
     # against the last model run that was retrieved.
 
@@ -83,8 +90,9 @@ def check_if_model_needs_update (model_name):
 
     model_timestamp = datetime.fromtimestamp (0)
 
-    cur.execute ("SELECT model_timestamp, status FROM logging.model_status WHERE model LIKE '" + model_name + "'")
-    fetch = cur.fetchone()
+    if not ignoredb:
+        curr.execute ("SELECT model_timestamp, status FROM logging.model_status WHERE model LIKE '" + model_name + "'")
+        fetch = curr.fetchone()
     if fetch:
         model_db_timestamp = fetch[0]
         if model_db_timestamp and fetch[1] != "FAILED":
@@ -156,10 +164,10 @@ def check_if_model_needs_update (model_name):
 
 def find_next_model_to_process ():
     time = datetime.now(utc).replace(microsecond=0)
-    global models, config, conn, cur
+    global models, config, conn, curr
     for model_name, model in models.items():
         if not model["enabled"]:
-            cur.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", ("DISABLED", None, 0, model_name)) 
+            curr.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", ("DISABLED", None, 0, model_name)) 
             conn.commit ()
             continue
 
@@ -167,8 +175,9 @@ def find_next_model_to_process ():
         print "---------------"
         print "Checking " + model_name + "..."
 
-        cur.execute ("SELECT * FROM logging.model_status WHERE model LIKE '" + model_name + "'")
-        result = cur.fetchone()
+        if not ignoredb:
+            curr.execute ("SELECT * FROM logging.model_status WHERE model LIKE '" + model_name + "'")
+            result = curr.fetchone()
 
         should_update = False
 
@@ -183,22 +192,24 @@ def find_next_model_to_process ():
             print "This model is currently " + result[1] + ", skipping."
         
         if should_update:
-            cur.execute ("INSERT INTO logging.model_status (model, status, model_timestamp, warnings, errors, log, start_time, end_time, progress) VALUES (%s, %s, null, 0, 0, null, %s, null, 0) ON CONFLICT (model) DO UPDATE SET (status, model_timestamp, warnings, errors, log, start_time, end_time, progress) = (EXCLUDED.status, EXCLUDED.model_timestamp, EXCLUDED.warnings, EXCLUDED.errors, EXCLUDED.log, EXCLUDED.start_time, EXCLUDED.end_time, EXCLUDED.progress)", (model_name, "PROCESSING", time)) 
-            conn.commit ()
+            if not ignoredb:
+                curr.execute ("INSERT INTO logging.model_status (model, status, model_timestamp, warnings, errors, log, start_time, end_time, progress) VALUES (%s, %s, null, 0, 0, null, %s, null, 0) ON CONFLICT (model) DO UPDATE SET (status, model_timestamp, warnings, errors, log, start_time, end_time, progress) = (EXCLUDED.status, EXCLUDED.model_timestamp, EXCLUDED.warnings, EXCLUDED.errors, EXCLUDED.log, EXCLUDED.start_time, EXCLUDED.end_time, EXCLUDED.progress)", (model_name, "PROCESSING", time)) 
+                conn.commit ()
             return model_name
         
     return None
 
 def set_model_to_waiting (model_name):
-    global cur, conn, fatal_error
+    global curr, conn, fatal_error
     time = datetime.now(utc)
     status = "WAITING"
     if fatal_error:
         status = "FAILED"
     if fatal_error and already_failed:
         status = "FAILED PERMANENTLY"
-    cur.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", (status, time, 100, model_name)) 
-    conn.commit ()
+    if not ignoredb:
+        curr.execute ("UPDATE logging.model_status SET (status, end_time, progress) = (%s, %s, %s) WHERE model = %s", (status, time, 100, model_name)) 
+        conn.commit ()
 
 def make_grib_filter_url (model_date, model_hour, fmt_timestep):
     global model, config
@@ -267,21 +278,49 @@ except:
     sys.exit (1)
 
 directory = os.path.dirname(os.path.realpath(__file__)) + "/"
+
+# GDAL error handling stuff
 err=GdalErrorHandler()
 handler=err.handler
 gdal.PushErrorHandler(handler)
 gdal.UseExceptions()
 
-# Todo - catch this if the file doesn't exist
-with open (directory + '/config.json') as f:
-    data = json.load(f)
+try:
+    with open (directory + '/config.json') as f:
+        data = json.load(f)
+except:
+    print "Error: Config file does not exist."
+    sys.exit (1)
 
 config = data["config"]
 models = data["models"]
 
-conn = None
+parser = argparse.ArgumentParser ()
+parser.add_argument ('--ignoredb', action='store_true')
+parser.add_argument ('--verbose', action='store_true')
+parser.add_argument ('--forcemodel', type=str)
+parser.add_argument ('--maxtime', type=int)
+args = parser.parse_args ()
+
+if args.maxtime:
+    print "Max FH set to " + str (args.maxtime)
+    config["maxTime"] = args.maxtime
+
+if args.verbose:
+    print "Verbose enabled"
+    verbose = True
+
+if args.ignoredb:
+    print "Ignore DB enabled"
+    ignoredb = True
+
+if args.forcemodel:
+    forcemodel = args.forcemodel
+    print "Will only process model " + forcemodel
+
 try:
-    conn = sql_connect ()
+    if not ignoredb:
+        conn = sql_connect ()
 except psycopg2.Error as e:
     print "Could not connect to database."
     print e
@@ -290,9 +329,14 @@ except psycopg2.Error as e:
 
 print "Connected successfully."
 
-cur = conn.cursor()
+if not ignoredb:
+    curr = conn.cursor()
 
-model_name = find_next_model_to_process ()
+if not forcemodel:
+    model_name = find_next_model_to_process ()
+else:
+    model_name = forcemodel
+
 if model_name == None:
     print "No updates needed.  Exiting."
     kill_script (0)
@@ -305,12 +349,13 @@ model_hour = model_time.strftime ("%H")
 model_date = model_time.strftime ("%Y-%m-%d")
 
 log ("Model processing start: {0} {1}Z".format (model_date, model_hour), "INFO", model_name)
-cur.execute ("UPDATE logging.model_status SET (model_timestamp) = (%s) WHERE model = %s", (model_time, model_name))
-conn.commit ()
-cur.execute ("DELETE FROM logging.run_status WHERE model = %s AND model_timestamp = %s",(model_name, model_time))
-conn.commit ()
-cur.execute ('INSERT INTO logging.run_status (model, result, model_timestamp, fh_complete, time_start) VALUES (%s, %s, %s, 0, %s)', (model_name, "IN PROGRESS", model_time, str(datetime.now(utc))))
-conn.commit ()
+if not ignoredb:
+    curr.execute ("UPDATE logging.model_status SET (model_timestamp) = (%s) WHERE model = %s", (model_time, model_name))
+    conn.commit ()
+    curr.execute ("DELETE FROM logging.run_status WHERE model = %s AND model_timestamp = %s",(model_name, model_time))
+    conn.commit ()
+    curr.execute ('INSERT INTO logging.run_status (model, result, model_timestamp, fh_complete, time_start) VALUES (%s, %s, %s, 0, %s)', (model_name, "IN PROGRESS", model_time, str(datetime.now(utc))))
+    conn.commit ()
 
 working_dir = directory + "/" + config["tempDir"] + model_name + "/"
 if not os.path.exists(working_dir):
@@ -477,7 +522,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
             log ("New raster created.", "INFO", model_name)
 
-            # This is important, or else gdalwarp and gdal_translate
+            # This is important, or else gdalwarp
             # can't read the raster and you get an empty raster in the end
             del new_raster
             del out_raster
@@ -492,7 +537,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     # I'm lazy and the documentation is much nicer for the shell commands
     # than it is for the API :)
     
-    log ("Beginning gdalwarp and gdal_translate.", "INFO", model_name)
+    log ("Beginning gdalwarp.", "INFO", model_name)
 
     try:
         if "extractBandsByMetadata" not in model:
@@ -500,7 +545,16 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         else:
             filenames = filename + "_temp.tif " + filename + ".tif"
 
-        os.system ('gdalwarp ' + filenames + ' -q -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r cubicspline -ts ' + str(config["imageWidth"]) + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"')
+        widthStr = ""
+        if model["imageWidth"]:
+            print "Setting image width from config."
+            widthStr = " -ts " + str(model["imageWidth"])
+
+        quietStr = " -q"
+        if verbose:
+            quietStr = ""
+
+        os.system ('gdalwarp ' + filenames + quietStr + ' -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r ' + config["resampling"] + widthStr + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"')
     
     except:
         log ("Could not translate the new raster.", "ERROR", model_name)
@@ -547,10 +601,11 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         print "Skipped (DEBUG)"
 
     try:
-        cur.execute ("UPDATE logging.model_status SET (progress) = (%s) WHERE model = %s", (str((float(model_timestep)/float(model_loop_end_time - 1))*100), model_name))
-        conn.commit ()
-        cur.execute ('UPDATE logging.run_status SET (fh_complete) = (%s) WHERE model = %s AND model_timestamp = %s', (model_timestep, model_name, model_time))
-        conn.commit ()
+        if not ignoredb:
+            curr.execute ("UPDATE logging.model_status SET (progress) = (%s) WHERE model = %s", (str((float(model_timestep)/float(model_loop_end_time - 1))*100), model_name))
+            conn.commit ()
+            curr.execute ('UPDATE logging.run_status SET (fh_complete) = (%s) WHERE model = %s AND model_timestamp = %s', (model_timestep, model_name, model_time))
+            conn.commit ()
     except:
         log ("Could not update model status.", "WARN", model_name)
         num_warnings += 1
@@ -563,8 +618,10 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 print "============================="
 print ""
 finish_time = datetime.utcnow().strftime ("%Y-%m-%d %H:%M:%S+00")
-cur.execute ("UPDATE logging.model_status SET (end_time, warnings, errors) = (%s, %s, %s) WHERE model = %s", (str(finish_time), num_warnings, num_errors, model_name))
-conn.commit ()
+
+if not ignoredb:
+    curr.execute ("UPDATE logging.model_status SET (end_time, warnings, errors) = (%s, %s, %s) WHERE model = %s", (str(finish_time), num_warnings, num_errors, model_name))
+    conn.commit ()
 
 status = "COMPLETE"
 if fatal_error:
@@ -572,18 +629,20 @@ if fatal_error:
 if fatal_error and already_failed:
     status = "PERMANENTLY FAILED"
 
-cur.execute ('UPDATE logging.run_status SET (time_end, result) = (%s, %s) WHERE model = %s AND model_timestamp = %s', (str(finish_time), status, model_name, model_time))
-conn.commit ()
+if not ignoredb:
+    curr.execute ('UPDATE logging.run_status SET (time_end, result) = (%s, %s) WHERE model = %s AND model_timestamp = %s', (str(finish_time), status, model_name, model_time))
+    conn.commit ()
 
 set_model_to_waiting (model_name)
 log ("Model processing completed successfully.".format(fmt_timestep),"INFO", model_name)
 
 
-log ("Cleaning up the logs...", "INFO")
-cur.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '2 days'")
-conn.commit ()
-cur.execute ("DELETE FROM logging.run_status WHERE model_timestamp < now() - interval '2 days'")
-conn.commit ()
+if not ignoredb:
+    log ("Cleaning up the logs...", "INFO")
+    curr.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '" + str(config["retentionDays"]) + " days'")
+    conn.commit ()
+    curr.execute ("DELETE FROM logging.run_status WHERE model_timestamp < now() - interval '" + str(config["retentionDays"]) + " days'")
+    conn.commit ()
 
-os.system ('find /map/*/* -mtime +2 -exec rm {} \;')
+os.system ('find /map/*/* -mtime +' + str(config["retentionDays"]) + ' -exec rm {} \;')
 kill_script (0)
