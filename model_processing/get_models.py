@@ -500,7 +500,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         else:
             filenames = filename + "_temp.tif " + filename + ".tif"
 
-        os.system ("gdalwarp " + filenames + " -q -t_srs EPSG:4326 " + extent + ' -multi --config CENTER_LONG 0 -r cubicspline -ts ' + config["imageWidth"] + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"')
+        os.system ('gdalwarp ' + filenames + ' -q -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r cubicspline -ts ' + str(config["imageWidth"]) + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"')
     
     except:
         log ("Could not translate the new raster.", "ERROR", model_name)
