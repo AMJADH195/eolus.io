@@ -425,6 +425,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             new_raster = gdal.GetDriverByName('MEM').Create('', width, height, 0, gdal.GDT_Float64)
             print " ---> Created, setting transform "
             new_raster.SetGeoTransform (list(geo_transform))
+            print " ---> Done, start processing each band"
 
             # For each band in the list, search through the bands of the raster for the match
             # if not found, print a warning and write an empty band
@@ -433,7 +434,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
                 extract_band_name = extract_band["gribLevel"]
                 matched = False
 
-                print " ---> Extracting band " + extract_band_name
+                print " ---> Extracting band " + extract_band_element
                 for i in range (1, num_src_bands):
                     band = grib_file.GetRasterBand(i)
                     band_metadata = band.GetMetadata()

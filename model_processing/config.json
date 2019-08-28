@@ -286,7 +286,7 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "gefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
                 {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
@@ -307,7 +307,7 @@
             "baseDirectory": "gens/prod",
             "gribFilename": "geavg.t%Hz.pgrb2a.0p50.f%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
                 {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
@@ -337,7 +337,7 @@
             "baseDirectory": "gens/prod",
             "gribFilename": "gespr.t%Hz.pgrb2a.0p50.f%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
                 {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
@@ -367,7 +367,7 @@
             "baseDirectory": "gfs/prod",
             "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
                 {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
@@ -437,7 +437,7 @@
                 "VIS"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
                 {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
@@ -502,7 +502,7 @@
                 "VIS"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
                 {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
@@ -550,7 +550,7 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.mean.f%T.grib2",
             "filetype": "grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
                 {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
                 {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
@@ -611,7 +611,7 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs_gespr.t%Hz.pgrb2a.0p50_bcf%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
@@ -632,7 +632,7 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
@@ -653,7 +653,7 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
@@ -675,7 +675,7 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
@@ -728,7 +728,7 @@
                 "LTNG"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
                 {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
@@ -805,7 +805,7 @@
                 "WEASD"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
                 {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
@@ -937,7 +937,7 @@
                 "WEASD"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
@@ -1008,7 +1008,7 @@
                 "WEASD"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
                 {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
                 {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
