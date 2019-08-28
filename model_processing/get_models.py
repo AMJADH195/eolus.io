@@ -580,10 +580,10 @@ log ("Model processing completed successfully.".format(fmt_timestep),"INFO", mod
 
 
 log ("Cleaning up the logs...", "INFO")
-cur.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '3 days'")
+cur.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '2 days'")
 conn.commit ()
-cur.execute ("DELETE FROM logging.run_status WHERE model_timestamp < now() - interval '3 days'")
+cur.execute ("DELETE FROM logging.run_status WHERE model_timestamp < now() - interval '2 days'")
 conn.commit ()
 
-os.system ('find /map/*/* -mtime +3 -exec rm {} \;')
+os.system ('find /map/*/* -mtime +2 -exec rm {} \;')
 kill_script (0)
