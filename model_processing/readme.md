@@ -66,11 +66,17 @@ This is the name of the file that logs will be written to. The script also logs 
 ### debug
 Setting this to `true` causes the script to not write to db, for development purposes.
 
+### resampling
+The resample type when using `gdalwarp`.
+
 ### sleepTime
 The seconds to sleep between polling for model timestamps. NCEP requests that this is done to prevent strain on their servers.
 
 ### maxTime
 Hard cutoff for forecast hour, so that the entire model run isn't processed (for dev purposes).
+
+### Retention Days
+Number of days to keep models and runs on the filesystem / in the db before deleting them.
 
 ### downloadTypes
 This right now just contains some common url prefixes for GRIBFILTER download types.
@@ -118,7 +124,10 @@ The type of file that will be downloaded. Usually grib2.
 (FILESERIES only) The full url to download the model from.
 
 ### extractBandsByMetadata
-See the section for that earlier in the documenation.
+See the section for that earlier in the documentation.
+
+### imageWidth
+The width of the output GeoTIFF, in pixels. Not required.
 
 # Script Flags
 All of these overwrite the setting in the config, if it exists.
