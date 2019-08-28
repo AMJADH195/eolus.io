@@ -60,9 +60,6 @@ This is the name of the file that logs will be written to. The script also logs 
 ### debug
 Setting this to `true` causes the script to not write to db, for development purposes.
 
-### maxModelAge
-Unused
-
 ### sleepTime
 The seconds to sleep between polling for model timestamps. NCEP requests that this is done to prevent strain on their servers.
 
@@ -71,9 +68,6 @@ Hard cutoff for forecast hour, so that the entire model run isn't processed (for
 
 ### downloadTypes
 This right now just contains some common url prefixes for GRIBFILTER download types.
-
-## variables
-Unused.
 
 ## models
 This is the bread and butter of the script. Each entry in this section of the config defines a model that will be processed by the script. The key is the model name.
