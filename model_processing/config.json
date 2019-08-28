@@ -548,7 +548,25 @@
             "endTime": 36,
             "downloadType": "FILESERIES",
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.mean.f%T.grib2",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "extractBandsByMetadata": [
+                {"gribVar": "TMP", "gribLvl": "2-HTGL", "id": "T-2M"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
+                {"gribVar": "RH", "gribLevel": "70000-ISBL", "id": "RH-2M"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
+                {"gribVar": "APCP01", "gribLevel": "0-SFC", "id": "APCP-01"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
+                {"gribVar": "REFD", "gribLevel": "1-HYBL", "id": "REFD"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"}
+            ]
         },
         "href_pmmn": {
             "enabled": true,
