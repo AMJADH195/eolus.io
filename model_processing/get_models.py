@@ -465,7 +465,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
                                 print " ---> Issue with the band, creating blank instead"
                                 new_raster.AddBand(gdal.GDT_Float64)
                             
-                            if band_data not None:
+                            if band_data is not None:
                                 new_band = new_raster.GetRasterBand (new_raster.RasterCount)
                                 new_raster.AddBand(data_type)
                                 new_band = new_raster.GetRasterBand (new_raster.RasterCount)
