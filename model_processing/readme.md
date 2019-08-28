@@ -39,6 +39,7 @@ The `gribVar` pertains to the `GRIB_ELEMENT` as reported by GDAL. the `gribLevel
 
  * psycopg2
  * requests
+ * osgeo (gdal, osr)
 
 # Configuration
 By default the configuration is close to what is used in production on eolus.io. Of note, the geopgraphic extent is set to roughly contain the state of Colorado. It also connects to the eolus.io database by default (or it would, if you knew the password).
