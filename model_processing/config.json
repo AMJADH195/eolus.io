@@ -28,228 +28,6 @@
             }
         }
     },
-    "variables": {
-        "4LFTX-180": {
-            "unit": "",
-            "name": "Lifted Index (Four Layer) [0-18000 SPDL]"
-        },
-        "4LFTX-SFC": {
-            "unit": "",
-            "name": "Lifted Index (Four Layer) [Surface]"
-        },
-        "APCP-01": {
-            "unit": "mm", 
-            "name": "Accumulated Precipitation (1hr)"
-        },
-        "APCP-03": {
-            "unit": "mm", 
-            "name": "Accumulated Precipitation (3hr)"
-        },
-        "APCP-06": {
-            "unit": "mm", 
-            "name": "Accumulated Precipitation (6hr)"
-        },
-        "APCP-12": {
-            "unit": "mm", 
-            "name": "Accumulated Precipitation (12hr)"
-        },
-        "APCP-24": {
-            "unit": "mm", 
-            "name": "Accumulated Precipitation (24hr)"
-        },
-        "APCP-SNOW": {
-            "unit": "mm",
-            "name": "Accumulated Snowfall"
-        },
-        "CAPE-180": {
-            "unit": "J/kg", 
-            "name": "CAPE [0-18000 SPDL]"
-        },
-        "CAPE-255": {
-            "unit": "J/kg",
-            "name": "CAPE [0-25500 SPDL]"
-        },
-        "CAPE-90": {
-            "unit": "J/kg", 
-            "name": "CAPE [0-9000 SPDL]"
-        },
-        "CAPE-SFC": {
-            "unit": "J/kg",
-            "name": "CAPE [Surface]"
-        },
-        "CEIL": {
-            "unit": "m",
-            "name": "Ceiling"
-        },
-        "CEIL-CBL": {
-            "unit": "m",
-            "name": "Ceiling [Cloud Boundary Layer]"
-        },
-        "CFRZR": {
-            "unit": "",
-            "name": "Categorical Frozen Rain"
-        },
-        "CICEP": {
-            "unit": "",
-            "name": "Categorical Ice Pellets"
-        },
-        "CIN-180": {
-            "unit": "J/kg", 
-            "name": "CIN [0-18000 SPDL]"
-        },
-        "CIN-255": {
-            "unit": "J/kg", 
-            "name": "CIN [0-25500 SPDL]"
-        },
-        "CIN-90": {
-            "unit": "J/kg", 
-            "name": "CIN [0-9000 SPDL]"
-        },
-        "CIN-SFC": {
-            "unit": "J/kg", 
-            "name": "CIN [Surface]"
-        },
-        "CPOFP": {
-            "unit": "%",
-            "name": "Percent of Frozen Precipitation"
-        },
-        "CRAIN": {
-            "unit": "",
-            "name": "Categorical Rain"
-        },
-        "CSNOW": {
-            "unit": "", 
-            "name": "Categorical Snow"
-        },
-        "DPT-2M": {
-            "unit": "K",
-            "name": "Dew Point [2m]"
-        },
-        "GUST-SFC": {
-            "unit": "m/s",
-            "name": "Wind Gust Speed [Surface]"
-        },
-        "GUST-10": {
-            "unit": "m/s",
-            "name": "Wind Gust Speed [10m]"
-        },
-        "LFTX-500": {
-            "unit": "",
-            "name": "Lifted Index [50000-100000 ISBL]"
-        },
-        "LFTX-SFC": {
-            "unit": "",
-            "name": "Lifted Index [Surface]"
-        },
-        "LTNG": {
-            "unit": "",
-            "name": "Lightning"
-        },
-        "PRATE": {
-            "unit": "mm/s",
-            "name": "Precipitation Rate"
-        },
-        "PWAT": {
-            "unit": "mm", 
-            "name": "Precipitable Water"
-        },
-        "REFC": {
-            "unit": "dbZ", 
-            "name": "Radar Reflectivity - Composite"
-        },
-        "REFD": {
-            "unit": "dbZ", 
-            "name": "Radar Reflectivity - Derived"
-        },
-        "RETOP": {
-            "unit": "m", 
-            "name": "Radar Reflectivity - Echo Top"
-        },
-        "RH-2M": {
-            "unit": "%",
-            "name": "Relative Humidity [2m]"
-        },
-        "SNOD": {
-            "unit": "m",
-            "name": "Snow Depth"
-        },
-        "SNOM": {
-            "unit": "mm",
-            "name": "Snow Melt"
-        },
-        "SNOWC": {
-            "unit": "%",
-            "name": "Snow Cover"
-        },
-        "T-2M": {
-            "unit": "K",
-            "name": "Temperature [2m]"
-        },
-        "T-80M": {
-            "unit": "K",
-            "name": "Temperature [80m]"
-        },
-        "T-SFC": {
-            "unit": "K",
-            "name": "Temperature [Surface]"
-        },
-        "TCDC-T": {
-            "unit": "%", 
-            "name": "Total Cloud Cover [All Levels]"
-        },
-        "TSTM-01": {
-            "unit": "",
-            "name": "Thunderstorm Something? [TODO]"
-        },
-        "UGRD-10M": {
-            "unit": "m/s",
-            "name": "Wind U-Component [10m]"
-        },
-        "UGRD-80M": {
-            "unit": "m/s",
-            "name": "Wind U-Component [80m]"
-        },
-        "USTM-6KM": {
-            "unit": "m/s",
-            "name": "Storm Movement U-Component [6km]"
-        },
-        "VGRD-10M": {
-            "unit": "m/s",
-            "name": "Wind V-Component [10m]"
-        },
-        "VGRD-80M": {
-            "unit": "m/s",
-            "name": "Wind V-Component [80m]"
-        },
-        "VIS-SFC": {
-            "unit": "m",
-            "name": "Visibility [Surface]"
-        },
-        "VSTM-6KM": {
-            "unit": "m/s",
-            "name": "Storm Movement V-Component [6km]"
-        },
-        "VVEL-850": {
-            "unit": "Pa/s",
-            "name": "Vertical Velocity (Pressure) [85000 ISBL]"
-        },
-        "WINDDIR-10M": {
-            "unit": "deg",
-            "name": "Wind Direction [10m]"
-        },
-        "WEASD": {
-            "unit": "mm",
-            "name": "Water Equivalent of Accumulated Snow Depth"
-        },
-        "WINDSPD-10M": {
-            "unit": "m/s",
-            "name": "Wind Speed [10m]"
-        },
-        "WX": {
-            "unit": "",
-            "name": "Weather Type"
-        }
-    },
     "models": {
         "gefs_ndgd_avg": {
             "enabled": false,
@@ -264,12 +42,12 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "gefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL", "id": "WINDDIR-10M"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
+                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
             ]
         },
         "gefs_ndgd_spr": {
@@ -285,12 +63,12 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "gefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL", "id": "WINDDIR-10M"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
+                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
             ]
         },
         "gefs_pt5_avg": {
@@ -306,21 +84,21 @@
             "baseDirectory": "gens/prod",
             "gribFilename": "geavg.t%Hz.pgrb2a.0p50.f%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)", "id": "TCDC-T"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "APCP06", "gribLevel": "0-SFC", "id": "APCP-06"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC", "id": "SNOD"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP06", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"}
             ]
         },
         "gefs_pt5_spr": {
@@ -336,21 +114,21 @@
             "baseDirectory": "gens/prod",
             "gribFilename": "gespr.t%Hz.pgrb2a.0p50.f%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)", "id": "TCDC-T"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "APCP06", "gribLevel": "0-SFC", "id": "APCP-06"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC", "id": "SNOD"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP06", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"}
             ]
         },
         "gfs": {
@@ -366,37 +144,37 @@
             "baseDirectory": "gfs/prod",
             "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL", "id": "UGRD-80M"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL", "id": "VGRD-80M"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC", "id": "GUST-SFC"},
-                {"gribVar": "LFTX", "gribLevel": "0-SFC", "id": "LFTX-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "0-SFC", "id": "4LFTX-SFC"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "CAPE", "gribLevel": "25500-0-SPDL", "id": "CAPE-255"},
-                {"gribVar": "CIN", "gribLevel": "25500-0-SPDL", "id": "CIN-255"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "USTM", "gribLevel": "6000-0-HTGL", "id": "USTM-6KM"},
-                {"gribVar": "VSTM", "gribLevel": "6000-0-HTGL", "id": "VSTM-6KM"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)", "id": "TCDC-T"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC", "id": "PRATE"},
-                {"gribVar": "CPOFP", "gribLevel": "0-SFC", "id": "CPOFP"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC", "id": "SNOD"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "80-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "GUST", "gribLevel": "0-SFC"},
+                {"gribVar": "LFTX", "gribLevel": "0-SFC"},
+                {"gribVar": "4LFTX", "gribLevel": "0-SFC"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "25500-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "25500-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "USTM", "gribLevel": "6000-0-HTGL"},
+                {"gribVar": "VSTM", "gribLevel": "6000-0-HTGL"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
+                {"gribVar": "CPOFP", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"}
             ]
         },
         "hiresw_arw": {
@@ -436,32 +214,32 @@
                 "VIS"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL", "id": "UGRD-80M"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL", "id": "VGRD-80M"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC", "id": "GUST-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL", "id": "4LFTX-180"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL", "id": "LFTX-500"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
-                {"gribVar": "REFD", "gribLevel": "1-HYBL", "id": "REFD"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC", "id": "APCP-01"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "80-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "GUST", "gribLevel": "0-SFC"},
+                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "REFD", "gribLevel": "1-HYBL"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"}
             ]
         },
         "hiresw_nmmb": {
@@ -501,32 +279,32 @@
                 "VIS"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL", "id": "UGRD-80M"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL", "id": "VGRD-80M"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC", "id": "GUST-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL", "id": "4LFTX-180"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL", "id": "LFTX-500"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
-                {"gribVar": "REFD", "gribLevel": "1-HYBL", "id": "REFD"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC", "id": "APCP-01"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "80-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "GUST", "gribLevel": "0-SFC"},
+                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "REFD", "gribLevel": "1-HYBL"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"}
             ]
         },
         "href_avrg": {
@@ -549,21 +327,21 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.mean.f%T.grib2",
             "filetype": "grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "70000-ISBL", "id": "RH-2M"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC", "id": "APCP-01"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "70000-ISBL"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL"}
             ]
         },
         "href_pmmn": {
@@ -609,12 +387,12 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs_gespr.t%Hz.pgrb2a.0p50_bcf%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "VVEL", "gribLevel": "85000-ISBL", "id": "VVEL-850"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VVEL", "gribLevel": "85000-ISBL"}
             ]
         },
         "naefs_bc_spr": {
@@ -630,12 +408,12 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "VVEL", "gribLevel": "85000-ISBL", "id": "VVEL-850"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VVEL", "gribLevel": "85000-ISBL"}
             ]
         },
         "naefs_ndgd_avg": {
@@ -651,13 +429,13 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL", "id": "WINDDIR-10M"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
+                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
             ]
         },
         "naefs_ndgd_spr": {
@@ -673,13 +451,13 @@
             "baseDirectory": "naefs/prod",
             "gribFilename": "naefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL", "id": "WINDDIR-10M"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
+                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
             ]
         },
         "nam3": {
@@ -726,39 +504,39 @@
                 "LTNG"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL", "id": "UGRD-80M"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL", "id": "VGRD-80M"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC", "id": "GUST-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL", "id": "4LFTX-180"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL", "id": "LFTX-500"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "CAPE", "gribLevel": "9000-0-SPDL", "id": "CAPE-90"},
-                {"gribVar": "CIN", "gribLevel": "9000-0-SPDL", "id": "CIN-90"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
-                {"gribVar": "VIS", "gribLevel": "0-CTL", "id": "VIS-SFC"},
-                {"gribVar": "REFD", "gribLevel": "1-HYBL", "id": "REFD"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "CPOFP", "gribLevel": "0-SFC", "id": "CPOFP"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC", "id": "PRATE"},
-                {"gribVar": "LTNG", "gribLevel": "0-SFC", "id": "LTNG"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC", "id": "SNOD"},
-                {"gribVar": "SNOWC", "gribLevel": "0-SFC", "id": "SNOWC"},
-                {"gribVar": "SNOM", "gribLevel": "0-SFC", "id": "SNOM"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "80-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "GUST", "gribLevel": "0-SFC"},
+                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "9000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "9000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-CTL"},
+                {"gribVar": "REFD", "gribLevel": "1-HYBL"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "CPOFP", "gribLevel": "0-SFC"},
+                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
+                {"gribVar": "LTNG", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOWC", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOM", "gribLevel": "0-SFC"}
             ]
         },
         "nam12": {
@@ -803,35 +581,35 @@
                 "WEASD"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "TMP", "gribLevel": "80-HTGL", "id": "T-80M"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL", "id": "UGRD-80M"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL", "id": "VGRD-80M"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC", "id": "GUST-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL", "id": "4LFTX-180"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL", "id": "LFTX-500"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
-                {"gribVar": "VIS", "gribLevel": "0-CTL", "id": "VIS-SFC"},
-                {"gribVar": "REFD", "gribLevel": "1-HYBL", "id": "REFD"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "APCP03", "gribLevel": "0-SFC", "id": "APCP-03"},
-                {"gribVar": "LTNG", "gribLevel": "0-SFC", "id": "LTNG"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC", "id": "SNOD"},
-                {"gribVar": "SNOWC", "gribLevel": "0-SFC", "id": "SNOWC"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "80-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
+                {"gribVar": "GUST", "gribLevel": "0-SFC"},
+                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-CTL"},
+                {"gribVar": "REFD", "gribLevel": "1-HYBL"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
+                {"gribVar": "LTNG", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOWC", "gribLevel": "0-SFC"}
             ]
         },
         "nbm": {
@@ -845,21 +623,21 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/blend/prod/blend.%D/%H/grib2/blend.t%Hz.master.f%T.co.grib2",
             "filetype": "grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "CEIL", "gribLevel": "0-CEIL", "id": "CEIL"},
-                {"gribVar": "CEIL", "gribLevel": "0-CBL", "id": "CEIL-CBL"},
-                {"gribVar": "Td", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RETOP", "gribLevel": "0-CTL", "id": "RETOP"},
-                {"gribVar": "Wx", "gribLevel": "0-0-SFC", "id": "WX"},
-                {"gribVar": "TSTM01", "gribLevel": "0-SFC", "id": "TSMT-01"},
-                {"gribVar": "QPF01", "gribLevel": "0-SFC", "id": "APCP-01"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "Sky", "gribLevel": "0-SFC", "id": "TCDC-T"},
-                {"gribVar": "SnowAmt01", "gribLevel": "0-SFC", "id": "APCP-SNOW"},
-                {"gribVar": "T", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
-                {"gribVar": "WindDir", "gribLevel": "10-HTGL", "id": "WINDDIR-10M"},
-                {"gribVar": "WindGust", "gribLevel": "10-HTGL", "id": "GUST-10"},
-                {"gribVar": "WindSpd", "gribLevel": "10-HTGL", "id": "WINDSPD-10M"}
+                {"gribVar": "CEIL", "gribLevel": "0-CEIL"},
+                {"gribVar": "CEIL", "gribLevel": "0-CBL"},
+                {"gribVar": "Td", "gribLevel": "2-HTGL"},
+                {"gribVar": "RETOP", "gribLevel": "0-CTL"},
+                {"gribVar": "Wx", "gribLevel": "0-0-SFC"},
+                {"gribVar": "TSTM01", "gribLevel": "0-SFC"},
+                {"gribVar": "QPF01", "gribLevel": "0-SFC"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "Sky", "gribLevel": "0-SFC"},
+                {"gribVar": "SnowAmt01", "gribLevel": "0-SFC"},
+                {"gribVar": "T", "gribLevel": "2-HTGL"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "WindDir", "gribLevel": "10-HTGL"},
+                {"gribVar": "WindGust", "gribLevel": "10-HTGL"},
+                {"gribVar": "WindSpd", "gribLevel": "10-HTGL"}
             ]
         },
         "sref_mean": {
@@ -935,32 +713,32 @@
                 "WEASD"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL", "id": "4LFTX-180"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL", "id": "LFTX-500"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM", "id": "REFC"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM", "id": "RETOP"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC", "id": "PRATE"},
-                {"gribVar": "APCP03", "gribLevel": "0-SFC", "id": "APCP-03"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "SNOWC", "gribLevel": "0-SFC", "id": "SNOWC"},
-                {"gribVar": "SNOM", "gribLevel": "0-SFC", "id": "SNOM"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "REFC", "gribLevel": "0-EATM"},
+                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOWC", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOM", "gribLevel": "0-SFC"}
             ]
         },
         "sref_nmb_ctl": {
@@ -1006,32 +784,32 @@
                 "WEASD"
             ],
             "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL", "id": "T-2M"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC", "id": "T-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL", "id": "DPT-2M"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL", "id": "RH-2M"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL", "id": "UGRD-10M"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL", "id": "VGRD-10M"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL", "id": "4LFTX-180"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL", "id": "LFTX-500"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL", "id": "CAPE-180"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL", "id": "CIN-180"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC", "id": "CAPE-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC", "id": "CIN-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM", "id": "PWAT"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM", "id": "TCDC-T"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM", "id": "REFC"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM", "id": "RETOP"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC", "id": "CRAIN"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC", "id": "PRATE"},
-                {"gribVar": "APCP03", "gribLevel": "0-SFC", "id": "APCP-03"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "SNOWC", "gribLevel": "0-SFC", "id": "SNOWC"},
-                {"gribVar": "SNOM", "gribLevel": "0-SFC", "id": "SNOM"}
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
+                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "REFC", "gribLevel": "0-EATM"},
+                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOWC", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOM", "gribLevel": "0-SFC"}
             ]
         },
         "wpc_snow_25pct": {
@@ -1045,7 +823,7 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_25pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "ASNOW25", "gribLevel": "0-SFC", "id": "APCP-SNOW"}
+                {"gribVar": "ASNOW25", "gribLevel": "0-SFC"}
             ]
         },
         "wpc_snow_50pct": {
@@ -1059,7 +837,7 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_50pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "extractBandsByMetadata": [
-                {"gribVar": "ASNOW50", "gribLevel": "0-SFC", "id": "APCP-SNOW"}
+                {"gribVar": "ASNOW50", "gribLevel": "0-SFC"}
             ]
         }
     }
