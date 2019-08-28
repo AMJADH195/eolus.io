@@ -560,7 +560,6 @@
                 {"gribVar": "VIS", "gribLevel": "0-SFC", "id": "VIS-SFC"},
                 {"gribVar": "APCP01", "gribLevel": "0-SFC", "id": "APCP-01"},
                 {"gribVar": "WEASD", "gribLevel": "0-SFC", "id": "WEASD"},
-                {"gribVar": "REFD", "gribLevel": "1-HYBL", "id": "REFD"},
                 {"gribVar": "CSNOW", "gribLevel": "0-SFC", "id": "CSNOW"},
                 {"gribVar": "CICEP", "gribLevel": "0-SFC", "id": "CICEP"},
                 {"gribVar": "CFRZR", "gribLevel": "0-SFC", "id": "CFRZR"},
