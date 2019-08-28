@@ -1,70 +1,33 @@
-# Model Processing New Process
-1. Script is run every five minutes, looks at models in config.json
-2. Script hits logging.model_status, finds first model that doesn't have status 'IN PROGRESS'
-3. Script compares timestamp from that column with the last model run available online
-4. If a newer model is available, changes STATUS back to IN PROGRESS and begins updating the data -- updates the timestamp
-5. All major log messages sent to logging.processing_logs
+# Model Processing Overview
 
+1. Run through the config and see which models are active.
+2. Cross-reference that model, and its run times, with the status on Postgres.
+3. If the model is not currently processing, and the last processed timestamp is older than the latest available model, begin the process.
+4. 
 
+## Where do the models come from?
 
+The models come from NCEP NOMADS folders. Some of them are downloaded directly, while others are retrieved via their GRIB filter (usually models that are prohibitively large, e.g. a few hundred megabytes per timestamp).
 
+## Why are only certain bands of the models retrieved?
 
-This script downloads a variety of weather models (if a new update is available) from NCEP NOMADS using their GRIB filter and uploads them to a Postgres, PostGIS database as rasters.
-
-The script works by reading a config JSON containing general configuration options and model-specific information.  The script checks if a newer model is available, compared to the last updated timestamp.  If so, the GRIB2 file is downloaded from NOMADS, warped to EPSG:4326 (using `gdalwarp` -- GeoTIFF format), then dumped as a SQL file (using `raster2pgsql`).  The timestamp of the model is injected into the SQL which is then executed.
+Most of the models don't just have "useful" outputs such as surface temperature. Model outputs generally contain all the data used by the model in its calculations, e.g. the state of the atmosphere at a dozen different layers. Most of this is not very useful for general forecasting work, and the model size can be greatly reduced by omitting this data.
 
 # Configuration
 The default config is set to download all models, **restricted to an area that encompasses the state of Colorado.**  It also connects to the eolus.io database by default (or it would, if you knew the password).
 
 These values need to be changed to be applicable to your database and geographical area.
 
-# Script Dependencies
+# Dependencies
 These dependencies are required on the machine that is running `get_models.py`.
 
  * GDAL/OGR
- * PostGIS (raster2pgsql)
  * .pgpass file for connecting to your DB
  * Local filesystem access for the user running it
+ 
+ ## Optional, but useful dependencies
+ 
+ * MapServer, for actually making the models available on the web. See `eolus.map`
 
-# Database Dependencies
- * PostGIS
-
-# Creating the PostGIS Tables
-Create a table with the exact same name as the model in config.json.
-
-### Columns
-| Column Name | Type | Notes |
-|-------------|------|-------|
-| timestamp | time stamp with time zone | NOT NULL, primary key |
-| rast | raster |    |
-
-### Upsert Rule
-Create a rule to upsert into the table, as raster2pgsql only creates INSERT statements:
-
-```
-CREATE RULE <MODELNAME>_Upsert AS ON INSERT TO <MODELNAME>
-  WHERE EXISTS (SELECT 1 from <MODELNAME> M where NEW.timestamp = M.timestamp)
-  DO INSTEAD
-     UPDATE <MODELNAME> SET rast = NEW.rast WHERE timestamp = NEW.timestamp;
-```
-
-# Notes
-The script creates a lockfile.  This allows the script to be scheduled to run many times per hour without duplicating efforts.
-
-Currently, this file does not get removed if the script crashes for some reason.  You may need to `rm .get_models_lockfile` if this occurs.
-
-# Sample Query
-```
-WITH pt AS (SELECT ST_SetSRID(ST_Point(-105,39.7392),4326) geom)
-	SELECT
-		wxmodel.timestamp,
-		ST_NearestValue (wxmodel.rast, 1, geom) as band_name,
-		ST_NearestValue (wxmodel.rast, 2, geom) as band_name2,
-		ST_NearestValue (wxmodel.rast, 3, geom) as band_name3,
-		ST_NearestValue (wxmodel.rast, 4, geom) as band_name4
-	FROM pt p
-		LEFT JOIN rasters.gfs wxmodel ON (ST_Intersects(p.geom, wxmodel.rast))
-	WHERE wxmodel.timestamp >= now()
-	ORDER BY wxmodel.timestamp
-	LIMIT 120
-```
+# Creating the Postgres Tables
+See the sql dump for the schemas required for the tables. These need to go into the "logging" namespace.
