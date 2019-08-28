@@ -464,7 +464,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
                     new_raster.AddBand(gdal.GDT_Float64)
 
             new_raster.SetProjection (grib_srs.ExportToWkt())
-            out_raster = gdal.GetDriverByName('GTiff').CreateCopy (filename + ".tif", new_raster, 0)
+            out_raster = gdal.GetDriverByName('GTiff').CreateCopy (filename + "_temp.tif", new_raster, 0)
 
             log ("New raster created.", "INFO", model_name)
 
@@ -486,7 +486,12 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     log ("Beginning gdalwarp and gdal_translate.", "INFO", model_name)
 
     try:
-        os.system ("gdalwarp " + filename + "." + warp_file_type + " " + filename + ".tif -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r lanczos -overwrite")
+        if "extractBandsByMetadata" not in model:
+            filenames = filename + "." + warp_file_type + " " + filename + ".tif"
+        else:
+            filenames = filename + "_temp.tif " + filename + ".tif"
+
+        os.system ("gdalwarp " + filenames + " -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r lanczos -overwrite")
     
     except:
         log ("Could not translate the new raster.", "ERROR", model_name)
