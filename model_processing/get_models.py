@@ -325,12 +325,6 @@ if config["maxTime"] > 0:
     model_loop_end_time = config["maxTime"] + 1
 
 table_name = model_name + '_' + str(int(calendar.timegm(model_time.utctimetuple())))
-#log ("Creating table rasters." + table_name, "INFO", model_name)
-
-#cur.execute ("DROP TABLE IF EXISTS rasters." + table_name)
-#conn.commit ()
-#cur.execute ('CREATE TABLE rasters.' + table_name + '("timestamp" timestamp without time zone NOT NULL, rast raster, CONSTRAINT ' + table_name + '_pkey PRIMARY KEY ("timestamp"),CONSTRAINT enforce_srid_rast CHECK (st_srid(rast) = 4326)) WITH (OIDS=FALSE);')
-#conn.commit ()
 
 for model_timestep in range (model["startTime"], model_loop_end_time):
     fmt_timestep = str(model_timestep).rjust (len(str(model["endTime"])), '0')
@@ -506,7 +500,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         else:
             filenames = filename + "_temp.tif " + filename + ".tif"
 
-        os.system ("gdalwarp " + filenames + " -q -t_srs EPSG:4326 " + extent + " -multi --config CENTER_LONG 0 -r lanczos -overwrite")
+        os.system ("gdalwarp " + filenames + " -q -t_srs EPSG:4326 " + extent + ' -multi --config CENTER_LONG 0 -r cubicspline -ts ' + config["imageWidth"] + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"')
     
     except:
         log ("Could not translate the new raster.", "ERROR", model_name)

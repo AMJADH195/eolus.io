@@ -18,6 +18,7 @@
         "maxModelAge": 259200,
         "sleepTime": 1,
         "maxTime": 0,
+        "imageWidth": 256,
         "deleteOldTimestamps": true,
         "downloadTypes": {
             "GRIBFILTER": {
