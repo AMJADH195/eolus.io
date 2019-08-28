@@ -436,8 +436,14 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
 
                 print " ---> Extracting band " + extract_band_element
                 for i in range (1, num_src_bands):
-                    band = grib_file.GetRasterBand(i)
-                    band_metadata = band.GetMetadata()
+                    band = None
+                    band_metadata = None
+                    try:
+                        band = grib_file.GetRasterBand(i)
+                        band_metadata = band.GetMetadata()
+                    except:
+                        print " ---> Couldn't read band :( "
+                        continue
                     if (band_metadata["GRIB_ELEMENT"] == extract_band_element and
                         band_metadata["GRIB_SHORT_NAME"] == extract_band_name):
 
