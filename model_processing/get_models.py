@@ -455,13 +455,22 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
                             print " !!! WARNING : The same variable (" + extract_band_element + " @ " + extract_band_name + ") has already been found in the GRIB bands.  They probably have different GRIB_FORECAST_SECONDS values."
                         else:
                             matched = True
-                            new_band = new_raster.GetRasterBand (new_raster.RasterCount)
-                            band_data = band.ReadAsArray()
-                            data_type = band.DataType
-                            new_raster.AddBand(data_type)
-                            new_band = new_raster.GetRasterBand (new_raster.RasterCount)
-                            new_band.WriteArray (band_data)
-                            new_band.FlushCache()
+                            band_data = None
+                            data_type = None
+                            try: 
+                                print " ---> Reading band data "
+                                band_data = band.ReadAsArray()
+                                data_type = band.DataType
+                            except:
+                                print " ---> Issue with the band, creating blank instead"
+                                new_raster.AddBand(gdal.GDT_Float64)
+                            
+                            if band_data not None:
+                                new_band = new_raster.GetRasterBand (new_raster.RasterCount)
+                                new_raster.AddBand(data_type)
+                                new_band = new_raster.GetRasterBand (new_raster.RasterCount)
+                                new_band.WriteArray (band_data)
+                                new_band.FlushCache()
                 if not matched:
                     num_warnings += 1
                     print " !!! WARNING: This run is missing a desired band: " + extract_band_element + " @ " + extract_band_name
