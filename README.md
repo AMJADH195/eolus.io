@@ -1,13 +1,14 @@
 # eolus.io
-This repository contains a full server-side suite to create an API for retrieving weather model data in JSON format.
+Automated weather model retrieval and processing using FOSS4G.
 
-Live site:
-http://eolus.io/
+Postgres is used for maintaining status / logging, and the model processing script (which should be run by cron) creates flat directories of GeoTIFF files.
+
+The primary use-case of this application is to create a library of weather models as geospatial rasters which can be distributed by an application like MapServer as a WMS. This allows for remote visualization and analysis of weather data in GIS applications and the web.
 
 # What's Here
-`./model_processing` contains some python code and configuration for grabbing weather model data off the internet (via NCEP NOMADS), processing it, and uploading it to a PostGIS database.  This script is designed to be run on a regular basis from, for example, a cron job.
+`./model_processing` contains python code and JSON configuration for grabbing weather model data off the internet (via NCEP NOMADS), processing it, and organizing it on the file system.  This script is designed to be run on a regular basis from, for example, a cron job.
 
-`./web` contains the PHP files which provide an API for accessing the weather model data.
+`./web` contains the PHP files which provide some mechanisms for basic model retrieval and viewing the logs / processing status.
 
 # Available Weather Models
 See the wiki on this GitHub page.
