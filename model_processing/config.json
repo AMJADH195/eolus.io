@@ -15,11 +15,9 @@
         "mapfileDir": "/map",
         "logFile": "model_update.log",
         "debug": false,
-        "maxModelAge": 259200,
         "sleepTime": 1,
         "maxTime": 0,
         "imageWidth": 256,
-        "deleteOldTimestamps": true,
         "downloadTypes": {
             "GRIBFILTER": {
                 "gribFilterExtension": ".pl?",
