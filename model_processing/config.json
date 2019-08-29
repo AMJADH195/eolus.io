@@ -652,7 +652,6 @@
             "updateOffset": 3,
             "startTime": 0,
             "endTime": 0,
-            "imageWidth": 36,
             "downloadType": "FILESERIES",
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2"
@@ -663,7 +662,6 @@
             "updateOffset": 3,
             "startTime": 0,
             "endTime": 0,
-            "imageWidth": 36,
             "downloadType": "FILESERIES",
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.spread_3hrly.grib2"
@@ -674,7 +672,6 @@
             "updateOffset": 3,
             "startTime": 0,
             "endTime": 0,
-            "imageWidth": 36,
             "downloadType": "FILESERIES",
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.prob_3hrly.grib2"
