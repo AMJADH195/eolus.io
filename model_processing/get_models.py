@@ -617,7 +617,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             else:
                 progress = (float(model_timestep)/float(model_loop_end_time - 1))*100
 
-            curr.execute ("UPDATE logging.model_status SET (progress) = (%s) WHERE model = %s", progress, model_name))
+            curr.execute ("UPDATE logging.model_status SET (progress) = (%s) WHERE model = %s", (progress, model_name))
             conn.commit ()
             curr.execute ('UPDATE logging.run_status SET (fh_complete) = (%s) WHERE model = %s AND model_timestamp = %s', (model_timestep, model_name, model_time))
             conn.commit ()
