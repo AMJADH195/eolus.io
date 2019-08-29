@@ -552,7 +552,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             filenames = filename + "_temp.tif " + filename + ".tif"
 
         widthStr = ""
-        if model["imageWidth"]:
+        if "imageWidth" in model:
             print "Setting image width from config."
             widthStr = " -ts " + str(model["imageWidth"])
 
@@ -560,7 +560,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         if verbose:
             quietStr = ""
 
-        warp = 'gdalwarp ' + filenames + quietStr + ' -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r ' + config["resampling"] + widthStr + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"'
+        warp = 'gdalwarp ' + filenames + quietStr + ' -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r ' + config["resampling"] + widthStr + ' -overwrite -co "TILED=YES"'
         if verbose:
             print warp
         os.system (warp)
