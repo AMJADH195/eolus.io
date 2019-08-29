@@ -38,6 +38,7 @@ The `gribVar` pertains to the `GRIB_ELEMENT` as reported by GDAL. the `gribLevel
 # Python Libs Required
 
  * psycopg2
+ * python-dateutil
  * requests
  * osgeo (gdal, osr) (`pip install GDAL`)
 

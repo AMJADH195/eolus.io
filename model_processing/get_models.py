@@ -25,6 +25,7 @@ ignoredb = False
 forcemodel = None
 conn = None
 curr = None
+fetch = None
 
 ZERO = timedelta(0)
 
@@ -90,6 +91,8 @@ def check_if_model_needs_update (model_name):
 
     model_timestamp = datetime.fromtimestamp (0)
 
+    fetch = None
+
     if not ignoredb:
         curr.execute ("SELECT model_timestamp, status FROM logging.model_status WHERE model LIKE '" + model_name + "'")
         fetch = curr.fetchone()
@@ -99,6 +102,8 @@ def check_if_model_needs_update (model_name):
             model_timestamp = parse(str(model_db_timestamp))
         if fetch[1] == "FAILED":
             already_failed = True
+    else:
+        model_timestamp = parse('1999-01-01')
 
     print "Last checked: " + model_timestamp.strftime ("%Y %m %d %HZ")
 
@@ -336,6 +341,7 @@ if not forcemodel:
     model_name = find_next_model_to_process ()
 else:
     model_name = forcemodel
+    check_if_model_needs_update(model_name)
 
 if model_name == None:
     print "No updates needed.  Exiting."
@@ -554,7 +560,10 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         if verbose:
             quietStr = ""
 
-        os.system ('gdalwarp ' + filenames + quietStr + ' -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r ' + config["resampling"] + widthStr + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"')
+        warp = 'gdalwarp ' + filenames + quietStr + ' -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r ' + config["resampling"] + widthStr + ' -overwrite -co "TILED=YES" -co "COMPRESS=LZW"'
+        if verbose:
+            print warp
+        os.system (warp)
     
     except:
         log ("Could not translate the new raster.", "ERROR", model_name)
@@ -564,10 +573,10 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         print ""
         continue
 
-    log ("Copy file over to /map/ directory.", "INFO", model_name)
+    log ("Copy file over to mapfile directory.", "INFO", model_name)
 
     try:
-        directory = "/map/" + model_name + "/"
+        directory = config["mapfileDir"] + "/" + model_name + "/"
         if not os.path.exists(directory):
             os.makedirs(directory)
 
