@@ -560,7 +560,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         if verbose:
             quietStr = ""
 
-        warp = 'gdalwarp ' + filenames + quietStr + ' -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r ' + config["resampling"] + widthStr + ' -overwrite -co "TILED=YES"'
+        warp = 'gdalwarp ' + filenames + quietStr + ' -t_srs EPSG:4326 ' + extent + ' -multi --config CENTER_LONG 0 -r ' + config["resampling"] + widthStr + ' -overwrite'
         if verbose:
             print warp
         os.system (warp)
