@@ -1,8 +1,7 @@
 <?php require ("./eolusHeader.php"); ?>
-
-<div class="usage">
-This is purely for development purposes and things may change at any time.
-</div>
-<br>
-<h3>Hi.</h3>
+<h3>For development purposes only.</h3>
+<p>
+Check out my github.
+https://github.com/potion-cellar/
+</p>
 <?php require ("./eolusFooter.php"); ?>

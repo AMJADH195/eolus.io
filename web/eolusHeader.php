@@ -116,8 +116,8 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
     </head>
     <body>
-        <div class="header">eolus.io api<font class="versionstub"><?php echo "v. {$version['Name']}" ?></font><br>
-        <p class="subheader">the easiest way to retrieve weather model data<br>
+        <div class="header">eolus.io<br>
+        <p class="subheader">weather model server<br>
         </p></div>
         <div class="version">
             
