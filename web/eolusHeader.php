@@ -117,7 +117,7 @@
     </head>
     <body>
         <div class="header">eolus.io<br>
-        <p class="subheader">weather model server<br>
+        <p class="subheader">open-source weather model server<br>
         </p></div>
         <div class="version">
             
