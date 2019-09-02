@@ -546,11 +546,12 @@
             ]
         },
         "nam12": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 84,
+            "imageWidth": 86,
             "downloadType": "GRIBFILTER",
             "gribFilterName": "nam",
             "gribDirectory": "/nam.%D",
