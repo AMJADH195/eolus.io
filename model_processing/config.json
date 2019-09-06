@@ -472,7 +472,7 @@
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 60,
-            "imageWidth": 50,
+            "imageWidth": 512,
             "downloadType": "FILESERIES",
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "filetype": "grib2",
