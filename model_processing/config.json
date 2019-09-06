@@ -467,7 +467,7 @@
             ]
         },
         "nam3": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
