@@ -13,6 +13,7 @@ MAP
    "time" "(2[0-3]|[01][0-9])"
    "fh" "[0-9]+"
    "model" ".*"
+   "resampling" ".*"
    "band" "[0-9]+"
   END
   PROJECTION
@@ -28,6 +29,6 @@ MAP
   DATA "/map/%model%/%model%_%date%_%time%z_t%fh%.tif"
   PROCESSING "BANDS=%band%"
   PROCESSING "CLOSE_CONNECTION=ALWAYS"
-  PROCESSING "RESAMPLE=BILINEAR"
+  PROCESSING "RESAMPLE=%resampling%"
  END
 END
