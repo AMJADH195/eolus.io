@@ -1,9 +1,9 @@
 {
     "config": {
         "postgres": {
-            "host": "wxdata.postgres.database.azure.com",
-            "db": "weather_models",
-            "user": "eolus@wxdata"
+            "host": "localhost",
+            "db": "eolus",
+            "user": "eolus"
         },
         "bounds": {
             "top": "41",
