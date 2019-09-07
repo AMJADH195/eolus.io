@@ -7,9 +7,9 @@
         },
         "bounds": {
             "top": "41",
-            "right": "255.5",
+            "right": "259",
             "bottom": "36",
-            "left": "251.5"
+            "left": "250"
         },
         "tempDir": "./tempWxData/",
         "mapfileDir": "/map",

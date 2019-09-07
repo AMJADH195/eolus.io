@@ -22,7 +22,7 @@ MAP
   METADATA
    "wms_title" "eolus"
    "wms_srs"   "EPSG:4326 EPSG:3857"
-   "wms_extent" "-108.5 41 -104.5 36"
+   "wms_extent" "-109 41 -102 36"
    "wms_enable_request" "*"
    "wms_format" "image/png"
   END
