@@ -1,0 +1,117 @@
+<StyledLayerDescriptor version="1.0.0">
+  <NamedLayer>
+    <Name>eolus</Name>
+    <UserStyle>
+      <Title>xxx</Title>
+      <FeatureTypeStyle>
+        <Rule>
+          <RasterSymbolizer>
+            <Opacity>1.0</Opacity>
+            <ColorMap>
+              <ColorMapEntry color="#ffbdf4" label="-30" quantity="-30"/>
+              <ColorMapEntry color="#f9aeed" label="-29.3939393939394" quantity="-29.3939393939394"/>
+              <ColorMapEntry color="#f39fe5" label="-28.7878787878788" quantity="-28.7878787878788"/>
+              <ColorMapEntry color="#ed8fdd" label="-28.1818181818182" quantity="-28.1818181818182"/>
+              <ColorMapEntry color="#e780d5" label="-27.5757575757576" quantity="-27.5757575757576"/>
+              <ColorMapEntry color="#e071ce" label="-26.969696969697" quantity="-26.969696969697"/>
+              <ColorMapEntry color="#da61c6" label="-26.3636363636364" quantity="-26.3636363636364"/>
+              <ColorMapEntry color="#d452be" label="-25.7575757575758" quantity="-25.7575757575758"/>
+              <ColorMapEntry color="#ce43b6" label="-25.1515151515152" quantity="-25.1515151515152"/>
+              <ColorMapEntry color="#c733af" label="-24.5454545454545" quantity="-24.5454545454545"/>
+              <ColorMapEntry color="#c124a7" label="-23.9393939393939" quantity="-23.9393939393939"/>
+              <ColorMapEntry color="#bb159f" label="-23.3333333333333" quantity="-23.3333333333333"/>
+              <ColorMapEntry color="#b50597" label="-22.7272727272727" quantity="-22.7272727272727"/>
+              <ColorMapEntry color="#ab029a" label="-22.1212121212121" quantity="-22.1212121212121"/>
+              <ColorMapEntry color="#a107a2" label="-21.5151515151515" quantity="-21.5151515151515"/>
+              <ColorMapEntry color="#960bab" label="-20.9090909090909" quantity="-20.9090909090909"/>
+              <ColorMapEntry color="#8b10b4" label="-20.3030303030303" quantity="-20.3030303030303"/>
+              <ColorMapEntry color="#8014bc" label="-19.6969696969697" quantity="-19.6969696969697"/>
+              <ColorMapEntry color="#7619c5" label="-19.0909090909091" quantity="-19.0909090909091"/>
+              <ColorMapEntry color="#6b1dce" label="-18.4848484848485" quantity="-18.4848484848485"/>
+              <ColorMapEntry color="#6022d6" label="-17.8787878787879" quantity="-17.8787878787879"/>
+              <ColorMapEntry color="#5526df" label="-17.2727272727273" quantity="-17.2727272727273"/>
+              <ColorMapEntry color="#4a2be8" label="-16.6666666666667" quantity="-16.6666666666667"/>
+              <ColorMapEntry color="#402ff0" label="-16.0606060606061" quantity="-16.0606060606061"/>
+              <ColorMapEntry color="#3534f9" label="-15.4545454545455" quantity="-15.4545454545455"/>
+              <ColorMapEntry color="#2d39fe" label="-14.8484848484848" quantity="-14.8484848484848"/>
+              <ColorMapEntry color="#2d42fa" label="-14.2424242424242" quantity="-14.2424242424242"/>
+              <ColorMapEntry color="#2d4bf5" label="-13.6363636363636" quantity="-13.6363636363636"/>
+              <ColorMapEntry color="#2d54f0" label="-13.030303030303" quantity="-13.030303030303"/>
+              <ColorMapEntry color="#2d5dec" label="-12.4242424242424" quantity="-12.4242424242424"/>
+              <ColorMapEntry color="#2e66e7" label="-11.8181818181818" quantity="-11.8181818181818"/>
+              <ColorMapEntry color="#2e6fe2" label="-11.2121212121212" quantity="-11.2121212121212"/>
+              <ColorMapEntry color="#2e78de" label="-10.6060606060606" quantity="-10.6060606060606"/>
+              <ColorMapEntry color="#2e81d9" label="-10" quantity="-10"/>
+              <ColorMapEntry color="#2e8ad4" label="-9.39393939393939" quantity="-9.393939393939389"/>
+              <ColorMapEntry color="#2e93d0" label="-8.78787878787879" quantity="-8.787878787878791"/>
+              <ColorMapEntry color="#2f9ccb" label="-8.18181818181818" quantity="-8.18181818181818"/>
+              <ColorMapEntry color="#2fa5c6" label="-7.57575757575757" quantity="-7.57575757575757"/>
+              <ColorMapEntry color="#3cadc9" label="-6.96969696969697" quantity="-6.96969696969697"/>
+              <ColorMapEntry color="#4db4ce" label="-6.36363636363636" quantity="-6.36363636363636"/>
+              <ColorMapEntry color="#5ebbd2" label="-5.75757575757576" quantity="-5.75757575757576"/>
+              <ColorMapEntry color="#6fc2d7" label="-5.15151515151515" quantity="-5.15151515151515"/>
+              <ColorMapEntry color="#80cadc" label="-4.54545454545454" quantity="-4.54545454545454"/>
+              <ColorMapEntry color="#91d1e1" label="-3.93939393939394" quantity="-3.93939393939394"/>
+              <ColorMapEntry color="#a2d8e5" label="-3.33333333333333" quantity="-3.33333333333333"/>
+              <ColorMapEntry color="#b3dfea" label="-2.72727272727273" quantity="-2.72727272727273"/>
+              <ColorMapEntry color="#c4e6ef" label="-2.12121212121212" quantity="-2.12121212121212"/>
+              <ColorMapEntry color="#d5eef4" label="-1.51515151515152" quantity="-1.51515151515152"/>
+              <ColorMapEntry color="#e6f5f8" label="-0.909090909090907" quantity="-0.909090909090907"/>
+              <ColorMapEntry color="#f7fcfd" label="-0.303030303030301" quantity="-0.303030303030301"/>
+              <ColorMapEntry color="#fffdf5" label="0.303030303030305" quantity="0.303030303030305"/>
+              <ColorMapEntry color="#fef7e0" label="0.90909090909091" quantity="0.9090909090909099"/>
+              <ColorMapEntry color="#fcf2cc" label="1.51515151515152" quantity="1.51515151515152"/>
+              <ColorMapEntry color="#fbecb7" label="2.12121212121212" quantity="2.12121212121212"/>
+              <ColorMapEntry color="#fae7a2" label="2.72727272727273" quantity="2.72727272727273"/>
+              <ColorMapEntry color="#f9e28e" label="3.33333333333334" quantity="3.33333333333334"/>
+              <ColorMapEntry color="#f8dc79" label="3.93939393939394" quantity="3.93939393939394"/>
+              <ColorMapEntry color="#f6d764" label="4.54545454545455" quantity="4.54545454545455"/>
+              <ColorMapEntry color="#f5d150" label="5.15151515151516" quantity="5.15151515151516"/>
+              <ColorMapEntry color="#f4cc3b" label="5.75757575757576" quantity="5.75757575757576"/>
+              <ColorMapEntry color="#f3c626" label="6.36363636363637" quantity="6.36363636363637"/>
+              <ColorMapEntry color="#f2c112" label="6.96969696969697" quantity="6.96969696969697"/>
+              <ColorMapEntry color="#f0ba00" label="7.57575757575758" quantity="7.57575757575758"/>
+              <ColorMapEntry color="#edab00" label="8.18181818181818" quantity="8.18181818181818"/>
+              <ColorMapEntry color="#ea9c01" label="8.78787878787879" quantity="8.787878787878791"/>
+              <ColorMapEntry color="#e78d01" label="9.3939393939394" quantity="9.3939393939394"/>
+              <ColorMapEntry color="#e47d02" label="10" quantity="10"/>
+              <ColorMapEntry color="#e16e02" label="10.6060606060606" quantity="10.6060606060606"/>
+              <ColorMapEntry color="#df5f03" label="11.2121212121212" quantity="11.2121212121212"/>
+              <ColorMapEntry color="#dc5003" label="11.8181818181818" quantity="11.8181818181818"/>
+              <ColorMapEntry color="#d94004" label="12.4242424242424" quantity="12.4242424242424"/>
+              <ColorMapEntry color="#d63105" label="13.030303030303" quantity="13.030303030303"/>
+              <ColorMapEntry color="#d32205" label="13.6363636363636" quantity="13.6363636363636"/>
+              <ColorMapEntry color="#d01306" label="14.2424242424242" quantity="14.2424242424242"/>
+              <ColorMapEntry color="#cd0306" label="14.8484848484849" quantity="14.8484848484849"/>
+              <ColorMapEntry color="#c50107" label="15.4545454545455" quantity="15.4545454545455"/>
+              <ColorMapEntry color="#bc0408" label="16.0606060606061" quantity="16.0606060606061"/>
+              <ColorMapEntry color="#b20709" label="16.6666666666667" quantity="16.6666666666667"/>
+              <ColorMapEntry color="#a9090a" label="17.2727272727273" quantity="17.2727272727273"/>
+              <ColorMapEntry color="#9f0c0b" label="17.8787878787879" quantity="17.8787878787879"/>
+              <ColorMapEntry color="#960e0c" label="18.4848484848485" quantity="18.4848484848485"/>
+              <ColorMapEntry color="#8c110e" label="19.0909090909091" quantity="19.0909090909091"/>
+              <ColorMapEntry color="#83130f" label="19.6969696969697" quantity="19.6969696969697"/>
+              <ColorMapEntry color="#791610" label="20.3030303030303" quantity="20.3030303030303"/>
+              <ColorMapEntry color="#701911" label="20.9090909090909" quantity="20.9090909090909"/>
+              <ColorMapEntry color="#671b12" label="21.5151515151515" quantity="21.5151515151515"/>
+              <ColorMapEntry color="#5d1e13" label="22.1212121212121" quantity="22.1212121212121"/>
+              <ColorMapEntry color="#672319" label="22.7272727272727" quantity="22.7272727272727"/>
+              <ColorMapEntry color="#742920" label="23.3333333333333" quantity="23.3333333333333"/>
+              <ColorMapEntry color="#803028" label="23.9393939393939" quantity="23.9393939393939"/>
+              <ColorMapEntry color="#8d362f" label="24.5454545454545" quantity="24.5454545454545"/>
+              <ColorMapEntry color="#9a3c36" label="25.1515151515152" quantity="25.1515151515152"/>
+              <ColorMapEntry color="#a6423d" label="25.7575757575758" quantity="25.7575757575758"/>
+              <ColorMapEntry color="#b34844" label="26.3636363636364" quantity="26.3636363636364"/>
+              <ColorMapEntry color="#c04e4c" label="26.969696969697" quantity="26.969696969697"/>
+              <ColorMapEntry color="#cd5453" label="27.5757575757576" quantity="27.5757575757576"/>
+              <ColorMapEntry color="#d95b5a" label="28.1818181818182" quantity="28.1818181818182"/>
+              <ColorMapEntry color="#e66161" label="28.7878787878788" quantity="28.7878787878788"/>
+              <ColorMapEntry color="#f36768" label="29.3939393939394" quantity="29.3939393939394"/>
+              <ColorMapEntry color="#ff6d6f" label="30" quantity="30"/>
+            </ColorMap>
+          </RasterSymbolizer>
+        </Rule>
+      </FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
+</StyledLayerDescriptor>

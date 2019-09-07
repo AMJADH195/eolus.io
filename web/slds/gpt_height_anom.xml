@@ -1,0 +1,116 @@
+<StyledLayerDescriptor version="1.0.0">
+  <NamedLayer>
+    <Name>eolus</Name>
+    <UserStyle>
+      <Title>xxx</Title>
+      <FeatureTypeStyle>
+        <Rule>
+          <RasterSymbolizer>
+            <Opacity>1.0</Opacity>
+            <ColorMap>
+              <ColorMapEntry color="#ffa7fb" label="&lt;= -392" quantity="-392"/>
+              <ColorMapEntry color="#f5a1fb" label="-392 - -384" quantity="-384"/>
+              <ColorMapEntry color="#ea9afc" label="-384 - -376" quantity="-376"/>
+              <ColorMapEntry color="#df94fc" label="-376 - -368" quantity="-368"/>
+              <ColorMapEntry color="#d58efc" label="-368 - -360" quantity="-360"/>
+              <ColorMapEntry color="#ca87fd" label="-360 - -352" quantity="-352"/>
+              <ColorMapEntry color="#bf81fd" label="-352 - -344" quantity="-344"/>
+              <ColorMapEntry color="#b57afd" label="-344 - -336" quantity="-336"/>
+              <ColorMapEntry color="#aa74fd" label="-336 - -328" quantity="-328"/>
+              <ColorMapEntry color="#9f6efe" label="-328 - -320" quantity="-320"/>
+              <ColorMapEntry color="#9467fe" label="-320 - -312" quantity="-312"/>
+              <ColorMapEntry color="#8a61fe" label="-312 - -304" quantity="-304"/>
+              <ColorMapEntry color="#7f5bff" label="-304 - -296" quantity="-296"/>
+              <ColorMapEntry color="#7454ff" label="-296 - -288" quantity="-288"/>
+              <ColorMapEntry color="#6a4eff" label="-288 - -280" quantity="-280"/>
+              <ColorMapEntry color="#5f47ff" label="-280 - -272" quantity="-272"/>
+              <ColorMapEntry color="#5a48fe" label="-272 - -264" quantity="-264"/>
+              <ColorMapEntry color="#594efc" label="-264 - -256" quantity="-256"/>
+              <ColorMapEntry color="#5954fb" label="-256 - -248" quantity="-248"/>
+              <ColorMapEntry color="#585af9" label="-248 - -240" quantity="-240"/>
+              <ColorMapEntry color="#5760f7" label="-240 - -232" quantity="-232"/>
+              <ColorMapEntry color="#5766f5" label="-232 - -224" quantity="-224"/>
+              <ColorMapEntry color="#566cf3" label="-224 - -216" quantity="-216"/>
+              <ColorMapEntry color="#5572f1" label="-216 - -208" quantity="-208"/>
+              <ColorMapEntry color="#5478ef" label="-208 - -200" quantity="-200"/>
+              <ColorMapEntry color="#547eed" label="-200 - -192" quantity="-192"/>
+              <ColorMapEntry color="#5384eb" label="-192 - -184" quantity="-184"/>
+              <ColorMapEntry color="#528aea" label="-184 - -176" quantity="-176"/>
+              <ColorMapEntry color="#5290e9" label="-176 - -168" quantity="-168"/>
+              <ColorMapEntry color="#5496e9" label="-168 - -160" quantity="-160"/>
+              <ColorMapEntry color="#569cea" label="-160 - -152" quantity="-152"/>
+              <ColorMapEntry color="#58a2eb" label="-152 - -144" quantity="-144"/>
+              <ColorMapEntry color="#5aa8eb" label="-144 - -136" quantity="-136"/>
+              <ColorMapEntry color="#5cadec" label="-136 - -128" quantity="-128"/>
+              <ColorMapEntry color="#5eb3ed" label="-128 - -120" quantity="-120"/>
+              <ColorMapEntry color="#60b9ee" label="-120 - -112" quantity="-112"/>
+              <ColorMapEntry color="#62bfee" label="-112 - -104" quantity="-104"/>
+              <ColorMapEntry color="#64c5ef" label="-104 - -96" quantity="-96"/>
+              <ColorMapEntry color="#66cbf0" label="-96 - -88" quantity="-88"/>
+              <ColorMapEntry color="#68d0f0" label="-88 - -80" quantity="-80"/>
+              <ColorMapEntry color="#76d4f1" label="-80 - -72" quantity="-72"/>
+              <ColorMapEntry color="#83d8f2" label="-72 - -64" quantity="-64"/>
+              <ColorMapEntry color="#91dcf2" label="-64 - -56" quantity="-56"/>
+              <ColorMapEntry color="#9fdff3" label="-56 - -48" quantity="-48"/>
+              <ColorMapEntry color="#ace3f4" label="-48 - -40" quantity="-40"/>
+              <ColorMapEntry color="#bae7f4" label="-40 - -32" quantity="-32"/>
+              <ColorMapEntry color="#c8eaf5" label="-32 - -24" quantity="-24"/>
+              <ColorMapEntry color="#d5eef6" label="-24 - -16" quantity="-16"/>
+              <ColorMapEntry color="#e3f2f6" label="-16 - -8" quantity="-8"/>
+              <ColorMapEntry color="#f1f6f7" label="-8 - 0" quantity="0"/>
+              <ColorMapEntry color="#f8f8f1" label="0 - 8" quantity="8"/>
+              <ColorMapEntry color="#f8f8e4" label="8 - 16" quantity="16"/>
+              <ColorMapEntry color="#f9f8d7" label="16 - 24" quantity="24"/>
+              <ColorMapEntry color="#f9f9ca" label="24 - 32" quantity="32"/>
+              <ColorMapEntry color="#faf9bd" label="32 - 40" quantity="40"/>
+              <ColorMapEntry color="#faf9b0" label="40 - 48" quantity="48"/>
+              <ColorMapEntry color="#fbf9a3" label="48 - 56" quantity="56"/>
+              <ColorMapEntry color="#fbfa96" label="56 - 64" quantity="64"/>
+              <ColorMapEntry color="#fcfa89" label="64 - 72" quantity="72"/>
+              <ColorMapEntry color="#fcfa7c" label="72 - 80" quantity="80"/>
+              <ColorMapEntry color="#fdfb6f" label="80 - 88" quantity="88"/>
+              <ColorMapEntry color="#fdfa62" label="88 - 96" quantity="96"/>
+              <ColorMapEntry color="#fcf05c" label="96 - 104" quantity="104"/>
+              <ColorMapEntry color="#fae755" label="104 - 112" quantity="112"/>
+              <ColorMapEntry color="#f9dd4e" label="112 - 120" quantity="120"/>
+              <ColorMapEntry color="#f7d447" label="120 - 128" quantity="128"/>
+              <ColorMapEntry color="#f6ca41" label="128 - 136" quantity="136"/>
+              <ColorMapEntry color="#f4c13a" label="136 - 144" quantity="144"/>
+              <ColorMapEntry color="#f3b733" label="144 - 152" quantity="152"/>
+              <ColorMapEntry color="#f1ad2c" label="152 - 160" quantity="160"/>
+              <ColorMapEntry color="#f0a426" label="160 - 168" quantity="168"/>
+              <ColorMapEntry color="#ee9a1f" label="168 - 176" quantity="176"/>
+              <ColorMapEntry color="#ed9118" label="176 - 184" quantity="184"/>
+              <ColorMapEntry color="#eb8711" label="184 - 192" quantity="192"/>
+              <ColorMapEntry color="#e97e0b" label="192 - 200" quantity="200"/>
+              <ColorMapEntry color="#e87404" label="200 - 208" quantity="208"/>
+              <ColorMapEntry color="#e76b02" label="208 - 216" quantity="216"/>
+              <ColorMapEntry color="#e76303" label="216 - 224" quantity="224"/>
+              <ColorMapEntry color="#e75a03" label="224 - 232" quantity="232"/>
+              <ColorMapEntry color="#e75204" label="232 - 240" quantity="240"/>
+              <ColorMapEntry color="#e74905" label="240 - 248" quantity="248"/>
+              <ColorMapEntry color="#e74106" label="248 - 256" quantity="256"/>
+              <ColorMapEntry color="#e73907" label="256 - 264" quantity="264"/>
+              <ColorMapEntry color="#e73007" label="264 - 272" quantity="272"/>
+              <ColorMapEntry color="#e72808" label="272 - 280" quantity="280"/>
+              <ColorMapEntry color="#e71f09" label="280 - 288" quantity="288"/>
+              <ColorMapEntry color="#e7170a" label="288 - 296" quantity="296"/>
+              <ColorMapEntry color="#e70e0b" label="296 - 304" quantity="304"/>
+              <ColorMapEntry color="#e6060b" label="304 - 312" quantity="312"/>
+              <ColorMapEntry color="#e70712" label="312 - 320" quantity="320"/>
+              <ColorMapEntry color="#ea1b22" label="320 - 328" quantity="328"/>
+              <ColorMapEntry color="#ec2f33" label="328 - 336" quantity="336"/>
+              <ColorMapEntry color="#ef4343" label="336 - 344" quantity="344"/>
+              <ColorMapEntry color="#f15754" label="344 - 352" quantity="352"/>
+              <ColorMapEntry color="#f36b64" label="352 - 360" quantity="360"/>
+              <ColorMapEntry color="#f67f75" label="360 - 368" quantity="368"/>
+              <ColorMapEntry color="#f89286" label="368 - 376" quantity="376"/>
+              <ColorMapEntry color="#fba696" label="376 - 384" quantity="384"/>
+              <ColorMapEntry color="#fdbaa7" label="384 - 392" quantity="392"/>
+            </ColorMap>
+          </RasterSymbolizer>
+        </Rule>
+      </FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
+</StyledLayerDescriptor>
