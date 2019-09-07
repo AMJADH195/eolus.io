@@ -380,6 +380,17 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.sprd.f%T.grib2",
             "filetype": "grib2"
         },
+        "hrrr": {
+            "enabled": true,
+            "updateFrequency": 1,
+            "updateOffset": 0,
+            "startTime": 0,
+            "endTime": 36,
+            "imageWidth": 512,
+            "downloadType": "FILESERIES",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/hrrr/prod/hrrr.%D/conus/hrrr.t%Hz.wrfsfcf%T.grib2",
+            "filetype": "grib2"
+        },
         "naefs_bc_avg": {
             "enabled": false,
             "updateFrequency": 6,
