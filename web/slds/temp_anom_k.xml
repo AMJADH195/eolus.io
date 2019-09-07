@@ -1,0 +1,117 @@
+<StyledLayerDescriptor version="1.0.0">
+  <NamedLayer>
+    <Name>eolus</Name>
+    <UserStyle>
+      <Title>xxx</Title>
+      <FeatureTypeStyle>
+        <Rule>
+          <RasterSymbolizer>
+            <Opacity>1.0</Opacity>
+            <ColorMap>
+              <ColorMapEntry color="#ffbdf4" label="&lt;= -302.56" quantity="-302.56"/>
+              <ColorMapEntry color="#f9aeed" label="-302.56 - -301.96" quantity="-301.96"/>
+              <ColorMapEntry color="#f39fe5" label="-301.96 - -301.36" quantity="-301.36"/>
+              <ColorMapEntry color="#ed8fdd" label="-301.36 - -300.76" quantity="-300.76"/>
+              <ColorMapEntry color="#e780d5" label="-300.76 - -300.16" quantity="-300.16"/>
+              <ColorMapEntry color="#e071ce" label="-300.16 - -299.56" quantity="-299.56"/>
+              <ColorMapEntry color="#da61c6" label="-299.56 - -298.96" quantity="-298.96"/>
+              <ColorMapEntry color="#d452be" label="-298.96 - -298.36" quantity="-298.36"/>
+              <ColorMapEntry color="#ce43b6" label="-298.36 - -297.76" quantity="-297.76"/>
+              <ColorMapEntry color="#c733ae" label="-297.76 - -297.16" quantity="-297.16"/>
+              <ColorMapEntry color="#c124a7" label="-297.16 - -296.56" quantity="-296.56"/>
+              <ColorMapEntry color="#bb159f" label="-296.56 - -295.96" quantity="-295.96"/>
+              <ColorMapEntry color="#b50597" label="-295.96 - -295.36" quantity="-295.36"/>
+              <ColorMapEntry color="#ab029a" label="-295.36 - -294.76" quantity="-294.76"/>
+              <ColorMapEntry color="#a107a2" label="-294.76 - -294.16" quantity="-294.16"/>
+              <ColorMapEntry color="#960bab" label="-294.16 - -293.56" quantity="-293.56"/>
+              <ColorMapEntry color="#8b10b4" label="-293.56 - -292.96" quantity="-292.96"/>
+              <ColorMapEntry color="#8014bc" label="-292.96 - -292.36" quantity="-292.36"/>
+              <ColorMapEntry color="#7619c5" label="-292.36 - -291.76" quantity="-291.76"/>
+              <ColorMapEntry color="#6b1dce" label="-291.76 - -291.16" quantity="-291.16"/>
+              <ColorMapEntry color="#6022d6" label="-291.16 - -290.56" quantity="-290.56"/>
+              <ColorMapEntry color="#5526df" label="-290.56 - -289.96" quantity="-289.96"/>
+              <ColorMapEntry color="#4a2ae8" label="-289.96 - -289.36" quantity="-289.36"/>
+              <ColorMapEntry color="#402ff0" label="-289.36 - -288.76" quantity="-288.76"/>
+              <ColorMapEntry color="#3533f9" label="-288.76 - -288.16" quantity="-288.16"/>
+              <ColorMapEntry color="#2d39fe" label="-288.16 - -287.56" quantity="-287.56"/>
+              <ColorMapEntry color="#2d42fa" label="-287.56 - -286.96" quantity="-286.96"/>
+              <ColorMapEntry color="#2d4bf5" label="-286.96 - -286.36" quantity="-286.36"/>
+              <ColorMapEntry color="#2d54f0" label="-286.36 - -285.76" quantity="-285.76"/>
+              <ColorMapEntry color="#2d5dec" label="-285.76 - -285.16" quantity="-285.16"/>
+              <ColorMapEntry color="#2e66e7" label="-285.16 - -284.56" quantity="-284.56"/>
+              <ColorMapEntry color="#2e6fe2" label="-284.56 - -283.96" quantity="-283.96"/>
+              <ColorMapEntry color="#2e78de" label="-283.96 - -283.36" quantity="-283.36"/>
+              <ColorMapEntry color="#2e81d9" label="-283.36 - -282.76" quantity="-282.76"/>
+              <ColorMapEntry color="#2e8ad4" label="-282.76 - -282.16" quantity="-282.16"/>
+              <ColorMapEntry color="#2e93d0" label="-282.16 - -281.56" quantity="-281.56"/>
+              <ColorMapEntry color="#2e9ccb" label="-281.56 - -280.96" quantity="-280.96"/>
+              <ColorMapEntry color="#2fa5c6" label="-280.96 - -280.36" quantity="-280.36"/>
+              <ColorMapEntry color="#3cadc9" label="-280.36 - -279.76" quantity="-279.76"/>
+              <ColorMapEntry color="#4db4ce" label="-279.76 - -279.16" quantity="-279.16"/>
+              <ColorMapEntry color="#5ebbd2" label="-279.16 - -278.56" quantity="-278.56"/>
+              <ColorMapEntry color="#6fc2d7" label="-278.56 - -277.96" quantity="-277.96"/>
+              <ColorMapEntry color="#80cadc" label="-277.96 - -277.36" quantity="-277.36"/>
+              <ColorMapEntry color="#91d1e1" label="-277.36 - -276.76" quantity="-276.76"/>
+              <ColorMapEntry color="#a2d8e5" label="-276.76 - -276.16" quantity="-276.16"/>
+              <ColorMapEntry color="#b3dfea" label="-276.16 - -275.56" quantity="-275.56"/>
+              <ColorMapEntry color="#c4e6ef" label="-275.56 - -274.96" quantity="-274.96"/>
+              <ColorMapEntry color="#d5eef4" label="-274.96 - -274.36" quantity="-274.36"/>
+              <ColorMapEntry color="#e6f5f8" label="-274.36 - -273.76" quantity="-273.76"/>
+              <ColorMapEntry color="#f7fcfd" label="-273.76 - -273.16" quantity="-273.16"/>
+              <ColorMapEntry color="#fffdf5" label="-273.16 - -272.56" quantity="-272.56"/>
+              <ColorMapEntry color="#fef7e0" label="-272.56 - -271.96" quantity="-271.96"/>
+              <ColorMapEntry color="#fcf2cc" label="-271.96 - -271.36" quantity="-271.36"/>
+              <ColorMapEntry color="#fbecb7" label="-271.36 - -270.76" quantity="-270.76"/>
+              <ColorMapEntry color="#fae7a2" label="-270.76 - -270.16" quantity="-270.16"/>
+              <ColorMapEntry color="#f9e28e" label="-270.16 - -269.56" quantity="-269.56"/>
+              <ColorMapEntry color="#f8dc79" label="-269.56 - -268.96" quantity="-268.96"/>
+              <ColorMapEntry color="#f6d764" label="-268.96 - -268.36" quantity="-268.36"/>
+              <ColorMapEntry color="#f5d150" label="-268.36 - -267.76" quantity="-267.76"/>
+              <ColorMapEntry color="#f4cc3b" label="-267.76 - -267.16" quantity="-267.16"/>
+              <ColorMapEntry color="#f3c626" label="-267.16 - -266.56" quantity="-266.56"/>
+              <ColorMapEntry color="#f2c112" label="-266.56 - -265.96" quantity="-265.96"/>
+              <ColorMapEntry color="#f0ba00" label="-265.96 - -265.36" quantity="-265.36"/>
+              <ColorMapEntry color="#edab00" label="-265.36 - -264.76" quantity="-264.76"/>
+              <ColorMapEntry color="#ea9c01" label="-264.76 - -264.16" quantity="-264.16"/>
+              <ColorMapEntry color="#e78d01" label="-264.16 - -263.56" quantity="-263.56"/>
+              <ColorMapEntry color="#e47d02" label="-263.56 - -262.96" quantity="-262.96"/>
+              <ColorMapEntry color="#e16e02" label="-262.96 - -262.36" quantity="-262.36"/>
+              <ColorMapEntry color="#df5f02" label="-262.36 - -261.76" quantity="-261.76"/>
+              <ColorMapEntry color="#dc5003" label="-261.76 - -261.16" quantity="-261.16"/>
+              <ColorMapEntry color="#d94003" label="-261.16 - -260.56" quantity="-260.56"/>
+              <ColorMapEntry color="#d63104" label="-260.56 - -259.96" quantity="-259.96"/>
+              <ColorMapEntry color="#d32204" label="-259.96 - -259.36" quantity="-259.36"/>
+              <ColorMapEntry color="#d01305" label="-259.36 - -258.76" quantity="-258.76"/>
+              <ColorMapEntry color="#cd0305" label="-258.76 - -258.16" quantity="-258.16"/>
+              <ColorMapEntry color="#c50106" label="-258.16 - -257.56" quantity="-257.56"/>
+              <ColorMapEntry color="#bc0407" label="-257.56 - -256.96" quantity="-256.96"/>
+              <ColorMapEntry color="#b20609" label="-256.96 - -256.36" quantity="-256.36"/>
+              <ColorMapEntry color="#a9090a" label="-256.36 - -255.76" quantity="-255.76"/>
+              <ColorMapEntry color="#9f0c0b" label="-255.76 - -255.16" quantity="-255.16"/>
+              <ColorMapEntry color="#960e0c" label="-255.16 - -254.56" quantity="-254.56"/>
+              <ColorMapEntry color="#8c110d" label="-254.56 - -253.96" quantity="-253.96"/>
+              <ColorMapEntry color="#83130e" label="-253.96 - -253.36" quantity="-253.36"/>
+              <ColorMapEntry color="#79160f" label="-253.36 - -252.76" quantity="-252.76"/>
+              <ColorMapEntry color="#701810" label="-252.76 - -252.16" quantity="-252.16"/>
+              <ColorMapEntry color="#671b11" label="-252.16 - -251.56" quantity="-251.56"/>
+              <ColorMapEntry color="#5d1d12" label="-251.56 - -250.96" quantity="-250.96"/>
+              <ColorMapEntry color="#672319" label="-250.96 - -250.36" quantity="-250.36"/>
+              <ColorMapEntry color="#742920" label="-250.36 - -249.76" quantity="-249.76"/>
+              <ColorMapEntry color="#802f27" label="-249.76 - -249.16" quantity="-249.16"/>
+              <ColorMapEntry color="#8d352e" label="-249.16 - -248.56" quantity="-248.56"/>
+              <ColorMapEntry color="#9a3c36" label="-248.56 - -247.96" quantity="-247.96"/>
+              <ColorMapEntry color="#a6423d" label="-247.96 - -247.36" quantity="-247.36"/>
+              <ColorMapEntry color="#b34844" label="-247.36 - -246.76" quantity="-246.76"/>
+              <ColorMapEntry color="#c04e4b" label="-246.76 - -246.16" quantity="-246.16"/>
+              <ColorMapEntry color="#cd5452" label="-246.16 - -245.56" quantity="-245.56"/>
+              <ColorMapEntry color="#d95a59" label="-245.56 - -244.96" quantity="-244.96"/>
+              <ColorMapEntry color="#e66161" label="-244.96 - -244.36" quantity="-244.36"/>
+              <ColorMapEntry color="#f36768" label="-244.36 - -243.76" quantity="-243.76"/>
+              <ColorMapEntry color="#ff6d6f" label="> -243.76" quantity="-243.16"/>
+            </ColorMap>
+          </RasterSymbolizer>
+        </Rule>
+      </FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
+</StyledLayerDescriptor>
