@@ -396,7 +396,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     try:
         grib_file = requests.get(url, timeout=60)
         if grib_file.status_code != 200:
-            log ("Grib retrieval for timestamp {0} failed with code {1}".format (str(fmt_timestep), grib_file.status_code), "INFO", model_name)
+            log ("Grib retrieval for timestamp {0} failed with code {1}".format (str(fmt_timestep), grib_file.status_code), "WARN", model_name)
             raise Exception ("This file does not exist on the remote server.")
 
     except Exception as e:
@@ -427,7 +427,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         time.sleep (config["sleepTime"])
         continue
 
-    log ("The grib file was downloaded successfully.", "INFO", model_name)
+    print "The grib file was downloaded successfully."
 
     warp_file_type = model["filetype"]
 
@@ -526,7 +526,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             new_raster.SetProjection (grib_srs.ExportToWkt())
             out_raster = gdal.GetDriverByName('GTiff').CreateCopy (filename + "_temp.tif", new_raster, 0)
 
-            log ("New raster created.", "INFO", model_name)
+            print "New raster created."
 
             # This is important, or else gdalwarp
             # can't read the raster and you get an empty raster in the end
@@ -543,7 +543,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     # I'm lazy and the documentation is much nicer for the shell commands
     # than it is for the API :)
     
-    log ("Beginning gdalwarp.", "INFO", model_name)
+    print "Beginning gdalwarp."
 
     try:
         if "extractBandsByMetadata" not in model:
@@ -573,7 +573,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         print ""
         continue
 
-    log ("Copy file over to mapfile directory.", "INFO", model_name)
+    print "Copy file over to mapfile directory."
 
     try:
         directory = config["mapfileDir"] + "/" + model_name + "/"
@@ -583,8 +583,8 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         infile = filename + ".tif"
         outfile = directory + model_name + "_" + str(model_date) + "_" + str(model_hour) + "z_t" + str(model_timestep) + ".tif"
 
-        log ("Infile: " + infile, "INFO", model_name)
-        log ("Outfile: " + outfile, "INFO", model_name)
+        print "Infile: " + infile
+        print "Outfile: " + outfile
 
         copy (infile, outfile)
 
@@ -596,7 +596,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
         print ""
         continue
     
-    log ("Cleaning up temporary files.", "INFO", model_name)
+    print "Cleaning up temporary files."
     
     if not config["debug"]:
         for a_file in os.listdir(working_dir):
@@ -653,7 +653,7 @@ log ("Model processing completed successfully.".format(fmt_timestep),"INFO", mod
 
 
 if not ignoredb:
-    log ("Cleaning up the logs...", "INFO")
+    print "Cleaning up the logs..."
     curr.execute ("DELETE FROM logging.processing_logs WHERE timestamp < now() - interval '" + str(config["retentionDays"]) + " days'")
     conn.commit ()
     curr.execute ("DELETE FROM logging.run_status WHERE model_timestamp < now() - interval '" + str(config["retentionDays"]) + " days'")
