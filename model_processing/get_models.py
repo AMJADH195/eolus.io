@@ -78,7 +78,7 @@ def log (message, level, model=""):
         conn.commit ()
 
         if model:
-            curr.execute ("UPDATE logging.model_status SET (log) = (%s) WHERE model = %s", (print_str, model_name))
+            curr.execute ("UPDATE logging.model_status SET log = %s WHERE model = %s", (print_str, model_name))
             conn.commit ()
 
 def check_if_model_needs_update (model_name):
