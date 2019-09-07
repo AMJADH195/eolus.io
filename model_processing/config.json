@@ -389,7 +389,43 @@
             "imageWidth": 512,
             "downloadType": "FILESERIES",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/hrrr/prod/hrrr.%D/conus/hrrr.t%Hz.wrfsfcf%T.grib2",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "extractBandsByMetadata": [
+                {"gribVar": "REFC", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "RETOP", "gribLevel": "0-CTL"},
+                {"gribVar": "VERIL", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
+
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "HAIL", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "LTNG", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
+
+                {"gribVar": "ASNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
+
+                {"gribVar": "GUST", "gribLevel": "0-SFC"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
+                {"gribVar": "USTM", "gribLevel": "0-6000-HTGL"},
+                {"gribVar": "VSTM", "gribLevel": "0-6000-HTGL"},
+
+                {"gribVar": "TMP", "gribLevel": "0-SFC"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"}
+            ]
         },
         "naefs_bc_avg": {
             "enabled": false,
@@ -486,7 +522,11 @@
             "imageWidth": 64,
             "downloadType": "FILESERIES",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/pgrb2ap5_an/naefs_geavg.t%Hz.pgrb2a.0p50_anvf%T",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "extractBandsByMetadata": [
+                {"gribVar": "HGT", "gribLevel": "50000-ISBL"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"}
+            ]
         },
         "nam3": {
             "enabled": true,
