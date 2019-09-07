@@ -477,6 +477,17 @@
                 {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
             ]
         },
+        "naefs_anom": {
+            "enabled": true,
+            "updateFrequency": 6,
+            "updateOffset": 0,
+            "startTime": 3,
+            "endTime": 384,
+            "imageWidth": 64,
+            "downloadType": "FILESERIES",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/pgrb2ap5_an/naefs_geavg.t%Hz.pgrb2a.0p50_anvf%T",
+            "fileType": "grib2"
+        },
         "nam3": {
             "enabled": true,
             "updateFrequency": 6,
