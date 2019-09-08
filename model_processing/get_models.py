@@ -394,32 +394,25 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
     log ("Downloading grib file for timestep {0}/{1}.".format (fmt_timestep, str(model_loop_end_time - 1)), "INFO", model_name)
 
     try:
-        grib_file = requests.get(url, timeout=60)
-        if grib_file.status_code != 200:
-            log ("Grib retrieval for timestamp {0} failed with code {1}".format (str(fmt_timestep), grib_file.status_code), "WARN", model_name)
-            raise Exception ("This file does not exist on the remote server.")
+        filename = working_dir + model_name + "_" + model_date + "_" + model_hour + "Z_f" + fmt_timestep
+
+        start = time.time()
+
+        with requests.get(url, timeout=6, verify=False, stream=True) as r:
+            
+            if r.status_code != 200:
+                log ("Grib retrieval for timestamp {0} failed with code {1}".format (str(fmt_timestep), grib_file.status_code), "WARN", model_name)
+                raise Exception ("This file does not exist on the remote server.")
+
+            with open (filename + "." + model["filetype"], 'wb') as outfile:
+                for chunk in r.iter_content(chunk_size=128):
+                    outfile.write (chunk)
+                    if time.time() > (start + 600)
+                        raise Exception ("The server did not response quickly enough.")
 
     except Exception as e:
         log ("Could not download grib file ({0}).  Skipping...".format (e), "WARN", model_name)
         num_warnings += 1
-        print "---------------"
-        print ""
-        # Wait a bit between polling server,
-        # per NCEP's usage guidelines.
-        time.sleep (config["sleepTime"])
-        continue
-
-    filename = ""
-    
-    try:
-        filename = working_dir + model_name + "_" + model_date + "_" + model_hour + "Z_f" + fmt_timestep
-
-        with open (filename + "." + model["filetype"], 'wb') as outfile:
-            outfile.write (grib_file.content)
-
-    except:
-        log ("Could not write grib file ({0}).".format (filename), "ERROR", model_name)
-        num_errors += 1
         print "---------------"
         print ""
         # Wait a bit between polling server,
