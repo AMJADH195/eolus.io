@@ -407,7 +407,7 @@ for model_timestep in range (model["startTime"], model_loop_end_time):
             with open (filename + "." + model["filetype"], 'wb') as outfile:
                 for chunk in r.iter_content(chunk_size=128):
                     outfile.write (chunk)
-                    if time.time() > (start + 600)
+                    if time.time() > (start + 600):
                         raise Exception ("The server did not response quickly enough.")
 
     except Exception as e:
