@@ -7,7 +7,8 @@ import pprint
 import subprocess
 import sys
 import time
-import urllib2
+import urllib3
+
 from datetime import datetime, timedelta, tzinfo
 from shutil import copy
 
@@ -28,6 +29,8 @@ curr = None
 fetch = None
 
 ZERO = timedelta(0)
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class UTC(tzinfo):
     def utcoffset(self, dt):
@@ -154,9 +157,9 @@ def check_if_model_needs_update (model_name):
         print "Checking URL: " + url
 
         try:
-            ret = urllib2.urlopen(url)
+            ret = requests.head(url)
 
-            if ret.code == 200 or ret.code == None:
+            if ret.status_code == 200 or ret.status_code == None:
                 print " *** New model run found. ***"
                 return True
 
