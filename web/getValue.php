@@ -69,7 +69,7 @@ if ((float) $lat > 90 || (float) $lat < -90 || (float) $lng > 180 || (float) $ln
     exit (1);
 }
 $filename = "/map/{$model}/{$model}_${year}-{$month}-{$day}_{$hour}z_t{$fh}.tif";
-$cmd = "gdallocationinfo -valonly {$bands} -wgs84 {$filename} {$lng} {$lat} 2>&1";
+$cmd = "gdallocationinfo -valonly {$bands} -wgs84 {$filename} {$lng} {$lat}";
 exec($cmd, $output, $return_var );
 
 $values = [];
