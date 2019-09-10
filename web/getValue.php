@@ -1,16 +1,17 @@
 <?php
 
-$band = $_GET['band'];
+$bands = $_GET['bands'];
 $year = $_GET['year'];
 $month = $_GET['month'];
 $day = $_GET['day'];
+$hour = $_GET['hour'];
 $fh = $_GET['fh'];
 $model = $_GET['model'];
 $lat = $_GET['lat'];
 $lng = $_GET['lng'];
 
-if (!is_numeric($band) || strlen($band) > 4) {
-    echo "Invalid band.";
+if (!preg_match('/^[0-9,]+$/', $bands)) {
+    echo "Invalid bands.";
     exit (1);
 }
 
@@ -26,6 +27,11 @@ if (!is_numeric($month) || strlen($month) != 2) {
 
 if (!is_numeric($day) || strlen($day) != 2) {
     echo "Invalid day.";
+    exit (1);
+}
+
+if (!is_numeric($hour) || strlen($hour) != 2) {
+    echo "Invalid hour.";
     exit (1);
 }
 
@@ -54,5 +60,15 @@ if ((float) $lat > 90 || (float) $lat < -90 || (float) $lng > 180 || (float) $ln
     exit (1);
 }
 echo "hi";
+
+$filename = "/map/{$model}/{$model}_${year}-{$month}-{$day}_{$hour}z_t{$fh}.tif";
+echo $filename;
+
+exec("gdallocationinfo -valonly -b {$bands} -wgs84 {$filename} {$lng} {$lat} 2>&1", $output, $return_var );
+
+print_r ($output);
+
+echo "and";
+print_r ($return_var);
 
 ?>
