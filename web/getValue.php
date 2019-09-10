@@ -88,10 +88,10 @@ $data = [
 
 if ($debug) {
     $data["debug"] = [
-        "Filename: " . $filename,
-        "Bands: " . $bands,
-        "Cmd: " . $cmd,
-        "Output" . strval($output)
+        "filename" => $filename,
+        "bands" => $bands,
+        "cmd" => $cmd,
+        "output" => $output
     ];
 }
 
