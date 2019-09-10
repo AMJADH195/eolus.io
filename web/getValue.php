@@ -60,7 +60,7 @@ if (!is_numeric($lng)) {
     exit (1);
 }
 
-if ($_GET['debug'] == "true") {
+if (isset($_GET['debug'])) {
     $debug = true;
 }
 
@@ -69,12 +69,11 @@ if ((float) $lat > 90 || (float) $lat < -90 || (float) $lng > 180 || (float) $ln
     exit (1);
 }
 $filename = "/map/{$model}/{$model}_${year}-{$month}-{$day}_{$hour}z_t{$fh}.tif";
-
-exec("gdallocationinfo -valonly {$bands} -wgs84 {$filename} {$lng} {$lat} 2>&1", $output, $return_var );
+$cmd = "gdallocationinfo -valonly {$bands} -wgs84 {$filename} {$lng} {$lat} 2>&1";
+exec($cmd, $output, $return_var );
 
 $values = [];
 $error = "";
-$debug = "";
 
 if ($return_var > 0) {
     $error = "Get value failed with code " . strval($return_var);
@@ -92,7 +91,7 @@ if ($debug) {
         "Filename: " . $filename,
         "Bands: " . $bands,
         "Cmd: " . $cmd,
-        "Output" . implode($output)
+        "Output" . strval($output)
     ];
 }
 
