@@ -13,6 +13,9 @@ $lng = $_GET['lng'];
 if (!preg_match('/^[0-9,]+$/', $bands)) {
     echo "Invalid bands.";
     exit (1);
+} else {
+    $bands = explode ("," $bands);
+    $bands = "-b " . join("-b ", $bands);
 }
 
 if (!is_numeric($year) || strlen($year) != 4) {
@@ -63,8 +66,8 @@ echo "hi";
 
 $filename = "/map/{$model}/{$model}_${year}-{$month}-{$day}_{$hour}z_t{$fh}.tif";
 echo $filename;
-
-exec("gdallocationinfo -valonly -b {$bands} -wgs84 {$filename} {$lng} {$lat} 2>&1", $output, $return_var );
+echo $bands;
+exec("gdallocationinfo -valonly {$bands} -wgs84 {$filename} {$lng} {$lat} 2>&1", $output, $return_var );
 
 print_r ($output);
 
