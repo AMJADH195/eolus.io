@@ -60,11 +60,9 @@ if (!is_numeric($lng)) {
     exit (1);
 }
 
-if (isset($_GET['debug'])) {
+if ($_GET['debug'] == "true") {
     $debug = true;
 }
-
-
 
 if ((float) $lat > 90 || (float) $lat < -90 || (float) $lng > 180 || (float) $lng < -180 ) {
     echo "Invalid bounds.";
