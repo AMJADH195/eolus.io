@@ -45,10 +45,13 @@ MAP
    "wms_srs"   "EPSG:4326 EPSG:3857"
    "wms_extent" "-111 42 -100 36"
    "wms_enable_request" "*"
+   "wms_feature_info_mime_type" "application/json"
+   "wms_formatlist" "image/png8, image/jpeg"
   END
   DATA "/map/%model%/%model%_%date%_%time%z_t%fh%.tif"
   PROCESSING "BANDS=%band%"
   PROCESSING "CLOSE_CONNECTION=ALWAYS"
   PROCESSING "RESAMPLE=%resampling%"
+  TEMPLATE "dummy"
  END
 END
