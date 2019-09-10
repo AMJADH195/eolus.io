@@ -9,13 +9,15 @@ $fh = $_GET['fh'];
 $model = $_GET['model'];
 $lat = $_GET['lat'];
 $lng = $_GET['lng'];
+$debug = false;
 
 if (!preg_match('/^[0-9,]+$/', $bands)) {
     echo "Invalid bands.";
     exit (1);
 } else {
-    $bands = explode ("," $bands);
-    $bands = "-b " . join("-b ", $bands);
+    $bandArr = explode(",", $bands);
+    $bandList = join(" -b ", $bandArr);
+    $bands = "-b " . $bandList;
 }
 
 if (!is_numeric($year) || strlen($year) != 4) {
@@ -58,20 +60,45 @@ if (!is_numeric($lng)) {
     exit (1);
 }
 
+if (isset($_GET['debug'])) {
+    $debug = true;
+}
+
+
+
 if ((float) $lat > 90 || (float) $lat < -90 || (float) $lng > 180 || (float) $lng < -180 ) {
     echo "Invalid bounds.";
     exit (1);
 }
-echo "hi";
-
 $filename = "/map/{$model}/{$model}_${year}-{$month}-{$day}_{$hour}z_t{$fh}.tif";
-echo $filename;
-echo $bands;
+
 exec("gdallocationinfo -valonly {$bands} -wgs84 {$filename} {$lng} {$lat} 2>&1", $output, $return_var );
 
-print_r ($output);
+$values = [];
+$error = "";
+$debug = "";
 
-echo "and";
-print_r ($return_var);
+if ($return_var > 0) {
+    $error = "Get value failed with code " . strval($return_var);
+} else {
+    $values = $output;
+}
+
+$data = [
+    "values" => $values,
+    "error" => $error
+];
+
+if ($debug) {
+    $data["debug"] = [
+        "Filename: " . $filename,
+        "Bands: " . $bands,
+        "Cmd: " . $cmd,
+        "Output" . implode($output)
+    ];
+}
+
+header('Content-type: application/json');
+echo json_encode($data);
 
 ?>
