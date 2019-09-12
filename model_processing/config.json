@@ -470,7 +470,7 @@
             ]
         },
         "naefs_ndgd_avg": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
@@ -492,7 +492,7 @@
             ]
         },
         "naefs_ndgd_spr": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
