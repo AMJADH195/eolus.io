@@ -893,6 +893,54 @@
             "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmsigma_12h_snow_%D%Hf0%T.grb",
             "filetype": "grib2"
+        },
+        "wpc_snow_tot_25pct": {
+            "enabled": true,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 72,
+            "endTime": 72,
+            "interval": 1,
+            "imageWidth": 720,
+            "downloadType": "FILESERIES",
+            "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_25pt_%D%Hf0%T.grb",
+            "filetype": "grib2"
+        },
+        "wpc_snow_tot_50pct": {
+            "enabled": true,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 72,
+            "endTime": 72,
+            "interval": 1,
+            "imageWidth": 720,
+            "downloadType": "FILESERIES",
+            "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_50pt_%D%Hf0%T.grb",
+            "filetype": "grib2"
+        },
+        "wpc_snow_tot_75pct": {
+            "enabled": true,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 72,
+            "endTime": 72,
+            "interval": 1,
+            "imageWidth": 720,
+            "downloadType": "FILESERIES",
+            "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_75pt_%D%Hf0%T.grb",
+            "filetype": "grib2"
+        },
+        "wpc_snow_tot_sigma": {
+            "enabled": true,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 72,
+            "endTime": 72,
+            "interval": 1,
+            "imageWidth": 720,
+            "downloadType": "FILESERIES",
+            "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmsigma_72h_snow_%D%Hf0%T.grb",
+            "filetype": "grib2"
         }
     }
 }
