@@ -847,7 +847,7 @@
             ]
         },
         "wpc_snow_25pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -856,10 +856,7 @@
             "imageWidth": 720,
             "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_25pt_%D%Hf0%T.grb",
-            "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "ASNOW25", "gribLevel": "0-SFC"}
-            ]
+            "filetype": "grib2"
         },
         "wpc_snow_50pct": {
             "enabled": true,
@@ -871,10 +868,31 @@
             "imageWidth": 720,
             "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_50pt_%D%Hf0%T.grb",
-            "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "ASNOW50", "gribLevel": "0-SFC"}
-            ]
+            "filetype": "grib2"
+        },
+        "wpc_snow_75pct": {
+            "enabled": true,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 12,
+            "endTime": 72,
+            "interval": 6,
+            "imageWidth": 720,
+            "downloadType": "FILESERIES",
+            "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_75pt_%D%Hf0%T.grb",
+            "filetype": "grib2"
+        },
+        "wpc_snow_sigma": {
+            "enabled": true,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 12,
+            "endTime": 72,
+            "interval": 6,
+            "imageWidth": 720,
+            "downloadType": "FILESERIES",
+            "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmsigma_12h_snow_%D%Hf0%T.grb",
+            "filetype": "grib2"
         }
     }
 }
