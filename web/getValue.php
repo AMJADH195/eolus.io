@@ -26,27 +26,27 @@ if (!preg_match('/^[0-9,]+$/', $bands)) {
     $bands = "-b " . $bandList;
 }
 
+if (!is_numeric($year) || strlen($year) != 4) {
+    echo "Invalid year.";
+    exit (1);
+}
+
+if (!is_numeric($month) || strlen($month) != 2) {
+    echo "Invalid month.";
+    exit (1);
+}
+
+if (!is_numeric($day) || strlen($day) != 2) {
+    echo "Invalid day.";
+    exit (1);
+}
+
+if (!is_numeric($hour) || strlen($hour) != 2) {
+    echo "Invalid hour.";
+    exit (1);
+}
+
 if (!isset($_GET['fhstep'])) {
-    if (!is_numeric($year) || strlen($year) != 4) {
-        echo "Invalid year.";
-        exit (1);
-    }
-
-    if (!is_numeric($month) || strlen($month) != 2) {
-        echo "Invalid month.";
-        exit (1);
-    }
-
-    if (!is_numeric($day) || strlen($day) != 2) {
-        echo "Invalid day.";
-        exit (1);
-    }
-
-    if (!is_numeric($hour) || strlen($hour) != 2) {
-        echo "Invalid hour.";
-        exit (1);
-    }
-
     if (!is_numeric($fh) || strlen($fh) > 4) {
         echo "Invalid fh.";
         exit (1);
