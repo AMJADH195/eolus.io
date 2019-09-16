@@ -119,6 +119,7 @@ if (!isset($_GET['fhstep'])) {
     }
 } else {
     for ($fh = intval($fhStart); $fh <= intval($fhEnd); $fh += intval($fhStep)) {
+        $output = [];
         $fhStr = strval($fh);
         $filename = $prefix . "t{$fhStr}.tif";
         $cmd = "gdallocationinfo -valonly {$bands} -wgs84 {$filename} {$lng} {$lat}";
@@ -128,7 +129,7 @@ if (!isset($_GET['fhstep'])) {
         } else {
             $values = $output;
         }
-        $data["values"][$fhVal] = [
+        $data["values"][$fhStr] = [
             "values" => $values,
             "error" => $error
         ];
