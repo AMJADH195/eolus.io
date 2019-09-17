@@ -346,6 +346,7 @@ if not ignoredb:
         if fetch:
             if (int(fetch[0]) >= config["maxConcurrentProcessing"]):
                 log ("Too many models are running right now.", "INFO")
+                kill_script (0)
 
 if not forcemodel:
     model_name = find_next_model_to_process ()
