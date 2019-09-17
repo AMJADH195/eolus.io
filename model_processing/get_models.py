@@ -329,12 +329,6 @@ if args.forcemodel:
 try:
     if not ignoredb:
         conn = sql_connect ()
-        if not ignoredb:
-            curr.execute ("SELECT COUNT(*) FROM logging.model_status WHERE status = 'PROCESSING'")
-            fetch = curr.fetchone()
-            if fetch:
-                if (int(fetch[0]) >= config["maxConcurrentProcessing"]):
-                    log ("Too many models are running right now.", "INFO")
 
 except psycopg2.Error as e:
     print "Could not connect to database."
@@ -346,6 +340,12 @@ print "Connected successfully."
 
 if not ignoredb:
     curr = conn.cursor()
+    if not forcemodel:
+        curr.execute ("SELECT COUNT(*) FROM logging.model_status WHERE status = 'PROCESSING'")
+        fetch = curr.fetchone()
+        if fetch:
+            if (int(fetch[0]) >= config["maxConcurrentProcessing"]):
+                log ("Too many models are running right now.", "INFO")
 
 if not forcemodel:
     model_name = find_next_model_to_process ()
