@@ -383,7 +383,7 @@
             "filetype": "grib2"
         },
         "href_sprd": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
