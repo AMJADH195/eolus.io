@@ -328,7 +328,13 @@
             "imageWidth": 400,
             "downloadType": "FILESERIES",
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.avrg.f%T.grib2",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "extractBandsByMetadata": [
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+                {"gribVar": "REFD", "gribLevel": "1000-HTGL"},
+                {"gribVar": "REFC", "gribLevel": "0-EATM"},
+                {"gribVar": "RETOP", "gribLevel": "0-EATM"}
+            ]
         },
         "href_mean": {
             "enabled": true,
@@ -369,7 +375,13 @@
             "imageWidth": 400,
             "downloadType": "FILESERIES",
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.pmmn.f%T.grib2",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "extractBandsByMetadata": [
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+                {"gribVar": "REFD", "gribLevel": "1000-HTGL"},
+                {"gribVar": "REFC", "gribLevel": "0-EATM"},
+                {"gribVar": "RETOP", "gribLevel": "0-EATM"}
+            ]
         },
         "href_prob": {
             "enabled": true,
