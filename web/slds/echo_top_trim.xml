@@ -1,0 +1,36 @@
+<StyledLayerDescriptor version="1.0.0">
+  <NamedLayer>
+    <Name>eolus</Name>
+    <UserStyle>
+      <Title>xxx</Title>
+      <FeatureTypeStyle>
+        <Rule>
+          <RasterSymbolizer>
+            <Opacity>1.0</Opacity>
+            <ColorMap>
+              <ColorMapEntry color="#ffffff" quantity="-99999" label="0"/>
+              <ColorMapEntry color="#c5c6c6" quantity="1296" label="1296"/>
+              <ColorMapEntry color="#90b4c1" quantity="2016" label="2016"/>
+              <ColorMapEntry color="#479cba" quantity="3024" label="3024"/>
+              <ColorMapEntry color="#247fb5" quantity="4032" label="4032"/>
+              <ColorMapEntry color="#205db0" quantity="5040" label="5040"/>
+              <ColorMapEntry color="#2152aa" quantity="6048" label="6048"/>
+              <ColorMapEntry color="#34959d" quantity="7056" label="7056"/>
+              <ColorMapEntry color="#47d991" quantity="8064" label="8064"/>
+              <ColorMapEntry color="#7be472" quantity="9000" label="9000"/>
+              <ColorMapEntry color="#bde049" quantity="10008" label="10008"/>
+              <ColorMapEntry color="#e9c62b" quantity="11016" label="11016"/>
+              <ColorMapEntry color="#dd7b27" quantity="12024" label="12024"/>
+              <ColorMapEntry color="#d13022" quantity="13032" label="13032"/>
+              <ColorMapEntry color="#ae1d1d" quantity="14040" label="14040"/>
+              <ColorMapEntry color="#861717" quantity="15048" label="15048"/>
+              <ColorMapEntry color="#5e1111" quantity="16056" label="16056"/>
+              <ColorMapEntry color="#350c0c" quantity="17064" label="17064"/>
+              <ColorMapEntry color="#100606" quantity="18000" label="18000"/>
+            </ColorMap>
+          </RasterSymbolizer>
+        </Rule>
+      </FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
+</StyledLayerDescriptor>
