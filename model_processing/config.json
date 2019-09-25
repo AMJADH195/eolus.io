@@ -403,7 +403,30 @@
             "imageWidth": 400,
             "downloadType": "FILESERIES",
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.sprd.f%T.grib2",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "extractBandsByMetadata": [
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+                {"gribVar": "REFD", "gribLevel": "1000-HTGL"},
+                {"gribVar": "REFC", "gribLevel": "0-EATM"},
+                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
+                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
+                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
+                {"gribVar": "CIN", "gribLevel": "0-SFC"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
+                {"gribVar": "RH", "gribLevel": "85000-ISBL"},
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "VIS", "gribLevel": "0-SFC"},
+                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
+                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
+                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
+                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
+                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
+                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
+                {"gribVar": "UGRD", "gribLevel": "85000-ISBL"},
+                {"gribVar": "VGRD", "gribLevel": "85000-ISBL"}
+            ]
         },
         "hrrr": {
             "enabled": true,
