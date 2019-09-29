@@ -31,106 +31,72 @@
         }
     },
     "models": {
-        "gefs_ndgd_avg": {
-            "enabled": false,
+        "gefs_pgrb2ap5_avg": {
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "gensbc_ndgd",
-            "gribDirectory": "/gefs.%D/%H/ndgd_gb2",
+            "endTime": 384,
+            "imageWidth": 64,
+            "downloadType": "FILESERIES",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/gens/prod/gefs.%D/%H/pgrb2ap5/geavg.t%Hz.pgrb2a.0p50.f%T",
             "filetype": "grib2",
-            "baseDirectory": "naefs/prod",
-            "gribFilename": "gefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "extractBandsByMetadata": [
                 {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
                 {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
-            ]
-        },
-        "gefs_ndgd_spr": {
-            "enabled": false,
-            "updateFrequency": 6,
-            "updateOffset": 0,
-            "startTime": 3,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "gensbc_ndgd",
-            "gribDirectory": "/gefs.%D/%H/ndgd_gb2",
-            "filetype": "grib2",
-            "baseDirectory": "naefs/prod",
-            "gribFilename": "gefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
-            ]
-        },
-        "gefs_pt5_avg": {
-            "enabled": false,
-            "updateFrequency": 6,
-            "updateOffset": 0,
-            "startTime": 0,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "gens_0p50",
-            "gribDirectory": "/gefs.%D/%H/pgrb2ap5",
-            "filetype": "grib2",
-            "baseDirectory": "gens/prod",
-            "gribFilename": "geavg.t%Hz.pgrb2a.0p50.f%T",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
+
+                {"gribVar": "APCP", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "O-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
                 {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
                 {"gribVar": "CICEP", "gribLevel": "0-SFC"},
                 {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
                 {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP06", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"}
+
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+
+                {"gribVar": "PRES", "gribLevel": "0-SFC"},
+                {"gribVar": "HGT", "gribLevel": "50000-ISBL"}
             ]
         },
-        "gefs_pt5_spr": {
-            "enabled": false,
+        "gefs_pgrb2ap5_spr": {
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "gens_0p50",
-            "gribDirectory": "/gefs.%D/%H/pgrb2ap5",
+            "endTime": 384,
+            "imageWidth": 64,
+            "downloadType": "FILESERIES",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/gens/prod/gefs.%D/%H/pgrb2ap5/gespr.t%Hz.pgrb2a.0p50.f%T",
             "filetype": "grib2",
-            "baseDirectory": "gens/prod",
-            "gribFilename": "gespr.t%Hz.pgrb2a.0p50.f%T",
             "extractBandsByMetadata": [
                 {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
                 {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
                 {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
+                {"gribVar": "RH", "gribLevel": "2-HTGL"},
+
+                {"gribVar": "APCP", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "O-SFC"},
+                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
                 {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
                 {"gribVar": "CICEP", "gribLevel": "0-SFC"},
                 {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
                 {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP06", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"}
+
+                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+
+                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
+                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
+
+                {"gribVar": "PRES", "gribLevel": "0-SFC"},
+                {"gribVar": "HGT", "gribLevel": "50000-ISBL"}
             ]
         },
         "gfs": {
