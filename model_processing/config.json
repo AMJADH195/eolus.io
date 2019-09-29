@@ -19,7 +19,7 @@
         "sleepTime": 1,
         "maxTime": 0,
         "retentionDays": 2,
-        "maxConcurrentProcessing": 2,
+        "maxConcurrentProcessing": 3,
         "downloadTypes": {
             "GRIBFILTER": {
                 "gribFilterExtension": ".pl?",
