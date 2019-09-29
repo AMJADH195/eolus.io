@@ -47,8 +47,8 @@
                 {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL"},
 
-                {"gribVar": "APCP", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "O-SFC"},
+                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
                 {"gribVar": "WEASD", "gribLevel": "0-SFC"},
                 {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
                 {"gribVar": "CICEP", "gribLevel": "0-SFC"},
@@ -81,8 +81,8 @@
                 {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
                 {"gribVar": "RH", "gribLevel": "2-HTGL"},
 
-                {"gribVar": "APCP", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "O-SFC"},
+                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
+                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
                 {"gribVar": "WEASD", "gribLevel": "0-SFC"},
                 {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
                 {"gribVar": "CICEP", "gribLevel": "0-SFC"},
