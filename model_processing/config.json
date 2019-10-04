@@ -56,7 +56,7 @@
                 {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
 
                 {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
 
                 {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
                 {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
@@ -90,7 +90,7 @@
                 {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
 
                 {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
+                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
 
                 {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
                 {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
