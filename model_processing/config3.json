@@ -1,0 +1,49 @@
+{
+    "config": {
+        "postgres": {
+            "host": "localhost",
+            "db": "eolus",
+            "user": "eolus"
+        },
+        "bounds": {
+            "top": "42",
+            "right": "-100",
+            "bottom": "36",
+            "left": "-111"
+        },
+        "tempDir": "./tempWxData/",
+        "mapfileDir": "/map",
+        "logFile": "model_update.log",
+        "debug": false,
+        "resampling": "cubicspline",
+        "sleepTime": 1,
+        "maxTime": 0,
+        "retentionDays": 2,
+        "maxConcurrentProcessing": 3
+    },
+    "levelMaps": {
+        "2m": { 
+            "idxName": "2 m above ground",
+            "gribName": "2-HTGL"
+        }
+    },
+    "models": {
+        "nam3": {
+            "enabled": true,
+            "updateFrequency": 6,
+            "updateOffset": 0,
+            "startTime": 0,
+            "endTime": 60,
+            "fhStep": {
+                "0": "1"
+            },
+            "imageWidth": 720,
+            "index": true,
+            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
+            "filetype": "grib2",
+            "bands": [
+                { "var": "TMP", "level": "2m" }
+            ]
+        }
+    }
+}
