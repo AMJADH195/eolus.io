@@ -54,6 +54,7 @@ def sqlConnect():
         user=config["postgres"]["user"],
         sslmode="require")
 
+
 def printLine():
     print ("-----------------")
 
@@ -216,8 +217,11 @@ def getModelStepStatus (tableName, fullFh):
 def getBaseFileName (modelName, timestamp, band):
     date = timestamp.strftime ("%Y%m%d")
     time = timestamp.strftime ("%HZ")
+    file = modelName + "_" + date + "_" + time
     if band is not None:
-        return modelName + "_" + date + "_" + time + "_" + band["shorthand"]
+        return file + "_" + band["shorthand"]
+    else:
+        return file
 
 
 def downloadBand (modelName, timestamp, fh, band, tableName):
@@ -229,7 +233,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     url = makeUrl (modelName, timestamp.strftime("%Y%m%d"), timestamp.strftime("%H"), fh)
 
     fileName = getBaseFileName (modelName, timestamp, band)
-    targetDir = config["mapfileDir"] + "/" + modelName + "/bands/" 
+    targetDir = config["mapfileDir"] + "/" + modelName + "/" 
     downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
     targetFileName = targetDir + fileName + ".tif"
 
@@ -250,7 +254,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         f.close ()
         print ("        ✓ Done.")
 
-        bounds = config["bounds"]
+        bounds = config["bounds"][model["bounds"]]
         width = model["imageWidth"]
 
         epsg4326 = osr.SpatialReference()
@@ -300,6 +304,14 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         tif = gdal.Open (targetFileName, gdalconst.GA_Update)
         tif.GetRasterBand(bandNumber).WriteArray(data)
         tif.FlushCache()
+        gribFile = None
+        tif = None
+
+        try:
+            os.remove(downloadFileName)
+            os.remove(downloadFileName + ".tif")
+        except:
+            print ("        (!) Could not delete a temp file.")
 
     curr.execute ("UPDATE eolus3." + tableName + " SET status = 'DONE' WHERE fh = %s", (fh,))
     conn.commit()
@@ -341,6 +353,104 @@ def getByteRange (band, idxFile):
     return None
 
 
+def downloadFullFile (modelName, timestamp, fh, tableName):
+    model = models[modelName]
+    curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
+    bandNumber = curr.fetchone()[0]
+
+    url = makeUrl (modelName, timestamp.strftime("%Y%m%d"), timestamp.strftime("%H"), fh)
+
+    fileName = getBaseFileName (modelName, timestamp, None)
+    targetDir = config["mapfileDir"] + "/" + modelName + "/" 
+    downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
+
+    print ("        ┼ Downloading the data.")
+    response = http.request('GET',url,retries=5)
+
+    f = open(downloadFileName, 'wb')
+    f.write (response.data)
+    f.close ()
+    print ("        ✓ Done.")
+
+    bounds = config["bounds"][model["bounds"]]
+    width = model["imageWidth"]
+
+    epsg4326 = osr.SpatialReference()
+    epsg4326.ImportFromEPSG(4326)
+
+    print ("        (i) Warping downloaded data.")
+    gribFile = gdal.Open (downloadFileName)
+    outFile = gdal.Warp(
+        downloadFileName + ".tif", 
+        gribFile, 
+        format='GTiff', 
+        outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
+        dstSRS=epsg4326, 
+        width=width,
+        resampleAlg=gdal.GRA_CubicSpline)
+    outFile.FlushCache()
+    outFile = None
+
+    curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
+    numBands = curr.fetchone()[0]
+
+    bands = makeModelBandArray(modelName, force=True)
+
+    print ("        (i) Extracting each band...")
+
+    for band in bands:
+        targetFileName = targetDir + getBaseFileName (modelName, timestamp, band) + ".tif"
+        if not os.path.exists(targetFileName):
+            print ("       (i) Making a fresh TIF...")
+            try:
+                os.makedirs (targetDir)
+            except:
+                print ("        (i) Directory already exists.")
+
+            gribFile = gdal.Open (downloadFileName + ".tif")
+            gribSrs = osr.SpatialReference()
+            gribSrs.ImportFromWkt (gribFile.GetProjection())
+            geoTransform = gribFile.GetGeoTransform()
+            width = gribFile.RasterXSize
+            height = gribFile.RasterYSize
+
+            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
+            newRaster.SetProjection (gribSrs.ExportToWkt())
+            gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
+            print ("       ✓ Fresh TIF created.")
+
+        print ("        (i) Writing the data to the temp GTiff: " + band["shorthand"])
+        # Copy the downloaded band to this temp file
+        gribFile = gdal.Open (downloadFileName + ".tif")
+        numBands = gribFile.RasterCount
+        bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
+        tif = gdal.Open (targetFileName, gdalconst.GA_Update)
+        for i in range (1, numBands):
+            try:
+                fileBand = gribFile.GetRasterBand(i)
+                metadata = fileBand.GetMetadata()
+                if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
+                    data = fileBand.ReadAsArray()
+                    tif.GetRasterBand(bandNumber).WriteArray(data)
+                break
+
+            except:
+                print ("        (!) Couldn't read band " + str(i))
+
+        tif.FlushCache()
+        gribFile = None
+        tif = None
+
+    try:
+        os.remove(downloadFileName)
+        os.remove(downloadFileName + ".tif")
+    except:
+        print ("        (!) Could not delete a temp file.")
+
+    curr.execute ("UPDATE eolus3." + tableName + " SET status = 'DONE' WHERE fh = %s", (fh,))
+    conn.commit()
+
+
 def processModelStep (modelName, tableName, fullFh, timestamp, band):
     model = models[modelName]
     processed = False
@@ -354,14 +464,12 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
         curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s", ("PROCESSING", datetime.now(), fullFh))
         conn.commit ()
         if band is None:
-            downloadFullFile (modelName, timestamp, fullFh)
+            downloadFullFile (modelName, timestamp, fullFh, tableName)
         else:
             downloadBand (modelName, timestamp, fullFh, band, tableName)
         processed = True
 
     #delete the table if all steps are done
-    fileName = getBaseFileName (modelName, timestamp, band)
-    workingFileName = config["tempDir"]  + "/" + fileName + ".tif"
     curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName + " WHERE status != 'DONE'")
     numBandsRemaining = curr.fetchone()[0]
 
@@ -398,10 +506,10 @@ def addAppropriateFhStep (modelName, fh):
     return fh
 
 
-def makeModelBandArray (modelName):
+def makeModelBandArray (modelName, force=False):
     model = models[modelName]
     modelBandArray = []
-    if model["index"]:
+    if model["index"] or force:
         for band in model["bands"]:
             modelBandArray.append({ 
                 "shorthand": band["var"].lower() + "_" + band["level"].lower(),
@@ -500,15 +608,35 @@ def main():
             processed = True
             break
 
+        # Turn the look behind into a loop, you sociopath
         elif status == "WAITING":
+            shouldProcess = False
             print ("    (i) Check if this model needs to be processed.")
             if not modelTimestampMatches (modelName, timestamp):
                 print ("    (i) It does -- checking if an update is available.")
                 if checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
-                    startProcessingModel (modelName, timestamp)
-                    findModelStepToProcess (modelName)
-                    processed = True
-                    break
+                    shouldProcess = True
+                else:
+                    print ("    · This run isn't available yet. Looking back another run.")
+                    timestamp = getLastAvailableTimestamp (model,prev=1)
+                    if not modelTimestampMatches (modelName, timestamp):
+                        if checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
+                            shouldProcess = True
+                        else:
+                            print ("    · This run isn't available yet. Looking back another run.")
+                            timestamp = getLastAvailableTimestamp (model,prev=2)
+                            if not modelTimestampMatches (modelName, timestamp):
+                                if checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
+                                    shouldProcess = True
+
+            else:
+                print ("    (i) Nope.")
+
+            if shouldProcess:
+                startProcessingModel (modelName, timestamp)
+                findModelStepToProcess (modelName)
+                processed = True
+                break
 
         elif status == "PROCESSING":
             processingModels.append (modelName)

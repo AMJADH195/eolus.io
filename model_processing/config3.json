@@ -6,10 +6,18 @@
             "user": "eolus"
         },
         "bounds": {
-            "top": "42",
-            "right": "-100",
-            "bottom": "36",
-            "left": "-111"
+            "colorado": {
+                "top": "42",
+                "right": "-100",
+                "bottom": "36",
+                "left": "-111"
+            },
+            "na": {
+                "top": "80",
+                "right": "-60",
+                "bottom": "20",
+                "left": "-180"
+            }
         },
         "tempDir": "./tempWxData",
         "mapfileDir": "F:/map",
@@ -25,11 +33,16 @@
         "2m": { 
             "idxName": "2 m above ground",
             "gribName": "2-HTGL"
+        },
+        "500mb": {
+            "idxName": "500 mb",
+            "gribName": "50000-ISBL"
         }
     },
     "models": {
         "nam3": {
             "enabled": true,
+            "bounds": "colorado",
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -42,7 +55,28 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "TMP", "level": "2m" }
+                { "var": "TMP", "level": "2m" },
+                { "var": "DPT", "level": "2m" }
+            ]
+        },
+        "naefs_anom": {
+            "enabled": true,
+            "bounds": "na",
+            "updateFrequency": 6,
+            "updateOffset": 0,
+            "startTime": 3,
+            "endTime": 384,
+            "imageWidth": 128,
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
+            "index": false,
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/pgrb2ap5_an/naefs_geavg.t%Hz.pgrb2a.0p50_anvf%T",
+            "filetype": "grib2",
+            "bands": [
+                {"var": "HGT", "level": "500mb"},
+                {"var": "TMP", "level": "2m"}
             ]
         }
     }
