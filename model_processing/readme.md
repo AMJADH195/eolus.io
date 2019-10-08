@@ -1,3 +1,12 @@
+```
+╔══════════════════════════════╗
+║  █▀▀ █▀▀█ █░░ █░░█ █▀▀ █▀▀█  ║
+║  █▀▀ █░░█ █░░ █░░█ ▀▀█ ░░▀▄  ║
+║  ▀▀▀ ▀▀▀▀ ▀▀▀ ░▀▀▀ ▀▀▀ █▄▄█  ║
+╚══════════════════════════════╝
+```
+**eolus.io** - eolus3
+
 # Model Processing Overview
  1. Run through the config and see which models are active.
  2. Cross-reference that model, and its run times, with the status on Postgres.

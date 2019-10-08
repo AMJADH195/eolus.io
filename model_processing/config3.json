@@ -1,7 +1,7 @@
 {
     "config": {
         "postgres": {
-            "host": "localhost",
+            "host": "eolus.io",
             "db": "eolus",
             "user": "eolus"
         },
@@ -11,8 +11,8 @@
             "bottom": "36",
             "left": "-111"
         },
-        "tempDir": "./tempWxData/",
-        "mapfileDir": "/map",
+        "tempDir": "./tempWxData",
+        "mapfileDir": "F:/map",
         "logFile": "model_update.log",
         "debug": false,
         "resampling": "cubicspline",
@@ -35,7 +35,7 @@
             "startTime": 0,
             "endTime": 60,
             "fhStep": {
-                "0": "1"
+                "0": 1
             },
             "imageWidth": 720,
             "index": true,
