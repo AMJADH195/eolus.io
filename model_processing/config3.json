@@ -60,13 +60,13 @@
             ]
         },
         "naefs_anom": {
-            "enabled": true,
+            "enabled": false,
             "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 3,
             "endTime": 384,
-            "imageWidth": 128,
+            "imageWidth": 480,
             "fhStep": {
                 "0": 3,
                 "192": 6

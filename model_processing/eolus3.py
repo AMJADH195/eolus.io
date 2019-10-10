@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, tzinfo, time
 conn = None
 curr = None
 http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=5.0, read=10.0))
+pid = str(os.getpid())
 
 directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 gdal.UseExceptions()
@@ -20,7 +21,7 @@ try:
     with open (directory + '/config3.json') as f:
         data = json.load(f)
 except:
-    print ("Error: Config file does not exist.")
+    print ("Error: Config file does not exist or is corrupt.")
     sys.exit (1)
 
 config = data["config"]
@@ -39,14 +40,30 @@ class UTC(tzinfo):
 
 utc = UTC()
 
+
 def killScript (exitCode): 
     curr.close()
     conn.close()
     sys.exit (exitCode)
 
 
+def log (text, level, indentLevel=0, remote=False, model=''):
+    timestamp = datetime.now()
+    timeStr = timestamp.strftime("%H:%M:%S")
+    indents = ""
+
+    for i in range (0, indentLevel):
+        indents += "   "
+
+    print (f"[{level}\t| {timeStr}] {indents}{text}")
+
+    if remote:
+        curr.execute ("INSERT INTO eolus3.log (model, level, timestamp, agent, message) VALUES (%s, %s, %s, %s, %s)", (model, level, timestamp, pid, text))
+        conn.commit ()
+
+
 def sqlConnect():
-    print ("Connecting to database [" + config["postgres"]["host"] + "]") 
+    log ("Connecting to database [" + config["postgres"]["host"] + "]", "INFO") 
     return psycopg2.connect (
         host=config["postgres"]["host"],
         port=5432,
@@ -65,14 +82,14 @@ def makeUrl (modelName, modelDate, modelHour, fh):
 
 
 def endModelProcessing (modelName):
-    print ("    ✓ This model is completely finished processing.")
+    log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
     curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
     conn.commit ()
 
 
 def addModelToDb (modelName):
-    print ("    ✓ Added model to models table.")
-    curr.execute ("INSERT INTO eolus3.models (model, status, \"bandsLeft\") VALUES (%s, %s, %s)", (modelName, "WAITING", 0))
+    log ("✓ Added model to models table.", "INFO", indentLevel=1, remote=True, model=modelName)
+    curr.execute ("INSERT INTO eolus3.models (model, status) VALUES (%s, %s)", (modelName, "WAITING"))
     conn.commit ()
 
 
@@ -97,7 +114,7 @@ def getLastAvailableTimestamp (model, prev=0):
         else:
             checkedTime = checkedTime + timedelta(hours=(model["updateFrequency"]))
 
-    print ("    · Last available timestamp: " + str(checkedTime))
+    log (f"· Last available timestamp, {str(prev)} runs ago: {str(checkedTime)}", "DEBUG", indentLevel=1)
 
     return checkedTime
 
@@ -118,20 +135,22 @@ def startProcessingModel (modelName, timestamp):
     model = models[modelName]
     formattedTimestamp = timestamp.strftime('%Y%m%d_%HZ')
 
-    print ("    · Processing " + modelName + " | " + formattedTimestamp)
+    log (f"· Started processing {modelName} | {formattedTimestamp} -- making table(s).", "INFO", indentLevel=1, remote=True, model=modelName)
     
-    curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("PROCESSING", timestamp, modelName))
+    curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("MAKINGTABLE", timestamp, modelName))
     conn.commit ()
 
     modelBandArray = makeModelBandArray (modelName)
     tableName = modelName + "_" + formattedTimestamp
 
-    if len(modelBandArray) == 0:
-        print ("    (i) This model is indexless.")
-        createBandTable (modelName, tableName)
-    else:
-        for band in modelBandArray:
-            createBandTable (modelName, tableName + "_" + band["shorthand"])
+    createBandTable (modelName, tableName)
+
+    curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("PROCESSING", timestamp, modelName))
+    conn.commit ()
+
+    curr.execute ("INSERT INTO eolus3.run_status (model, status, timestamp) VALUES (%s, %s, %s)", (modelName, "PROCESSING", timestamp))
+    conn.commit ()
+
 
 
 def getFullFh (modelName, fh):
@@ -139,18 +158,10 @@ def getFullFh (modelName, fh):
     return str(fh).rjust (len(str(model["endTime"])), '0')
 
 
-def getRemainingBandTableCount (modelName):
-    curr.execute ("SELECT \"bandsLeft\" FROM eolus3.models WHERE model = %s", (modelName,))
-    return curr.fetchone()[0]
-
-
 def createBandTable (modelName, tableName):
+    log (f"· Creating table | {tableName}", "NOTICE", indentLevel=1, remote=True, model=modelName)
     model = models[modelName]
-    curr.execute ("CREATE TABLE eolus3." + tableName + " (fh text, status text, band integer, start_time timestamp with time zone, end_time timestamp with time zone) WITH ( OIDS = FALSE )")
-    conn.commit ()
-
-    bandsRemaining = getRemainingBandTableCount (modelName) + 1
-    curr.execute ("UPDATE eolus3.models SET \"bandsLeft\" = %s WHERE model = %s", (bandsRemaining, modelName))
+    curr.execute ("CREATE TABLE eolus3." + tableName + " (fh text, status text, band integer, start_time timestamp with time zone, grib_var text, agent text) WITH ( OIDS = FALSE )")
     conn.commit ()
 
     fh = model["startTime"]
@@ -158,10 +169,17 @@ def createBandTable (modelName, tableName):
 
     populated = False
 
+    bands = makeModelBandArray(modelName)
+
     while not populated:
         fullFh = getFullFh (modelName, fh)
-        curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band) VALUES (%s, %s, %s)", (fullFh, "WAITING", str(i)))
-        conn.commit ()
+        if len(bands) == 0:
+            curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band) VALUES (%s, %s, %s)", (fullFh, "WAITING", str(i)))
+            conn.commit ()
+        else:
+            for band in bands:
+                curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band, grib_var) VALUES (%s, %s, %s, %s)", (fullFh, "WAITING", str(i), band["shorthand"]))
+                conn.commit ()
         fh = addAppropriateFhStep (modelName, fh)
         i += 1
 
@@ -178,35 +196,50 @@ def findModelStepToProcess(modelName):
     timestamp = curr.fetchone()[0]
 
     formattedTimestamp = timestamp.strftime('%Y%m%d_%HZ')
+    tableName = modelName + "_" + formattedTimestamp
 
-    while not found:
-        fullFh = getFullFh (modelName, fh)
+    curr.execute ("SELECT fh, grib_var FROM eolus3." + tableName + " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
+    res = curr.fetchone()
+    if not res or len(res) == 0:
+        return False
+        
+    fullFh = res[0]
+    gribVar = res[1]
+
+    band = None
+
+    if not gribVar:
+        band = None
+    else:
         modelBandArray = makeModelBandArray (modelName)
-        tableName = modelName + "_" + formattedTimestamp
+        for bandItem in modelBandArray:
+            if bandItem["shorthand"] == gribVar:
+                band = bandItem
+                break
 
-        # If empty model band array, just check the only existing table
-        if len(modelBandArray) == 0:
-            status = getModelStepStatus (tableName, fullFh)
-            if status == "WAITING":
-                found = processModelStep (modelName, tableName, fullFh, timestamp, None)
-                if found:
-                    print ("    ✓ Forecast hour " + fullFh + " was processed.")
-                    return True
+    bandStr = ""
+    if band:
+        bandStr = " AND grib_var = '" + band["shorthand"] + "'"
 
-        else:
-            for band in modelBandArray:
-                status = getModelStepStatus (tableName + "_" + band["shorthand"], fullFh)
-                if status == "WAITING":
-                    found = processModelStep (modelName, tableName + "_" + band["shorthand"], fullFh, timestamp, band)
-                    if found:
-                        print ("    ✓ Forecast hour " + fullFh + " for band " + band["shorthand"] + " was processed.")
-                        return True
+    bandInfoStr = ""
+    if band is not None:
+        bandInfoStr = " | Band: " + band["shorthand"]
 
-        fh = addAppropriateFhStep (modelName, fh)
+    curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" + bandStr, ("PROCESSING", datetime.now(), pid, fullFh))
+    conn.commit ()
 
-        if fh > model["endTime"]:
-            print ("    × No model bands/hours are available for processing at this time.")
-            return False
+    log ("· Attempting to process fh " + fullFh + bandInfoStr, "INFO", remote=True, indentLevel=1, model=modelName)
+    processed = processModelStep (modelName, tableName, fullFh, timestamp, band)
+    if processed:
+        log ("✓ Done.", "INFO", remote=True, indentLevel=1, model=modelName)
+        return True
+
+    else:
+        curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.now(), fullFh))
+        conn.commit ()
+        log ("× This fh is not available yet.", "INFO", remote=True, indentLevel=1, model=modelName)
+        print ()
+        return False
 
 
 def getModelStepStatus (tableName, fullFh):
@@ -240,9 +273,9 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     byteRange = getByteRange (band, url + ".idx")
 
     if not byteRange:
-        print ("       (i) This band doesn't exist.")
+        log (f"· Band {band['shorthand']} doesn't exist for fh {fh}.", "WARN", remote=True, indentLevel=2, model=modelName)
     else:
-        print ("        ┼ Downloading the data.")
+        log (f"↓ Downloading band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         response = http.request('GET',url,
             headers={
                 'Range': 'bytes=' + byteRange
@@ -252,7 +285,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         f = open(downloadFileName, 'wb')
         f.write (response.data)
         f.close ()
-        print ("        ✓ Done.")
+        log (f"✓ Downloaded band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
 
         bounds = config["bounds"][model["bounds"]]
         width = model["imageWidth"]
@@ -260,7 +293,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         epsg4326 = osr.SpatialReference()
         epsg4326.ImportFromEPSG(4326)
 
-        print ("        (i) Warping downloaded data.")
+        log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         gribFile = gdal.Open (downloadFileName)
         outFile = gdal.Warp(
             downloadFileName + ".tif", 
@@ -275,11 +308,11 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
         # check to see if the working raster exists
         if not os.path.exists(targetFileName):
-            print ("       (i) Making a fresh TIF...")
+            log (f"· Creating output master TIF | {targetFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
             try:
                 os.makedirs (targetDir)
             except:
-                print ("        (i) Directory already exists.")
+                log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
 
             curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
             numBands = curr.fetchone()[0]
@@ -293,10 +326,11 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
             newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
             newRaster.SetProjection (gribSrs.ExportToWkt())
+            newRaster.SetGeoTransform (list(geoTransform))
             gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
-            print ("       ✓ Fresh TIF created.")
+            log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
 
-        print ("        (i) Writing the data to the temp GTiff.")
+        log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         # Copy the downloaded band to this temp file
         gribFile = gdal.Open (downloadFileName + ".tif")
         data = gribFile.GetRasterBand(1).ReadAsArray()
@@ -306,14 +340,16 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         tif.FlushCache()
         gribFile = None
         tif = None
-
+        log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        
         try:
             os.remove(downloadFileName)
             os.remove(downloadFileName + ".tif")
         except:
-            print ("        (!) Could not delete a temp file.")
+            log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
+        
 
-    curr.execute ("UPDATE eolus3." + tableName + " SET status = 'DONE' WHERE fh = %s", (fh,))
+    curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s AND grib_var = %s", (fh,band["shorthand"]))
     conn.commit()
 
 
@@ -321,7 +357,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     Copied a bit from https://github.com/cacraig/grib-inventory/ - thanks!
 '''
 def getByteRange (band, idxFile):
-    print ("        ---> Searching for band defs in index file " + idxFile)
+    log (f"· Searching for band defs in index file {idxFile}", "DEBUG", indentLevel=2, remote=True)
     response = http.request('GET', idxFile)
     data = response.data.decode('utf-8')
     varNameToFind = band["band"]["var"]
@@ -341,15 +377,16 @@ def getByteRange (band, idxFile):
             break
 
         if varName == varNameToFind and level == levelToFind:
-            print ("           ✓ Found.")
+            log ("✓ Found.", "DEBUG", indentLevel=2, remote=False)
             found = True
             startByte = parts[1]
             continue
 
     if found:
-        print ("            (i) Bytes " + startByte + " to " + endByte)
+        log (f"· Bytes {startByte} to {endByte}", "DEBUG", indentLevel=2)
         return startByte + "-" + endByte
-
+    else:
+        log (f"· Couldn't find band def in index file.", "WARN", indentLevel=2, remote=True)
     return None
 
 
@@ -364,13 +401,13 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
     targetDir = config["mapfileDir"] + "/" + modelName + "/" 
     downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
 
-    print ("        ┼ Downloading the data.")
+    log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     response = http.request('GET',url,retries=5)
 
     f = open(downloadFileName, 'wb')
     f.write (response.data)
     f.close ()
-    print ("        ✓ Done.")
+    log (f"✓ Downloaded band fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
 
     bounds = config["bounds"][model["bounds"]]
     width = model["imageWidth"]
@@ -378,7 +415,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
     epsg4326 = osr.SpatialReference()
     epsg4326.ImportFromEPSG(4326)
 
-    print ("        (i) Warping downloaded data.")
+    log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     gribFile = gdal.Open (downloadFileName)
     outFile = gdal.Warp(
         downloadFileName + ".tif", 
@@ -390,22 +427,23 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         resampleAlg=gdal.GRA_CubicSpline)
     outFile.FlushCache()
     outFile = None
+    gribFile = None
 
     curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
     numBands = curr.fetchone()[0]
 
     bands = makeModelBandArray(modelName, force=True)
 
-    print ("        (i) Extracting each band...")
+    log (f"· Extracting bands for fh {fh}.", "INFO", indentLevel=2, remote=True, model=modelName)
 
     for band in bands:
         targetFileName = targetDir + getBaseFileName (modelName, timestamp, band) + ".tif"
         if not os.path.exists(targetFileName):
-            print ("       (i) Making a fresh TIF...")
+            log (f"· Creating output master TIF with {str(numBands) } bands | {targetFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
             try:
                 os.makedirs (targetDir)
             except:
-                print ("        (i) Directory already exists.")
+                log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
 
             gribFile = gdal.Open (downloadFileName + ".tif")
             gribSrs = osr.SpatialReference()
@@ -416,38 +454,44 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
             newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
             newRaster.SetProjection (gribSrs.ExportToWkt())
+            newRaster.SetGeoTransform (list(geoTransform))
             gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
-            print ("       ✓ Fresh TIF created.")
+            gribFile = None
+            newRaster = None
+            log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
 
-        print ("        (i) Writing the data to the temp GTiff: " + band["shorthand"])
+        log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}", "NOTICE", indentLevel=2, remote=True, model=modelName)
         # Copy the downloaded band to this temp file
         gribFile = gdal.Open (downloadFileName + ".tif")
-        numBands = gribFile.RasterCount
+        gribNumBands = gribFile.RasterCount
         bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
         tif = gdal.Open (targetFileName, gdalconst.GA_Update)
-        for i in range (1, numBands):
+        for i in range (1, gribNumBands):
             try:
                 fileBand = gribFile.GetRasterBand(i)
                 metadata = fileBand.GetMetadata()
                 if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
+                    log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2)
                     data = fileBand.ReadAsArray()
                     tif.GetRasterBand(bandNumber).WriteArray(data)
-                break
+                    break
 
             except:
-                print ("        (!) Couldn't read band " + str(i))
+                log (f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}", "WARN", indentLevel=2, remote=True, model=modelName)
 
         tif.FlushCache()
         gribFile = None
         tif = None
 
+    
     try:
         os.remove(downloadFileName)
         os.remove(downloadFileName + ".tif")
     except:
-        print ("        (!) Could not delete a temp file.")
+        log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
+    
 
-    curr.execute ("UPDATE eolus3." + tableName + " SET status = 'DONE' WHERE fh = %s", (fh,))
+    curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
     conn.commit()
 
 
@@ -455,14 +499,21 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
     model = models[modelName]
     processed = False
 
-    curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fullFh,))
-    bandNumber = curr.fetchone()[0]
+    bandStr = ""
+    if band:
+        bandStr = " AND grib_var = '" + band["shorthand"] + "'"
+
+    try:
+        curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = '" + fullFh + "' " + bandStr)
+        bandNumber = curr.fetchone()[0]
+    except:
+        log ("× Some other agent finished the model.", "NOTICE", indentLevel=1, remote=True, model=modelName)
+        killScript(0)
 
     fileExists = checkIfModelFhAvailable (modelName, timestamp, fullFh)
 
     if fileExists:
-        curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s", ("PROCESSING", datetime.now(), fullFh))
-        conn.commit ()
+        log ("· Start processing fh " + fullFh + ".", "NOTICE",remote=True, model=modelName, indentLevel=1)
         if band is None:
             downloadFullFile (modelName, timestamp, fullFh, tableName)
         else:
@@ -473,18 +524,13 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
     curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName + " WHERE status != 'DONE'")
     numBandsRemaining = curr.fetchone()[0]
 
-    print ("    (i) There are " + str(numBandsRemaining) + " remaining bands to process.")
+    log ("· There are " + str(numBandsRemaining) + " remaining bands to process.", "DEBUG", indentLevel=1)
 
     if numBandsRemaining == 0:
+        log ("· Deleting table " + tableName + ".", "NOTICE", indentLevel=1, remote=True, model=modelName)
         curr.execute ("DROP TABLE eolus3." + tableName)
         conn.commit ()
-
-        bandsRemaining = getRemainingBandTableCount (modelName) - 1
-        curr.execute ("UPDATE eolus3.models SET \"bandsLeft\" = %s WHERE model = %s", (bandsRemaining, modelName))
-        conn.commit ()
-    
-        if bandsRemaining == 0:
-            endModelProcessing(modelName)
+        endModelProcessing(modelName)
 
     # If success, return True
     return processed
@@ -502,7 +548,7 @@ def addAppropriateFhStep (modelName, fh):
         if fh >= int(key):
             return fh + model["fhStep"][key]
 
-    print ("Couldn't match the appropriate step size.")
+    log ("× Couldn't match the appropriate step size.", "WARN", indentLevel=1, remote=True, model=modelName)
     return fh
 
 
@@ -527,19 +573,19 @@ def getLevelNameForLevel (levelShorthand, nameType):
 def checkIfModelFhAvailable (modelName, timestamp, fh):
     model = models[modelName]
     url = makeUrl (modelName, timestamp.strftime("%Y%m%d"), timestamp.strftime("%H"), fh)
-    print ("    ---> Checking URL: " + url)
+    log ("· Checking URL: " + url, "DEBUG", remote=True, indentLevel=1, model=modelName)
 
     try:
         ret = requests.head(url)
 
         if ret.status_code == 200 or ret.status_code == None:
-            print ("        ✓ Found.")
+            log (" ✓ Found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
             return True
         else:
-            print ("        × Not found.")
+            log ("× Not found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
 
     except:
-        print ("        × Not found.")
+        log ("× Not found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
     
     return False
 
@@ -549,6 +595,32 @@ def modelTimestampMatches (modelName, timestamp):
     modelTime = str(curr.fetchone()[0])[0:16]
     tTime = str(timestamp)[0:16]
     return modelTime == tTime
+
+
+def updateRunStatus (modelName):
+    try:
+        curr.execute ("UPDATE eolus3.run_status SET status = 'COMPLETE' WHERE model = '" + modelName + "'")
+        conn.commit ()
+    except:
+        log (f"!!! Could not update run_status!", "ERROR", indentLevel=0, remote=True, model=modelName)
+
+
+def clean ():
+    retentionDays = str(config["retentionDays"])
+    log (f"· Deleting rasters from {config['mapfileDir']} older than {retentionDays} days.", "DEBUG", indentLevel=0)
+    try:
+        os.system ('find /map/*/* -mtime +' + retentionDays + ' -exec rm {} \;')
+    except:
+        log (f"· Couldn't delete old rasters from {config['mapfileDir']}.", "WARN", indentLevel=0, remote=True)
+
+    log (f"· Cleaning logs older than {retentionDays} days.", "DEBUG", indentLevel=0)
+    try:
+        curr.execute ("DELETE FROM eolus3.log WHERE timestamp < now() - interval '" + retentionDays + " days'")
+        conn.commit ()
+        curr.execute ("DELETE FROM eolus3.run_status WHERE model_timestamp < now() - interval '" + retentionDays + " days'")
+        conn.commit ()
+    except:
+        log (f"· Couldn't delete old logs.", "WARN", indentLevel=0, remote=True)
 
 
 def init():
@@ -567,12 +639,12 @@ def init():
         conn = sqlConnect ()
         curr = conn.cursor()
     except psycopg2.Error as e:
-        print ("    × Could not connect to database.")
+        log ("× Could not connect to database.", "ERROR", indentLevel=1)
         print (str(e))
         print (str(e.pgerror))
         sys.exit (1)
 
-    print ("    ✓ Connected.")
+    log ("✓ Connected.", "DEBUG", indentLevel=1)
     printLine()
     print ()
     main ()
@@ -584,23 +656,27 @@ def main():
     processed = False
     # Check only brand new models, or models that are waiting first
     for modelName, model in models.items():
-        print ("Checking " + modelName)
+        log ("Checking " + modelName, "INFO", indentLevel=0)
         # Flag this model as disabled in the DB
         if not model["enabled"]:
             curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("DISABLED", modelName))
             conn.commit ()
-            print ("    × Disabled.")
+            log ("× Disabled.", "DEBUG", indentLevel=1)
+            print ()
             continue
 
         timestamp = getLastAvailableTimestamp (model)
 
         status = getModelStatus (modelName)
-        print ("    · Status: " + str(status))
+        log ("· Status: " + str(status), "INFO", indentLevel=1)
 
         if status == None:
             if not checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
-                print ("    · This run isn't available yet. Looking back another run.")
+                log ("· This run isn't available yet. Looking back another run.", "INFO", indentLevel=1)
                 timestamp = getLastAvailableTimestamp (model,prev=1)
+                if not checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
+                    log ("· This run isn't available yet. Looking back another run.", "INFO", indentLevel=1)
+                    timestamp = getLastAvailableTimestamp (model,prev=2)
 
             addModelToDb (modelName)
             startProcessingModel (modelName, timestamp)
@@ -609,28 +685,28 @@ def main():
             break
 
         # Turn the look behind into a loop, you sociopath
-        elif status == "WAITING":
+        elif status == "WAITING" or status == "DISABLED":
             shouldProcess = False
-            print ("    (i) Check if this model needs to be processed.")
+            log ("· Checking if this model needs to be processed.", "INFO", indentLevel=1)
             if not modelTimestampMatches (modelName, timestamp):
-                print ("    (i) It does -- checking if an update is available.")
+                log ("· It does -- checking if an update is available.", "INFO", indentLevel=1)
                 if checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
                     shouldProcess = True
                 else:
-                    print ("    · This run isn't available yet. Looking back another run.")
+                    log ("· This run isn't available yet. Looking back another run.", "INFO", indentLevel=1)
                     timestamp = getLastAvailableTimestamp (model,prev=1)
                     if not modelTimestampMatches (modelName, timestamp):
                         if checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
                             shouldProcess = True
                         else:
-                            print ("    · This run isn't available yet. Looking back another run.")
+                            log ("· This run isn't available yet. Looking back another run.", "INFO", indentLevel=1)
                             timestamp = getLastAvailableTimestamp (model,prev=2)
                             if not modelTimestampMatches (modelName, timestamp):
                                 if checkIfModelFhAvailable (modelName, timestamp, getFullFh(modelName, model["startTime"])):
                                     shouldProcess = True
 
             else:
-                print ("    (i) Nope.")
+                log ("· Nope.", "INFO", indentLevel=1)
 
             if shouldProcess:
                 startProcessingModel (modelName, timestamp)
@@ -641,17 +717,21 @@ def main():
         elif status == "PROCESSING":
             processingModels.append (modelName)
 
+        elif status == "MAKINGTABLE":
+            log ("Another agent is starting processing for this model", "INFO", indentLevel=1)
+
         print ()
 
     if processed:
-        print ("✓ Model processing complete.")
+        log ("✓ Model processing complete.", "NOTICE", indentLevel=0, remote=True, model=modelName)
+        clean()
         printLine ()
         print ()
         print ()
         main()
 
     printLine ()
-    print ("No new updates are waiting. Checking models in progress.")
+    log ("No new updates are waiting. Checking models in progress.", "INFO", indentLevel=0)
     print ()
     for modelName in processingModels:
         print (modelName + " ----- ")
@@ -661,13 +741,14 @@ def main():
             break
 
     if not processed:
-        print ("(i) No models waiting to process.")
+        log ("No models waiting to process.", "INFO", indentLevel=0)
         printLine ()
         print ()
         killScript (0)
 
     if processed:
-        print ("✓ Model processing complete.")
+        log ("✓ Model processing complete.", "NOTICE", indentLevel=0, remote=True, model=modelName)
+        clean()
         printLine ()
         print ()
         print ()
