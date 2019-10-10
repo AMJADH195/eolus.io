@@ -6,6 +6,7 @@ import os
 import sys
 import os.path
 import argparse
+import signal
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
 
@@ -27,6 +28,13 @@ except:
 config = data["config"]
 levelMaps = data["levelMaps"]
 models = data["models"]
+try:
+    signal.signal (signal.SIGALRM, killRequest)
+except:
+    print ("--------------")
+    print ("NOTE: SIGALRM is not supported on this OS. This may result in stuck requests not being closed.")
+    print ("--------------")
+    print()
 
 ZERO = timedelta(0)
 
@@ -41,9 +49,16 @@ class UTC(tzinfo):
 utc = UTC()
 
 
+def killRequest (signum, frame):
+    raise Exception ("timeout")
+
+
 def killScript (exitCode): 
-    curr.close()
-    conn.close()
+    try:
+        curr.close()
+        conn.close()
+    except:
+        log ("No connection to close.", "DEBUG")
     sys.exit (exitCode)
 
 
@@ -82,15 +97,22 @@ def makeUrl (modelName, modelDate, modelHour, fh):
 
 
 def endModelProcessing (modelName):
-    log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
-    curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
-    conn.commit ()
+    try:
+        log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
+        curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
+        conn.commit ()
+    except:
+        log ("Couldn't mark model as complete.", "ERROR", remote=True, model=modelName)
 
 
 def addModelToDb (modelName):
-    log ("✓ Added model to models table.", "INFO", indentLevel=1, remote=True, model=modelName)
-    curr.execute ("INSERT INTO eolus3.models (model, status) VALUES (%s, %s)", (modelName, "WAITING"))
-    conn.commit ()
+    try:
+        log ("✓ Added model to models table.", "INFO", indentLevel=1, remote=True, model=modelName)
+        curr.execute ("INSERT INTO eolus3.models (model, status) VALUES (%s, %s)", (modelName, "WAITING"))
+        conn.commit ()
+    except:
+        log ("Couldn't add model to db.", "ERROR", remote=True, model=modelName)
+        killScript (1)
 
 
 def getLastAvailableTimestamp (model, prev=0):
@@ -137,19 +159,25 @@ def startProcessingModel (modelName, timestamp):
 
     log (f"· Started processing {modelName} | {formattedTimestamp} -- making table(s).", "INFO", indentLevel=1, remote=True, model=modelName)
     
-    curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("MAKINGTABLE", timestamp, modelName))
-    conn.commit ()
+    try:
+        curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("MAKINGTABLE", timestamp, modelName))
+        conn.commit ()
+    except:
+        killScript(1)
 
     modelBandArray = makeModelBandArray (modelName)
     tableName = modelName + "_" + formattedTimestamp
 
     createBandTable (modelName, tableName)
 
-    curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("PROCESSING", timestamp, modelName))
-    conn.commit ()
+    try:
+        curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("PROCESSING", timestamp, modelName))
+        conn.commit ()
 
-    curr.execute ("INSERT INTO eolus3.run_status (model, status, timestamp) VALUES (%s, %s, %s)", (modelName, "PROCESSING", timestamp))
-    conn.commit ()
+        curr.execute ("INSERT INTO eolus3.run_status (model, status, timestamp) VALUES (%s, %s, %s)", (modelName, "PROCESSING", timestamp))
+        conn.commit ()
+    except:
+        log ("Could not set the model status back to processing! This requires manual intervention.", "ERROR", remote=True)
 
 
 
@@ -160,9 +188,14 @@ def getFullFh (modelName, fh):
 
 def createBandTable (modelName, tableName):
     log (f"· Creating table | {tableName}", "NOTICE", indentLevel=1, remote=True, model=modelName)
-    model = models[modelName]
-    curr.execute ("CREATE TABLE eolus3." + tableName + " (fh text, status text, band integer, start_time timestamp with time zone, grib_var text, agent text) WITH ( OIDS = FALSE )")
-    conn.commit ()
+    try:
+        model = models[modelName]
+        curr.execute ("CREATE TABLE eolus3." + tableName + " (fh text, status text, band integer, start_time timestamp with time zone, grib_var text, agent text) WITH ( OIDS = FALSE )")
+        conn.commit ()
+
+    except:
+        log ("Could not create table. This will probably need to be manually fixed.", "ERROR", remote=True)
+        return
 
     fh = model["startTime"]
     i = 1
@@ -170,21 +203,24 @@ def createBandTable (modelName, tableName):
     populated = False
 
     bands = makeModelBandArray(modelName)
-
-    while not populated:
-        fullFh = getFullFh (modelName, fh)
-        if len(bands) == 0:
-            curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band) VALUES (%s, %s, %s)", (fullFh, "WAITING", str(i)))
-            conn.commit ()
-        else:
-            for band in bands:
-                curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band, grib_var) VALUES (%s, %s, %s, %s)", (fullFh, "WAITING", str(i), band["shorthand"]))
+    try:
+        while not populated:
+            fullFh = getFullFh (modelName, fh)
+            if len(bands) == 0:
+                curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band) VALUES (%s, %s, %s)", (fullFh, "WAITING", str(i)))
                 conn.commit ()
-        fh = addAppropriateFhStep (modelName, fh)
-        i += 1
+            else:
+                for band in bands:
+                    curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band, grib_var) VALUES (%s, %s, %s, %s)", (fullFh, "WAITING", str(i), band["shorthand"]))
+                    conn.commit ()
+            fh = addAppropriateFhStep (modelName, fh)
+            i += 1
 
-        if fh > model["endTime"]:
-            return
+            if fh > model["endTime"]:
+                return
+    except:
+        log ("An error occurred while making the table. This will probably need to be manually fixed.", "ERROR", remote=True)
+        return
 
 
 def findModelStepToProcess(modelName):
@@ -192,16 +228,24 @@ def findModelStepToProcess(modelName):
     model = models[modelName]
     fh = model["startTime"]
 
-    curr.execute ("SELECT timestamp FROM eolus3.models WHERE model = %s", (modelName,))
-    timestamp = curr.fetchone()[0]
+    try:
+        curr.execute ("SELECT timestamp FROM eolus3.models WHERE model = %s", (modelName,))
+        timestamp = curr.fetchone()[0]
 
-    formattedTimestamp = timestamp.strftime('%Y%m%d_%HZ')
-    tableName = modelName + "_" + formattedTimestamp
+        formattedTimestamp = timestamp.strftime('%Y%m%d_%HZ')
+        tableName = modelName + "_" + formattedTimestamp
 
-    curr.execute ("SELECT fh, grib_var FROM eolus3." + tableName + " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
-    res = curr.fetchone()
-    if not res or len(res) == 0:
-        return False
+    except:
+        log ("Couldn't get the timetamp for model " + modelName, "ERROR", remote=True)
+
+    try:
+        curr.execute ("SELECT fh, grib_var FROM eolus3." + tableName + " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
+        res = curr.fetchone()
+        if not res or len(res) == 0:
+            return False
+
+    except:
+        log ("Couldn't get the status of a timestep from " + tableName, "ERROR", remote=True)
         
     fullFh = res[0]
     gribVar = res[1]
@@ -225,26 +269,36 @@ def findModelStepToProcess(modelName):
     if band is not None:
         bandInfoStr = " | Band: " + band["shorthand"]
 
-    curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" + bandStr, ("PROCESSING", datetime.now(), pid, fullFh))
-    conn.commit ()
+    try:
+        curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" + bandStr, ("PROCESSING", datetime.now(), pid, fullFh))
+        conn.commit ()
+    except:
+        log ("Couldn't set a status to processing in " + tableName, "ERROR", remote=True)
 
     log ("· Attempting to process fh " + fullFh + bandInfoStr, "INFO", remote=True, indentLevel=1, model=modelName)
     processed = processModelStep (modelName, tableName, fullFh, timestamp, band)
+
     if processed:
         log ("✓ Done.", "INFO", remote=True, indentLevel=1, model=modelName)
         return True
 
     else:
-        curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.now(), fullFh))
-        conn.commit ()
+        try:
+            curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.now(), fullFh))
+            conn.commit ()
+        except:
+            log ("Couldn't set a status to back to waiting in " + tableName + "... This will need manual intervention.", "ERROR", remote=True)
         log ("× This fh is not available yet.", "INFO", remote=True, indentLevel=1, model=modelName)
         print ()
         return False
 
 
 def getModelStepStatus (tableName, fullFh):
-    curr.execute ("SELECT status FROM eolus3." + tableName + " WHERE fh = %s", (fullFh,))
-    return curr.fetchone()[0]
+    try:
+        curr.execute ("SELECT status FROM eolus3." + tableName + " WHERE fh = %s", (fullFh,))
+        return curr.fetchone()[0]
+    except:
+        log ("Couldn't get status for fh " + fullFh + " in table " + tableName, "ERROR", remote=True)
 
 
 def getBaseFileName (modelName, timestamp, band):
@@ -260,8 +314,12 @@ def getBaseFileName (modelName, timestamp, band):
 def downloadBand (modelName, timestamp, fh, band, tableName):
     model = models[modelName]
 
-    curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
-    bandNumber = curr.fetchone()[0]
+    try:
+        curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
+        bandNumber = curr.fetchone()[0]
+    except:
+        log ("Couldn't get the next band to process, fh " + fh + ", table " + tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
+        return False
 
     url = makeUrl (modelName, timestamp.strftime("%Y%m%d"), timestamp.strftime("%H"), fh)
 
@@ -274,8 +332,17 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
     if not byteRange:
         log (f"· Band {band['shorthand']} doesn't exist for fh {fh}.", "WARN", remote=True, indentLevel=2, model=modelName)
-    else:
-        log (f"↓ Downloading band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        try:
+            curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s AND grib_var = %s", (fh,band["shorthand"]))
+            conn.commit()
+        except:
+            log ("Couldn't delete an unusable band from the table. " + fh + ", table " + tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
+        return False
+
+
+    log (f"↓ Downloading band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    try:
+        signal.alarm (model["readTimeout"])
         response = http.request('GET',url,
             headers={
                 'Range': 'bytes=' + byteRange
@@ -285,11 +352,179 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         f = open(downloadFileName, 'wb')
         f.write (response.data)
         f.close ()
-        log (f"✓ Downloaded band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        signal.alarm(0)
+    except:
+        log ("Couldn't read the band -- the request likely timed out. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
+        return False
 
-        bounds = config["bounds"][model["bounds"]]
-        width = model["imageWidth"]
+    log (f"✓ Downloaded band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
 
+    bounds = config["bounds"][model["bounds"]]
+    width = model["imageWidth"]
+
+    epsg4326 = osr.SpatialReference()
+    epsg4326.ImportFromEPSG(4326)
+
+    log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    try:
+        gribFile = gdal.Open (downloadFileName)
+        outFile = gdal.Warp(
+            downloadFileName + ".tif", 
+            gribFile, 
+            format='GTiff', 
+            outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
+            dstSRS=epsg4326, 
+            width=width,
+            resampleAlg=gdal.GRA_CubicSpline)
+        outFile.FlushCache()
+        outFile = None
+        gribFile = None
+    except:
+        log ("Warping failed -- " + downloadFileName, "ERROR", remote=True)
+        return False
+
+    # check to see if the working raster exists
+    if not os.path.exists(targetFileName):
+        log (f"· Creating output master TIF | {targetFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        try:
+            os.makedirs (targetDir)
+        except:
+            log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+
+        try:
+            curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
+            numBands = curr.fetchone()[0]
+        except:
+            log ("Couldn't get the number of bands this raster should have.", "ERROR", indentLevel=2, remote=True, model=modelName)
+            return False
+
+        try:
+            gribFile = gdal.Open (downloadFileName + ".tif")
+            gribSrs = osr.SpatialReference()
+            gribSrs.ImportFromWkt (gribFile.GetProjection())
+            geoTransform = gribFile.GetGeoTransform()
+            width = gribFile.RasterXSize
+            height = gribFile.RasterYSize
+
+            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
+            newRaster.SetProjection (gribSrs.ExportToWkt())
+            newRaster.SetGeoTransform (list(geoTransform))
+            gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
+            log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        except:
+            log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+            return False
+
+    log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+
+    try:
+        # Copy the downloaded band to this temp file
+        gribFile = gdal.Open (downloadFileName + ".tif")
+        data = gribFile.GetRasterBand(1).ReadAsArray()
+
+        tif = gdal.Open (targetFileName, gdalconst.GA_Update)
+        tif.GetRasterBand(bandNumber).WriteArray(data)
+        tif.FlushCache()
+        gribFile = None
+        tif = None
+        log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    except:
+        log ("Couldn't write band to TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        return False
+    
+    try:
+        os.remove(downloadFileName)
+        os.remove(downloadFileName + ".tif")
+    except:
+        log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
+    
+    try:
+        curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s AND grib_var = %s", (fh,band["shorthand"]))
+        conn.commit()
+    except:
+        log ("Couldn't update the DB that this band was processed.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        return False
+
+    return True
+
+
+'''
+    Copied a bit from https://github.com/cacraig/grib-inventory/ - thanks!
+'''
+def getByteRange (band, idxFile):
+    log (f"· Searching for band defs in index file {idxFile}", "DEBUG", indentLevel=2, remote=True)
+    try:
+        signal.alarm (60)
+        response = http.request('GET', idxFile)
+        data = response.data.decode('utf-8')
+        signal.alarm (0)
+        varNameToFind = band["band"]["var"]
+        levelToFind = getLevelNameForLevel(band["band"]["level"], "idxName")
+        found = False
+        startByte = None
+        endByte = None
+
+        for line in data.splitlines():
+            line = str(line)
+            parts = line.split(':')
+            varName = parts[3]
+            level = parts[4]
+
+            if found:
+                endByte = parts[1]
+                break
+
+            if varName == varNameToFind and level == levelToFind:
+                log ("✓ Found.", "DEBUG", indentLevel=2, remote=False)
+                found = True
+                startByte = parts[1]
+                continue
+
+        if found:
+            log (f"· Bytes {startByte} to {endByte}", "DEBUG", indentLevel=2)
+            return startByte + "-" + endByte
+        else:
+            log (f"· Couldn't find band def in index file.", "WARN", indentLevel=2, remote=True)
+        return None
+
+    except:
+        log (f"Band def retrieval failed.", "ERROR", indentLevel=2, remote=True)
+        return None
+
+
+def downloadFullFile (modelName, timestamp, fh, tableName):
+    model = models[modelName]
+    try:
+        curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
+        bandNumber = curr.fetchone()[0]
+    except:
+        log ("Couldn't get the next fh to process, fh " + fh + ", table " + tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
+        return False
+
+    url = makeUrl (modelName, timestamp.strftime("%Y%m%d"), timestamp.strftime("%H"), fh)
+
+    fileName = getBaseFileName (modelName, timestamp, None)
+    targetDir = config["mapfileDir"] + "/" + modelName + "/" 
+    downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
+
+    log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    try:
+        signal.alarm (model["readTimeout"])
+        response = http.request('GET',url,retries=5)
+
+        f = open(downloadFileName, 'wb')
+        f.write (response.data)
+        f.close ()
+        signal.alarm (0)
+        log (f"✓ Downloaded band fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    except:
+        log ("Couldn't read the fh -- the request likely timed out. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
+        return False
+
+    bounds = config["bounds"][model["bounds"]]
+    width = model["imageWidth"]
+
+    try:
         epsg4326 = osr.SpatialReference()
         epsg4326.ImportFromEPSG(4326)
 
@@ -305,132 +540,18 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             resampleAlg=gdal.GRA_CubicSpline)
         outFile.FlushCache()
         outFile = None
-
-        # check to see if the working raster exists
-        if not os.path.exists(targetFileName):
-            log (f"· Creating output master TIF | {targetFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
-            try:
-                os.makedirs (targetDir)
-            except:
-                log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
-
-            curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
-            numBands = curr.fetchone()[0]
-
-            gribFile = gdal.Open (downloadFileName + ".tif")
-            gribSrs = osr.SpatialReference()
-            gribSrs.ImportFromWkt (gribFile.GetProjection())
-            geoTransform = gribFile.GetGeoTransform()
-            width = gribFile.RasterXSize
-            height = gribFile.RasterYSize
-
-            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
-            newRaster.SetProjection (gribSrs.ExportToWkt())
-            newRaster.SetGeoTransform (list(geoTransform))
-            gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
-            log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-
-        log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-        # Copy the downloaded band to this temp file
-        gribFile = gdal.Open (downloadFileName + ".tif")
-        data = gribFile.GetRasterBand(1).ReadAsArray()
-
-        tif = gdal.Open (targetFileName, gdalconst.GA_Update)
-        tif.GetRasterBand(bandNumber).WriteArray(data)
-        tif.FlushCache()
         gribFile = None
-        tif = None
-        log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-        
-        try:
-            os.remove(downloadFileName)
-            os.remove(downloadFileName + ".tif")
-        except:
-            log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
-        
 
-    curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s AND grib_var = %s", (fh,band["shorthand"]))
-    conn.commit()
+    except:
+        log ("Warping failed -- " + downloadFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
+        return False
 
-
-'''
-    Copied a bit from https://github.com/cacraig/grib-inventory/ - thanks!
-'''
-def getByteRange (band, idxFile):
-    log (f"· Searching for band defs in index file {idxFile}", "DEBUG", indentLevel=2, remote=True)
-    response = http.request('GET', idxFile)
-    data = response.data.decode('utf-8')
-    varNameToFind = band["band"]["var"]
-    levelToFind = getLevelNameForLevel(band["band"]["level"], "idxName")
-    found = False
-    startByte = None
-    endByte = None
-
-    for line in data.splitlines():
-        line = str(line)
-        parts = line.split(':')
-        varName = parts[3]
-        level = parts[4]
-
-        if found:
-            endByte = parts[1]
-            break
-
-        if varName == varNameToFind and level == levelToFind:
-            log ("✓ Found.", "DEBUG", indentLevel=2, remote=False)
-            found = True
-            startByte = parts[1]
-            continue
-
-    if found:
-        log (f"· Bytes {startByte} to {endByte}", "DEBUG", indentLevel=2)
-        return startByte + "-" + endByte
-    else:
-        log (f"· Couldn't find band def in index file.", "WARN", indentLevel=2, remote=True)
-    return None
-
-
-def downloadFullFile (modelName, timestamp, fh, tableName):
-    model = models[modelName]
-    curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
-    bandNumber = curr.fetchone()[0]
-
-    url = makeUrl (modelName, timestamp.strftime("%Y%m%d"), timestamp.strftime("%H"), fh)
-
-    fileName = getBaseFileName (modelName, timestamp, None)
-    targetDir = config["mapfileDir"] + "/" + modelName + "/" 
-    downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
-
-    log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-    response = http.request('GET',url,retries=5)
-
-    f = open(downloadFileName, 'wb')
-    f.write (response.data)
-    f.close ()
-    log (f"✓ Downloaded band fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-
-    bounds = config["bounds"][model["bounds"]]
-    width = model["imageWidth"]
-
-    epsg4326 = osr.SpatialReference()
-    epsg4326.ImportFromEPSG(4326)
-
-    log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-    gribFile = gdal.Open (downloadFileName)
-    outFile = gdal.Warp(
-        downloadFileName + ".tif", 
-        gribFile, 
-        format='GTiff', 
-        outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
-        dstSRS=epsg4326, 
-        width=width,
-        resampleAlg=gdal.GRA_CubicSpline)
-    outFile.FlushCache()
-    outFile = None
-    gribFile = None
-
-    curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
-    numBands = curr.fetchone()[0]
+    try:
+        curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
+        numBands = curr.fetchone()[0]
+    except:
+        log ("Couldn't get the number of bands this raster should have.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        return False
 
     bands = makeModelBandArray(modelName, force=True)
 
@@ -445,45 +566,52 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
             except:
                 log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
 
-            gribFile = gdal.Open (downloadFileName + ".tif")
-            gribSrs = osr.SpatialReference()
-            gribSrs.ImportFromWkt (gribFile.GetProjection())
-            geoTransform = gribFile.GetGeoTransform()
-            width = gribFile.RasterXSize
-            height = gribFile.RasterYSize
+            try:
+                gribFile = gdal.Open (downloadFileName + ".tif")
+                gribSrs = osr.SpatialReference()
+                gribSrs.ImportFromWkt (gribFile.GetProjection())
+                geoTransform = gribFile.GetGeoTransform()
+                width = gribFile.RasterXSize
+                height = gribFile.RasterYSize
 
-            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
-            newRaster.SetProjection (gribSrs.ExportToWkt())
-            newRaster.SetGeoTransform (list(geoTransform))
-            gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
-            gribFile = None
-            newRaster = None
-            log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+                newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
+                newRaster.SetProjection (gribSrs.ExportToWkt())
+                newRaster.SetGeoTransform (list(geoTransform))
+                gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
+                gribFile = None
+                newRaster = None
+                log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+            except:
+                log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+                return False
 
         log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}", "NOTICE", indentLevel=2, remote=True, model=modelName)
         # Copy the downloaded band to this temp file
-        gribFile = gdal.Open (downloadFileName + ".tif")
-        gribNumBands = gribFile.RasterCount
-        bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
-        tif = gdal.Open (targetFileName, gdalconst.GA_Update)
-        for i in range (1, gribNumBands):
-            try:
-                fileBand = gribFile.GetRasterBand(i)
-                metadata = fileBand.GetMetadata()
-                if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
-                    log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2)
-                    data = fileBand.ReadAsArray()
-                    tif.GetRasterBand(bandNumber).WriteArray(data)
-                    break
+        try:
+            gribFile = gdal.Open (downloadFileName + ".tif")
+            gribNumBands = gribFile.RasterCount
+            bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
+            tif = gdal.Open (targetFileName, gdalconst.GA_Update)
+            for i in range (1, gribNumBands):
+                try:
+                    fileBand = gribFile.GetRasterBand(i)
+                    metadata = fileBand.GetMetadata()
+                    if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
+                        log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2)
+                        data = fileBand.ReadAsArray()
+                        tif.GetRasterBand(bandNumber).WriteArray(data)
+                        break
 
-            except:
-                log (f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}", "WARN", indentLevel=2, remote=True, model=modelName)
+                except:
+                    log (f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}", "WARN", indentLevel=2, remote=True, model=modelName)
 
-        tif.FlushCache()
-        gribFile = None
-        tif = None
+            tif.FlushCache()
+            gribFile = None
+            tif = None
+        except:
+            log ("Couldn't write bands to the tiff. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
+            return False
 
-    
     try:
         os.remove(downloadFileName)
         os.remove(downloadFileName + ".tif")
@@ -491,8 +619,14 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
     
 
-    curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
-    conn.commit()
+    try:
+        curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
+        conn.commit()
+    except:
+        log ("Couldn't update the DB that this band was processed.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        return False
+
+    return True
 
 
 def processModelStep (modelName, tableName, fullFh, timestamp, band):
@@ -515,28 +649,47 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
     if fileExists:
         log ("· Start processing fh " + fullFh + ".", "NOTICE",remote=True, model=modelName, indentLevel=1)
         if band is None:
-            downloadFullFile (modelName, timestamp, fullFh, tableName)
+            try:
+                success = downloadFullFile (modelName, timestamp, fullFh, tableName)
+                if not success:
+                    return False
+            except:
+                return False
         else:
-            downloadBand (modelName, timestamp, fullFh, band, tableName)
+            try:
+                success = downloadBand (modelName, timestamp, fullFh, band, tableName)
+                if not success:
+                    return False
+            except:
+                return False
+    
         processed = True
 
     #delete the table if all steps are done
-    curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName + " WHERE status != 'DONE'")
-    numBandsRemaining = curr.fetchone()[0]
+    try:
+        curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName + " WHERE status != 'DONE'")
+        numBandsRemaining = curr.fetchone()[0]
+    except:
+        log ("Couldn't get remaining count from table " + tableName + ".", "ERROR", indentLevel=1, remote=True, model=modelName)
+        killScript(1)
 
     log ("· There are " + str(numBandsRemaining) + " remaining bands to process.", "DEBUG", indentLevel=1)
 
     if numBandsRemaining == 0:
         log ("· Deleting table " + tableName + ".", "NOTICE", indentLevel=1, remote=True, model=modelName)
-        curr.execute ("DROP TABLE eolus3." + tableName)
-        conn.commit ()
+        try:
+            curr.execute ("DROP TABLE eolus3." + tableName)
+            conn.commit ()
+        except:
+            log ("Couldn't remove the table " + tableName + ".", "ERROR", indentLevel=1, remote=True, model=modelName)
+            killScript(1)
+
         endModelProcessing(modelName)
 
     # If success, return True
     return processed
 
     
-
 # This iterates a fh by the appropriate step size,
 # given the fh. This is for models where the fh step size
 # increases after a certain hour.
@@ -591,10 +744,13 @@ def checkIfModelFhAvailable (modelName, timestamp, fh):
 
 
 def modelTimestampMatches (modelName, timestamp):
-    curr.execute ("SELECT timestamp FROM eolus3.models WHERE model = %s", (modelName,))
-    modelTime = str(curr.fetchone()[0])[0:16]
-    tTime = str(timestamp)[0:16]
-    return modelTime == tTime
+    try:
+        curr.execute ("SELECT timestamp FROM eolus3.models WHERE model = %s", (modelName,))
+        modelTime = str(curr.fetchone()[0])[0:16]
+        tTime = str(timestamp)[0:16]
+        return modelTime == tTime
+    except:
+        return False
 
 
 def updateRunStatus (modelName):

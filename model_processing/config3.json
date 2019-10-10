@@ -43,6 +43,7 @@
         "nam3": {
             "enabled": true,
             "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
@@ -64,6 +65,7 @@
             "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
+            "readTimeout": 300,
             "startTime": 3,
             "endTime": 384,
             "imageWidth": 480,
