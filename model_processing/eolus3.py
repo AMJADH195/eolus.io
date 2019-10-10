@@ -17,7 +17,7 @@ pid = str(os.getpid())
 
 directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 gdal.UseExceptions()
-
+canAlarm = True
 try:
     with open (directory + '/config3.json') as f:
         data = json.load(f)
@@ -31,6 +31,7 @@ models = data["models"]
 try:
     signal.signal (signal.SIGALRM, killRequest)
 except:
+    canAlarm = False
     print ("--------------")
     print ("NOTE: SIGALRM is not supported on this OS. This may result in stuck requests not being closed.")
     print ("--------------")
@@ -342,7 +343,8 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
     log (f"↓ Downloading band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
-        signal.alarm (model["readTimeout"])
+        if canAlarm:
+            signal.alarm (model["readTimeout"])
         response = http.request('GET',url,
             headers={
                 'Range': 'bytes=' + byteRange
@@ -352,7 +354,8 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         f = open(downloadFileName, 'wb')
         f.write (response.data)
         f.close ()
-        signal.alarm(0)
+        if canAlarm:
+            signal.alarm(0)
     except:
         log ("Couldn't read the band -- the request likely timed out. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
@@ -454,10 +457,12 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 def getByteRange (band, idxFile):
     log (f"· Searching for band defs in index file {idxFile}", "DEBUG", indentLevel=2, remote=True)
     try:
-        signal.alarm (60)
+        if canAlarm:
+            signal.alarm (60)
         response = http.request('GET', idxFile)
         data = response.data.decode('utf-8')
-        signal.alarm (0)
+        if canAlarm:
+            signal.alarm (0)
         varNameToFind = band["band"]["var"]
         levelToFind = getLevelNameForLevel(band["band"]["level"], "idxName")
         found = False
@@ -509,13 +514,15 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
     log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
-        signal.alarm (model["readTimeout"])
+        if canAlarm:
+            signal.alarm (model["readTimeout"])
         response = http.request('GET',url,retries=5)
 
         f = open(downloadFileName, 'wb')
         f.write (response.data)
         f.close ()
-        signal.alarm (0)
+        if canAlarm:
+            signal.alarm (0)
         log (f"✓ Downloaded band fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     except:
         log ("Couldn't read the fh -- the request likely timed out. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
@@ -773,7 +780,7 @@ def clean ():
     try:
         curr.execute ("DELETE FROM eolus3.log WHERE timestamp < now() - interval '" + retentionDays + " days'")
         conn.commit ()
-        curr.execute ("DELETE FROM eolus3.run_status WHERE model_timestamp < now() - interval '" + retentionDays + " days'")
+        curr.execute ("DELETE FROM eolus3.run_status WHERE timestamp < now() - interval '" + retentionDays + " days'")
         conn.commit ()
     except:
         log (f"· Couldn't delete old logs.", "WARN", indentLevel=0, remote=True)

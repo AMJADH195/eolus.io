@@ -1,7 +1,7 @@
 {
     "config": {
         "postgres": {
-            "host": "eolus.io",
+            "host": "localhost",
             "db": "eolus",
             "user": "eolus"
         },
@@ -20,7 +20,7 @@
             }
         },
         "tempDir": "./tempWxData",
-        "mapfileDir": "F:/map",
+        "mapfileDir": "/map",
         "logFile": "model_update.log",
         "debug": false,
         "resampling": "cubicspline",
@@ -61,7 +61,7 @@
             ]
         },
         "naefs_anom": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
