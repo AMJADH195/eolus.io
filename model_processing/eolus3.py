@@ -6,6 +6,7 @@ import os
 import sys
 import os.path
 import argparse
+import _signal
 import signal
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
@@ -29,7 +30,7 @@ config = data["config"]
 levelMaps = data["levelMaps"]
 models = data["models"]
 try:
-    signal.signal (signal.SIGALRM, killRequest)
+    signal.signal (_signal.SIGALRM, killRequest)
 except:
     canAlarm = False
     print ("--------------")
