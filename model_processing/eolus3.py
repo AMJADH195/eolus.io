@@ -163,6 +163,9 @@ def startProcessingModel (modelName, timestamp):
         curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("PROCESSING", timestamp, modelName))
         conn.commit ()
 
+        curr.execute ("DELETE FROM eolus3.run_status WHERE model = %s AND timestamp = %s", (modelName, timestamp))
+        conn.commit ()
+
         curr.execute ("INSERT INTO eolus3.run_status (model, status, timestamp) VALUES (%s, %s, %s)", (modelName, "PROCESSING", timestamp))
         conn.commit ()
     except:
