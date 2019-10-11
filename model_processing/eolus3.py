@@ -60,6 +60,7 @@ def resetPgConnection ():
 
 
 def addAgent ():
+    global agentLogged
     try:
         curr.execute ("INSERT INTO eolus3.agents (pid, start_time) VALUES (%s, %s)", (pid, datetime.utcnow()))
         conn.commit ()
@@ -70,6 +71,7 @@ def addAgent ():
 
 
 def removeAgent ():
+    log ("Removing agent " + pid, "DEBUG")
     try:
         curr.execute ("DELETE FROM eolus3.agents WHERE pid = %s", (pid,))
         conn.commit ()
@@ -288,13 +290,14 @@ def findModelStepToProcess(modelName):
         res = curr.fetchone()
         if not res or len(res) == 0:
             return False
+        fullFh = res[0]
+        gribVar = res[1]
 
     except:
         resetPgConnection()
         log ("Couldn't get the status of a timestep from " + tableName, "ERROR", remote=True)
+        return False
         
-    fullFh = res[0]
-    gribVar = res[1]
 
     band = None
 
@@ -336,8 +339,6 @@ def findModelStepToProcess(modelName):
         except:
             resetPgConnection()
             log ("Couldn't set a status to back to waiting in " + tableName + "... This will need manual intervention.", "ERROR", remote=True)
-        log ("× This fh is not available yet.", "INFO", remote=True, indentLevel=1, model=modelName)
-        print ()
         return False
 
 
