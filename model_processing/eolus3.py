@@ -379,7 +379,14 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
     targetFileName = targetDir + fileName + ".tif"
 
-    byteRange = getByteRange (band, url + ".idx")
+    try:
+        response = requests.head(url)
+        contentLength = str(response.headers["Content-Length"])
+    except:
+        log (f"· Couldn't get header of " + url, "ERROR", remote=True, indentLevel=2, model=modelName)
+        return False
+
+    byteRange = getByteRange (band, url + ".idx", contentLength)
 
     if not byteRange:
         log (f"· Band {band['shorthand']} doesn't exist for fh {fh}.", "WARN", remote=True, indentLevel=2, model=modelName)
@@ -503,7 +510,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 '''
     Copied a bit from https://github.com/cacraig/grib-inventory/ - thanks!
 '''
-def getByteRange (band, idxFile):
+def getByteRange (band, idxFile, contentLength):
     log (f"· Searching for band defs in index file {idxFile}", "DEBUG", indentLevel=2, remote=True)
     try:
         response = http.request('GET', idxFile)
@@ -519,18 +526,28 @@ def getByteRange (band, idxFile):
             parts = line.split(':')
             varName = parts[3]
             level = parts[4]
+            time = parts[5]
 
             if found:
                 endByte = parts[1]
                 break
 
             if varName == varNameToFind and level == levelToFind:
+                if "timeRange" in band["band"].keys():
+                    rangeVal = time.split (" ", 1)[0]
+                    ranges = rangeVal.split("-")
+                    if (int(ranges[1]) - int(ranges[0])) != band["band"]["timeRange"]:
+                        continue
+                    
                 log ("✓ Found.", "DEBUG", indentLevel=2, remote=False)
                 found = True
                 startByte = parts[1]
                 continue
 
         if found:
+            if endByte == None:
+                endByte = contentLength
+
             log (f"· Bytes {startByte} to {endByte}", "DEBUG", indentLevel=2)
             return startByte + "-" + endByte
         else:
