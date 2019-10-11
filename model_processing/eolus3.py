@@ -61,7 +61,7 @@ def resetPgConnection ():
 
 def addAgent ():
     try:
-        curr.execute ("INSERT INTO eolus3.agents (pid, start_time) VALUES (%s, %s)", (pid, datetime.now()))
+        curr.execute ("INSERT INTO eolus3.agents (pid, start_time) VALUES (%s, %s)", (pid, datetime.utcnow()))
         conn.commit ()
         agentLogged = True
     except:
@@ -92,7 +92,7 @@ def getAgentCount ():
 
 
 def log (text, level, indentLevel=0, remote=False, model=''):
-    timestamp = datetime.now()
+    timestamp = datetime.utcnow()
     timeStr = timestamp.strftime("%H:%M:%S")
     indents = ""
 
@@ -316,7 +316,7 @@ def findModelStepToProcess(modelName):
         bandInfoStr = " | Band: " + band["shorthand"]
 
     try:
-        curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" + bandStr, ("PROCESSING", datetime.now(), pid, fullFh))
+        curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" + bandStr, ("PROCESSING", datetime.utcnow(), pid, fullFh))
         conn.commit ()
     except:
         resetPgConnection()
@@ -331,7 +331,7 @@ def findModelStepToProcess(modelName):
 
     else:
         try:
-            curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.now(), fullFh))
+            curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.utcnow(), fullFh))
             conn.commit ()
         except:
             resetPgConnection()
