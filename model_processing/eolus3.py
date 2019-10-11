@@ -6,17 +6,18 @@ import os
 import sys
 import os.path
 import argparse
+import certifi
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
 
 conn = None
 curr = None
-http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=5.0, read=10.0))
+http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=5.0, read=10.0),cert_reqs='CERT_REQUIRED',ca_certs=certifi.where())
 pid = str(os.getpid())
 
 directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 gdal.UseExceptions()
-canAlarm = True
+
 try:
     with open (directory + '/config3.json') as f:
         data = json.load(f)
@@ -39,11 +40,6 @@ class UTC(tzinfo):
         return ZERO
 
 utc = UTC()
-
-
-def killRequest (signum, frame):
-    raise Exception ("timeout")
-
 
 def killScript (exitCode): 
     try:
