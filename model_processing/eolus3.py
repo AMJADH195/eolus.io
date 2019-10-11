@@ -6,7 +6,6 @@ import os
 import sys
 import os.path
 import argparse
-import signal
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
 
@@ -28,14 +27,6 @@ except:
 config = data["config"]
 levelMaps = data["levelMaps"]
 models = data["models"]
-try:
-    signal.signal (signal.SIGALRM, killRequest)
-except:
-    canAlarm = False
-    print ("--------------")
-    print ("NOTE: SIGALRM is not supported on this OS. This may result in stuck requests not being closed.")
-    print ("--------------")
-    print()
 
 ZERO = timedelta(0)
 
@@ -344,8 +335,6 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
     log (f"↓ Downloading band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
-        if canAlarm:
-            signal.alarm (model["readTimeout"])
         response = http.request('GET',url,
             headers={
                 'Range': 'bytes=' + byteRange
@@ -355,8 +344,6 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         f = open(downloadFileName, 'wb')
         f.write (response.data)
         f.close ()
-        if canAlarm:
-            signal.alarm(0)
     except:
         log ("Couldn't read the band -- the request likely timed out. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
@@ -458,12 +445,8 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 def getByteRange (band, idxFile):
     log (f"· Searching for band defs in index file {idxFile}", "DEBUG", indentLevel=2, remote=True)
     try:
-        if canAlarm:
-            signal.alarm (60)
         response = http.request('GET', idxFile)
         data = response.data.decode('utf-8')
-        if canAlarm:
-            signal.alarm (0)
         varNameToFind = band["band"]["var"]
         levelToFind = getLevelNameForLevel(band["band"]["level"], "idxName")
         found = False
@@ -515,15 +498,11 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
     log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
-        if canAlarm:
-            signal.alarm (model["readTimeout"])
         response = http.request('GET',url,retries=5)
 
         f = open(downloadFileName, 'wb')
         f.write (response.data)
         f.close ()
-        if canAlarm:
-            signal.alarm (0)
         log (f"✓ Downloaded band fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     except:
         log ("Couldn't read the fh -- the request likely timed out. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
