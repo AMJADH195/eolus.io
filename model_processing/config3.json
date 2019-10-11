@@ -1,7 +1,7 @@
 {
     "config": {
         "postgres": {
-            "host": "localhost",
+            "host": "eolus.io",
             "db": "eolus",
             "user": "eolus"
         },
@@ -20,14 +20,14 @@
             }
         },
         "tempDir": "./tempWxData",
-        "mapfileDir": "/map",
+        "mapfileDir": "F:/map",
         "logFile": "model_update.log",
         "debug": false,
         "resampling": "cubicspline",
         "sleepTime": 1,
         "maxTime": 0,
         "retentionDays": 2,
-        "maxConcurrentProcessing": 3
+        "maxAgents": 3
     },
     "levelMaps": {
         "2m": { 

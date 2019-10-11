@@ -14,6 +14,7 @@ conn = None
 curr = None
 http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=5.0, read=10.0),cert_reqs='CERT_REQUIRED',ca_certs=certifi.where())
 pid = str(os.getpid())
+agentLogged = False
 
 directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 gdal.UseExceptions()
@@ -43,11 +44,51 @@ utc = UTC()
 
 def killScript (exitCode): 
     try:
+        if agentLogged:
+            removeAgent ()
+
         curr.close()
         conn.close()
     except:
         log ("No connection to close.", "DEBUG")
     sys.exit (exitCode)
+
+
+def resetPgConnection ():
+    conn.cancel ()
+    conn.reset ()
+
+
+def addAgent ():
+    try:
+        curr.execute ("INSERT INTO eolus3.agents (pid, start_time) VALUES (%s, %s)", (pid, datetime.now()))
+        conn.commit ()
+        agentLogged = True
+    except:
+        log ("Couldn't add agent.", "ERROR")
+        killScript (1)
+
+
+def removeAgent ():
+    try:
+        curr.execute ("DELETE FROM eolus3.agents WHERE pid = %s", (pid,))
+        conn.commit ()
+        agentLogged = False
+    except:
+        resetPgConnection ()
+        log ("Couldn't add agent.", "ERROR", remote=True)
+
+
+def getAgentCount ():
+    try:
+        curr.execute ("SELECT COUNT(*) FROM eolus3.agents")
+        conn.commit () 
+        result = curr.fetchone()
+        return result[0]
+    except:
+        resetPgConnection ()
+        log ("Couldn't get agent count.", "ERROR", remote=True)
+        killScript (1)
 
 
 def log (text, level, indentLevel=0, remote=False, model=''):
@@ -61,8 +102,12 @@ def log (text, level, indentLevel=0, remote=False, model=''):
     print (f"[{level}\t| {timeStr}] {indents}{text}")
 
     if remote:
-        curr.execute ("INSERT INTO eolus3.log (model, level, timestamp, agent, message) VALUES (%s, %s, %s, %s, %s)", (model, level, timestamp, pid, text))
-        conn.commit ()
+        try:
+            curr.execute ("INSERT INTO eolus3.log (model, level, timestamp, agent, message) VALUES (%s, %s, %s, %s, %s)", (model, level, timestamp, pid, text))
+            conn.commit ()
+        except:
+            print ("Wasn't logged remotely :(")
+            resetPgConnection()
 
 
 def sqlConnect():
@@ -92,6 +137,7 @@ def endModelProcessing (modelName):
         updateRunStatus(modelName)
     except:
         log ("Couldn't mark model as complete.", "ERROR", remote=True, model=modelName)
+        resetPgConnection()
 
 
 def addModelToDb (modelName):
@@ -101,6 +147,7 @@ def addModelToDb (modelName):
         conn.commit ()
     except:
         log ("Couldn't add model to db.", "ERROR", remote=True, model=modelName)
+        resetPgConnection()
         killScript (1)
 
 
@@ -138,6 +185,7 @@ def getModelStatus (modelName):
         return result[0]
 
     except:
+        resetPgConnection()
         return None
 
 
@@ -152,6 +200,7 @@ def startProcessingModel (modelName, timestamp):
         curr.execute ("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s", ("MAKINGTABLE", timestamp, modelName))
         conn.commit ()
     except:
+        resetPgConnection()
         killScript(1)
 
     modelBandArray = makeModelBandArray (modelName)
@@ -169,6 +218,7 @@ def startProcessingModel (modelName, timestamp):
         curr.execute ("INSERT INTO eolus3.run_status (model, status, timestamp) VALUES (%s, %s, %s)", (modelName, "PROCESSING", timestamp))
         conn.commit ()
     except:
+        resetPgConnection()
         log ("Could not set the model status back to processing! This requires manual intervention.", "ERROR", remote=True)
 
 
@@ -186,6 +236,7 @@ def createBandTable (modelName, tableName):
         conn.commit ()
 
     except:
+        resetPgConnection()
         log ("Could not create table. This will probably need to be manually fixed.", "ERROR", remote=True)
         return
 
@@ -211,6 +262,7 @@ def createBandTable (modelName, tableName):
             if fh > model["endTime"]:
                 return
     except:
+        resetPgConnection()
         log ("An error occurred while making the table. This will probably need to be manually fixed.", "ERROR", remote=True)
         return
 
@@ -228,6 +280,7 @@ def findModelStepToProcess(modelName):
         tableName = modelName + "_" + formattedTimestamp
 
     except:
+        resetPgConnection()
         log ("Couldn't get the timetamp for model " + modelName, "ERROR", remote=True)
 
     try:
@@ -237,6 +290,7 @@ def findModelStepToProcess(modelName):
             return False
 
     except:
+        resetPgConnection()
         log ("Couldn't get the status of a timestep from " + tableName, "ERROR", remote=True)
         
     fullFh = res[0]
@@ -265,6 +319,7 @@ def findModelStepToProcess(modelName):
         curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" + bandStr, ("PROCESSING", datetime.now(), pid, fullFh))
         conn.commit ()
     except:
+        resetPgConnection()
         log ("Couldn't set a status to processing in " + tableName, "ERROR", remote=True)
 
     log ("· Attempting to process fh " + fullFh + bandInfoStr, "INFO", remote=True, indentLevel=1, model=modelName)
@@ -279,6 +334,7 @@ def findModelStepToProcess(modelName):
             curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.now(), fullFh))
             conn.commit ()
         except:
+            resetPgConnection()
             log ("Couldn't set a status to back to waiting in " + tableName + "... This will need manual intervention.", "ERROR", remote=True)
         log ("× This fh is not available yet.", "INFO", remote=True, indentLevel=1, model=modelName)
         print ()
@@ -290,6 +346,7 @@ def getModelStepStatus (tableName, fullFh):
         curr.execute ("SELECT status FROM eolus3." + tableName + " WHERE fh = %s", (fullFh,))
         return curr.fetchone()[0]
     except:
+        resetPgConnection()
         log ("Couldn't get status for fh " + fullFh + " in table " + tableName, "ERROR", remote=True)
 
 
@@ -310,6 +367,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
         bandNumber = curr.fetchone()[0]
     except:
+        resetPgConnection()
         log ("Couldn't get the next band to process, fh " + fh + ", table " + tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
         return False
 
@@ -328,6 +386,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s AND grib_var = %s", (fh,band["shorthand"]))
             conn.commit()
         except:
+            resetPgConnection()
             log ("Couldn't delete an unusable band from the table. " + fh + ", table " + tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
         return False
 
@@ -385,6 +444,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
             numBands = curr.fetchone()[0]
         except:
+            resetPgConnection()
             log ("Couldn't get the number of bands this raster should have.", "ERROR", indentLevel=2, remote=True, model=modelName)
             return False
 
@@ -432,6 +492,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s AND grib_var = %s", (fh,band["shorthand"]))
         conn.commit()
     except:
+        resetPgConnection()
         log ("Couldn't update the DB that this band was processed.", "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
@@ -486,6 +547,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
         bandNumber = curr.fetchone()[0]
     except:
+        resetPgConnection()
         log ("Couldn't get the next fh to process, fh " + fh + ", table " + tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
         return False
 
@@ -536,6 +598,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
         numBands = curr.fetchone()[0]
     except:
+        resetPgConnection()
         log ("Couldn't get the number of bands this raster should have.", "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
@@ -609,6 +672,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
         conn.commit()
     except:
+        resetPgConnection()
         log ("Couldn't update the DB that this band was processed.", "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
@@ -627,6 +691,7 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
         curr.execute ("SELECT band FROM eolus3." + tableName + " WHERE fh = '" + fullFh + "' " + bandStr)
         bandNumber = curr.fetchone()[0]
     except:
+        resetPgConnection()
         log ("× Some other agent finished the model.", "NOTICE", indentLevel=1, remote=True, model=modelName)
         killScript(0)
 
@@ -656,6 +721,7 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
         curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName + " WHERE status != 'DONE'")
         numBandsRemaining = curr.fetchone()[0]
     except:
+        resetPgConnection()
         log ("Couldn't get remaining count from table " + tableName + ".", "ERROR", indentLevel=1, remote=True, model=modelName)
         killScript(1)
 
@@ -667,6 +733,7 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
             curr.execute ("DROP TABLE eolus3." + tableName)
             conn.commit ()
         except:
+            resetPgConnection()
             log ("Couldn't remove the table " + tableName + ".", "ERROR", indentLevel=1, remote=True, model=modelName)
             killScript(1)
 
@@ -736,6 +803,7 @@ def modelTimestampMatches (modelName, timestamp):
         tTime = str(timestamp)[0:16]
         return modelTime == tTime
     except:
+        resetPgConnection()
         return False
 
 
@@ -744,6 +812,7 @@ def updateRunStatus (modelName):
         curr.execute ("UPDATE eolus3.run_status SET status = 'COMPLETE' WHERE model = '" + modelName + "'")
         conn.commit ()
     except:
+        resetPgConnection()
         log (f"!!! Could not update run_status!", "ERROR", indentLevel=0, remote=True, model=modelName)
 
 
@@ -762,6 +831,7 @@ def clean ():
         curr.execute ("DELETE FROM eolus3.run_status WHERE timestamp < now() - interval '" + retentionDays + " days'")
         conn.commit ()
     except:
+        resetPgConnection()
         log (f"· Couldn't delete old logs.", "WARN", indentLevel=0, remote=True)
 
 
@@ -771,9 +841,9 @@ def init():
     # It's THAT kind of script :)
     print ('''
     ╔══════════════════════════════╗
-    ║  █▀▀ █▀▀█ █░░ █░░█ █▀▀ █▀▀█  ║
-    ║  █▀▀ █░░█ █░░ █░░█ ▀▀█ ░░▀▄  ║
-    ║  ▀▀▀ ▀▀▀▀ ▀▀▀ ░▀▀▀ ▀▀▀ █▄▄█  ║
+    ║ ░█▀▀ █▀█ █░░ █░░█ █▀▀ █▀▀█░░ ║
+    ║  █▀▀ █░█ █░░ █░░█ ▀▀█ ░░▀▄░  ║
+    ║  ▀▀▀ ▀▀▀ ▀▀▀ ░▀▀▀ ▀▀▀ █▄▄█   ║
     ╚══════════════════════════════╝
     ''')
 
@@ -789,7 +859,13 @@ def init():
     log ("✓ Connected.", "DEBUG", indentLevel=1)
     printLine()
     print ()
-    main ()
+
+    agents = getAgentCount ()
+    if agents < config["maxAgents"]:
+        addAgent ()
+        main ()
+    else:
+        print ("Too many agents already processing.")
 
 
 def main():
