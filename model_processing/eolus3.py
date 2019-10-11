@@ -6,7 +6,6 @@ import os
 import sys
 import os.path
 import argparse
-import _signal
 import signal
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
@@ -30,7 +29,7 @@ config = data["config"]
 levelMaps = data["levelMaps"]
 models = data["models"]
 try:
-    signal.signal (_signal.SIGALRM, killRequest)
+    signal.signal (signal.SIGALRM, killRequest)
 except:
     canAlarm = False
     print ("--------------")
@@ -103,6 +102,7 @@ def endModelProcessing (modelName):
         log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
         curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
         conn.commit ()
+        updateRunStatus(modelName)
     except:
         log ("Couldn't mark model as complete.", "ERROR", remote=True, model=modelName)
 
