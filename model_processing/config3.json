@@ -82,7 +82,7 @@
     "models": {
         "gefs_pgrb2ap5_avg": {
             "enabled": true,
-            "bounds": "na",
+            "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -94,7 +94,7 @@
             },
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/gens/prod/gefs.%D/%H/pgrb2ap5/geavg.t%Hz.pgrb2a.0p50.f%T",
             "filetype": "grib2",
-            "imageWidth": 480,
+            "imageWidth": 240,
             "index": true,
             "bands": [
                 { "var": "TMP", "level": "2m" },
@@ -124,7 +124,7 @@
         },
         "gefs_pgrb2ap5_spr": {
             "enabled": true,
-            "bounds": "na",
+            "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -136,7 +136,7 @@
             },
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/gens/prod/gefs.%D/%H/pgrb2ap5/gespr.t%Hz.pgrb2a.0p50.f%T",
             "filetype": "grib2",
-            "imageWidth": 480,
+            "imageWidth": 240,
             "index": true,
             "bands": [
                 { "var": "TMP", "level": "2m" },
@@ -364,7 +364,7 @@
             "endTime": 18,
             "extEndTime": 36,
             "index": true,
-            "imageWidth": 720,
+            "imageWidth": 480,
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/hrrr/prod/hrrr.%D/conus/hrrr.t%Hz.wrfsfcf%T.grib2",
             "filetype": "grib2",
             "fhStep": {
@@ -441,7 +441,7 @@
             "readTimeout": 300,
             "startTime": 3,
             "endTime": 384,
-            "imageWidth": 720,
+            "imageWidth": 480,
             "fhStep": {
                 "0": 3,
                 "192": 6
@@ -465,7 +465,7 @@
             "readTimeout": 300,
             "startTime": 3,
             "endTime": 384,
-            "imageWidth": 720,
+            "imageWidth": 480,
             "fhStep": {
                 "0": 3,
                 "192": 6
@@ -492,7 +492,7 @@
             "fhStep": {
                 "0": 1
             },
-            "imageWidth": 720,
+            "imageWidth": 480,
             "index": true,
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "filetype": "grib2",
@@ -551,7 +551,7 @@
                 "0": 1,
                 "36": 3
             },
-            "imageWidth": 720,
+            "imageWidth": 480,
             "index": true,
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conus.hiresf%T.tm00.grib2",
             "filetype": "grib2",
@@ -602,7 +602,7 @@
             "updateOffset": 3,
             "startTime": 1,
             "endTime": 1,
-            "imageWidth": 48,
+            "imageWidth": 240,
             "fhStep": {
                 "0": 1
             },
@@ -618,7 +618,7 @@
             "updateOffset": 3,
             "startTime": 1,
             "endTime": 1,
-            "imageWidth": 720,
+            "imageWidth": 480,
             "fhStep": {
                 "0": 1
             },
@@ -634,7 +634,7 @@
             "updateOffset": 3,
             "startTime": 1,
             "endTime": 1,
-            "imageWidth": 48,
+            "imageWidth": 240,
             "fhStep": {
                 "0": 1
             },
@@ -650,7 +650,7 @@
             "updateOffset": 3,
             "startTime": 1,
             "endTime": 1,
-            "imageWidth": 720,
+            "imageWidth": 480,
             "fhStep": {
                 "0": 1
             },
