@@ -423,7 +423,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     epsg4326 = osr.SpatialReference()
     epsg4326.ImportFromEPSG(4326)
 
-    log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    log ("· Translating downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
         gribFile = gdal.Open (downloadFileName)
         outFile = gdal.Translate(
@@ -436,7 +436,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         outFile = None
         gribFile = None
     except:
-        log ("Warping failed -- " + downloadFileName, "ERROR", remote=True)
+        log ("Translating failed -- " + downloadFileName, "ERROR", remote=True)
         return False
 
     # check to see if the working raster exists
@@ -593,7 +593,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         epsg4326 = osr.SpatialReference()
         epsg4326.ImportFromEPSG(4326)
 
-        log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        log ("· Translating downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         gribFile = gdal.Open (downloadFileName)
         outFile = gdal.Translate(
             downloadFileName + ".tif", 
@@ -606,7 +606,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         gribFile = None
 
     except:
-        log ("Warping failed -- " + downloadFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
+        log ("Translating failed -- " + downloadFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
     try:
