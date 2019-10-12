@@ -136,7 +136,7 @@ def makeUrl (modelName, modelDate, modelHour, fh):
 def endModelProcessing (modelName):
 
     clean ()
-    
+
     try:
         log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
         curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
@@ -476,7 +476,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
             return False
 
-    log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | bandNumber: {str(bandNumber)}", "NOTICE", indentLevel=2, remote=True, model=modelName)
 
     try:
         # Copy the downloaded band to this temp file
