@@ -617,7 +617,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
     try:
         curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
-        numBands = curr.fetchone()[0]
+        numBands = curr.fetchone()[0] + 1
     except:
         resetPgConnection()
         log ("Couldn't get the number of bands this raster should have.", "ERROR", indentLevel=2, remote=True, model=modelName)
