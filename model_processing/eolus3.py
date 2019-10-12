@@ -8,7 +8,7 @@ import shutil
 import os.path
 import argparse
 import certifi
-import time
+from time import sleep
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
 
@@ -80,7 +80,7 @@ def removeAgent ():
         agentLogged = False
     except:
         resetPgConnection ()
-        log ("Couldn't add agent.", "ERROR", remote=True)
+        log ("Couldn't remove agent.", "ERROR", remote=True)
 
 
 def getAgentCount ():
@@ -134,6 +134,11 @@ def makeUrl (modelName, modelDate, modelHour, fh):
 
 
 def endModelProcessing (modelName):
+
+    clean ()
+
+    ## warp final rasters
+
     try:
         log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
         curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
@@ -975,11 +980,10 @@ def main():
 
     if processed:
         log ("✓ Model processing complete.", "NOTICE", indentLevel=0, remote=True, model=modelName)
-        clean()
         printLine ()
         print ()
         print ()
-        time.sleep (1)
+        sleep (1)
         main()
 
     printLine ()
@@ -1000,11 +1004,10 @@ def main():
 
     if processed:
         log ("✓ Model processing complete.", "NOTICE", indentLevel=0, remote=True, model=modelName)
-        clean()
         printLine ()
         print ()
         print ()
-        time.sleep (1)
+        sleep (1)
         main()
 
 if __name__ == "__main__":
