@@ -4,6 +4,7 @@ import requests
 import json
 import os
 import sys
+import shutil
 import os.path
 import argparse
 import certifi
@@ -621,70 +622,84 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         return False
 
     bands = makeModelBandArray(modelName, force=True)
+    if bands == None:
+        try:
+            os.makedirs (targetDir)
+        except:
+            log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
 
-    log (f"· Extracting bands for fh {fh}.", "INFO", indentLevel=2, remote=True, model=modelName)
+        targetFileName = targetDir + getBaseFileName (modelName, timestamp, None) + "_t" + fh + ".tif"
+        log ("· Copying to " + targetFileName, "NOTICE", indentLevel=2, remote=True, model=modelName)
 
-    for band in bands:
-        targetFileName = targetDir + getBaseFileName (modelName, timestamp, band) + ".tif"
-        if not os.path.exists(targetFileName):
-            log (f"· Creating output master TIF with {str(numBands) } bands | {targetFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
-            try:
-                os.makedirs (targetDir)
-            except:
-                log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+        try:
+            shutil.copyfile (downloadFileName + ".tif", targetFileName)
+        except:
+            log ("Couldn't copy.","ERROR", indentLevel=2, remote=True, model=modelName)
+            return False
 
+    else:
+        log (f"· Extracting bands for fh {fh}.", "INFO", indentLevel=2, remote=True, model=modelName)
+
+        for band in bands:
+            targetFileName = targetDir + getBaseFileName (modelName, timestamp, band) + ".tif"
+            if not os.path.exists(targetFileName):
+                log (f"· Creating output master TIF with {str(numBands) } bands | {targetFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
+                try:
+                    os.makedirs (targetDir)
+                except:
+                    log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+
+                try:
+                    gribFile = gdal.Open (downloadFileName + ".tif")
+                    gribSrs = osr.SpatialReference()
+                    gribSrs.ImportFromWkt (gribFile.GetProjection())
+                    geoTransform = gribFile.GetGeoTransform()
+                    width = gribFile.RasterXSize
+                    height = gribFile.RasterYSize
+
+                    newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
+                    newRaster.SetProjection (gribSrs.ExportToWkt())
+                    newRaster.SetGeoTransform (list(geoTransform))
+                    gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
+                    gribFile = None
+                    newRaster = None
+                    log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+                except:
+                    log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+                    return False
+
+            log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}", "NOTICE", indentLevel=2, remote=True, model=modelName)
+            # Copy the downloaded band to this temp file
             try:
                 gribFile = gdal.Open (downloadFileName + ".tif")
-                gribSrs = osr.SpatialReference()
-                gribSrs.ImportFromWkt (gribFile.GetProjection())
-                geoTransform = gribFile.GetGeoTransform()
-                width = gribFile.RasterXSize
-                height = gribFile.RasterYSize
+                gribNumBands = gribFile.RasterCount
+                bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
+                tif = gdal.Open (targetFileName, gdalconst.GA_Update)
+                for i in range (1, gribNumBands):
+                    try:
+                        fileBand = gribFile.GetRasterBand(i)
+                        metadata = fileBand.GetMetadata()
+                        if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
+                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2)
+                            data = fileBand.ReadAsArray()
+                            tif.GetRasterBand(bandNumber).WriteArray(data)
+                            break
 
-                newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
-                newRaster.SetProjection (gribSrs.ExportToWkt())
-                newRaster.SetGeoTransform (list(geoTransform))
-                gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
+                    except:
+                        log (f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}", "WARN", indentLevel=2, remote=True, model=modelName)
+
+                tif.FlushCache()
                 gribFile = None
-                newRaster = None
-                log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+                tif = None
             except:
-                log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+                log ("Couldn't write bands to the tiff. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
                 return False
-
-        log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}", "NOTICE", indentLevel=2, remote=True, model=modelName)
-        # Copy the downloaded band to this temp file
-        try:
-            gribFile = gdal.Open (downloadFileName + ".tif")
-            gribNumBands = gribFile.RasterCount
-            bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
-            tif = gdal.Open (targetFileName, gdalconst.GA_Update)
-            for i in range (1, gribNumBands):
-                try:
-                    fileBand = gribFile.GetRasterBand(i)
-                    metadata = fileBand.GetMetadata()
-                    if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
-                        log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2)
-                        data = fileBand.ReadAsArray()
-                        tif.GetRasterBand(bandNumber).WriteArray(data)
-                        break
-
-                except:
-                    log (f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}", "WARN", indentLevel=2, remote=True, model=modelName)
-
-            tif.FlushCache()
-            gribFile = None
-            tif = None
-        except:
-            log ("Couldn't write bands to the tiff. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
-            return False
 
     try:
         os.remove(downloadFileName)
         os.remove(downloadFileName + ".tif")
     except:
         log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
-    
 
     try:
         curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s", (fh,))
@@ -778,6 +793,9 @@ def addAppropriateFhStep (modelName, fh):
 
 def makeModelBandArray (modelName, force=False):
     model = models[modelName]
+    if not "bands" in model.keys():
+        return None
+
     modelBandArray = []
     if model["index"] or force:
         for band in model["bands"]:
