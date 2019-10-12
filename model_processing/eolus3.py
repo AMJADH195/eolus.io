@@ -8,6 +8,7 @@ import shutil
 import os.path
 import argparse
 import certifi
+import time
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
 
@@ -978,7 +979,7 @@ def main():
         printLine ()
         print ()
         print ()
-        sleep (1)
+        time.sleep (1)
         main()
 
     printLine ()
@@ -1003,7 +1004,7 @@ def main():
         printLine ()
         print ()
         print ()
-        sleep (1)
+        time.sleep (1)
         main()
 
 if __name__ == "__main__":
