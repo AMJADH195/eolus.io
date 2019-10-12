@@ -139,8 +139,8 @@ def endModelProcessing (modelName):
         conn.commit ()
         updateRunStatus(modelName)
     except:
-        log ("Couldn't mark model as complete.", "ERROR", remote=True, model=modelName)
         resetPgConnection()
+        log ("Couldn't mark model as complete.", "ERROR", remote=True, model=modelName)
 
 
 def addModelToDb (modelName):
@@ -149,8 +149,8 @@ def addModelToDb (modelName):
         curr.execute ("INSERT INTO eolus3.models (model, status) VALUES (%s, %s)", (modelName, "WAITING"))
         conn.commit ()
     except:
-        log ("Couldn't add model to db.", "ERROR", remote=True, model=modelName)
         resetPgConnection()
+        log ("Couldn't add model to db.", "ERROR", remote=True, model=modelName)
         killScript (1)
 
 
@@ -266,7 +266,7 @@ def createBandTable (modelName, tableName):
                 return
     except:
         resetPgConnection()
-        log ("An error occurred while making the table. This will probably need to be manually fixed.", "ERROR", remote=True)
+        log ("An error occurred while making the table (" + tableName + ").", "ERROR", remote=True, model=modelName)
         return
 
 
