@@ -426,14 +426,17 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
         gribFile = gdal.Open (downloadFileName)
+        gribSrs = osr.SpatialReference()
+        gribSrs.ImportFromWkt (gribFile.GetProjection())
         outFile = gdal.Warp(
             downloadFileName + ".tif", 
             gribFile, 
             format='GTiff', 
             outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
-            dstSRS=epsg4326, 
-            width=width,
-            resampleAlg=gdal.GRA_CubicSpline)
+            dstSRS=gribSrs, 
+            #width=width,
+            #resampleAlg=gdal.GRA_CubicSpline
+        )
         outFile.FlushCache()
         outFile = None
         gribFile = None
@@ -597,14 +600,17 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
         log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         gribFile = gdal.Open (downloadFileName)
+        gribSrs = osr.SpatialReference()
+        gribSrs.ImportFromWkt (gribFile.GetProjection())
         outFile = gdal.Warp(
             downloadFileName + ".tif", 
             gribFile, 
             format='GTiff', 
             outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
-            dstSRS=epsg4326, 
-            width=width,
-            resampleAlg=gdal.GRA_CubicSpline)
+            dstSRS=gribSrs, 
+            #width=width,
+            #resampleAlg=gdal.GRA_CubicSpline
+        )
         outFile.FlushCache()
         outFile = None
         gribFile = None
