@@ -423,20 +423,22 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     epsg4326 = osr.SpatialReference()
     epsg4326.ImportFromEPSG(4326)
 
-    log ("· Translating downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+    log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
         gribFile = gdal.Open (downloadFileName)
-        outFile = gdal.Translate(
+        outFile = gdal.Warp(
             downloadFileName + ".tif", 
             gribFile, 
             format='GTiff', 
-            outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]]
-        )
+            outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
+            dstSRS=epsg4326, 
+            width=width,
+            resampleAlg=gdal.GRA_CubicSpline)
         outFile.FlushCache()
         outFile = None
         gribFile = None
     except:
-        log ("Translating failed -- " + downloadFileName, "ERROR", remote=True)
+        log ("Warping failed -- " + downloadFileName, "ERROR", remote=True)
         return False
 
     # check to see if the working raster exists
@@ -448,7 +450,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
 
         try:
-            curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
+            curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName + " WHERE grib_var = %s",(band["shorthand"],))
             numBands = curr.fetchone()[0]
         except:
             resetPgConnection()
@@ -457,14 +459,12 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
         try:
             gribFile = gdal.Open (downloadFileName + ".tif")
-            gribSrs = osr.SpatialReference()
-            gribSrs.ImportFromWkt (gribFile.GetProjection())
             geoTransform = gribFile.GetGeoTransform()
             width = gribFile.RasterXSize
             height = gribFile.RasterYSize
 
             newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
-            newRaster.SetProjection (gribSrs.ExportToWkt())
+            newRaster.SetProjection (gribFile.GetProjection())
             newRaster.SetGeoTransform (list(geoTransform))
             gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
             log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
@@ -593,20 +593,22 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         epsg4326 = osr.SpatialReference()
         epsg4326.ImportFromEPSG(4326)
 
-        log ("· Translating downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         gribFile = gdal.Open (downloadFileName)
-        outFile = gdal.Translate(
+        outFile = gdal.Warp(
             downloadFileName + ".tif", 
             gribFile, 
             format='GTiff', 
-            outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]]
-        )
+            outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
+            dstSRS=epsg4326, 
+            width=width,
+            resampleAlg=gdal.GRA_CubicSpline)
         outFile.FlushCache()
         outFile = None
         gribFile = None
 
     except:
-        log ("Translating failed -- " + downloadFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
+        log ("Warping failed -- " + downloadFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
     try:
@@ -647,14 +649,12 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
                 try:
                     gribFile = gdal.Open (downloadFileName + ".tif")
-                    gribSrs = osr.SpatialReference()
-                    gribSrs.ImportFromWkt (gribFile.GetProjection())
                     geoTransform = gribFile.GetGeoTransform()
                     width = gribFile.RasterXSize
                     height = gribFile.RasterYSize
 
                     newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
-                    newRaster.SetProjection (gribSrs.ExportToWkt())
+                    newRaster.SetProjection (gribFile.GetProjection())
                     newRaster.SetGeoTransform (list(geoTransform))
                     gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
                     gribFile = None
