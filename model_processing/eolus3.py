@@ -978,6 +978,7 @@ def main():
         printLine ()
         print ()
         print ()
+        sleep (1)
         main()
 
     printLine ()
@@ -1002,6 +1003,7 @@ def main():
         printLine ()
         print ()
         print ()
+        sleep (1)
         main()
 
 if __name__ == "__main__":
