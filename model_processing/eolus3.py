@@ -80,7 +80,7 @@ def removeAgent ():
         agentLogged = False
     except:
         resetPgConnection ()
-        log ("Couldn't remove agent.", "ERROR", remote=True)
+        log ("Couldn't add agent.", "ERROR", remote=True)
 
 
 def getAgentCount ():
@@ -136,9 +136,7 @@ def makeUrl (modelName, modelDate, modelHour, fh):
 def endModelProcessing (modelName):
 
     clean ()
-
-    ## warp final rasters
-
+    
     try:
         log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
         curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
