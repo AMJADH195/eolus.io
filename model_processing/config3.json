@@ -1,7 +1,7 @@
 {
     "config": {
         "postgres": {
-            "host": "eolus.io",
+            "host": "localhost",
             "db": "eolus",
             "user": "eolus"
         },
@@ -20,7 +20,7 @@
             }
         },
         "tempDir": "./tempWxData",
-        "mapfileDir": "F:/map",
+        "mapfileDir": "/map",
         "logFile": "model_update.log",
         "debug": false,
         "resampling": "cubicspline",
@@ -81,7 +81,7 @@
     },
     "models": {
         "gefs_pgrb2ap5_avg": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "readTimeout": 300,
             "updateFrequency": 6,
@@ -123,7 +123,7 @@
             ]
         },
         "gefs_pgrb2ap5_spr": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "readTimeout": 300,
             "updateFrequency": 6,
@@ -413,7 +413,7 @@
             ]
         },
         "naefs_anom": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -434,7 +434,7 @@
             ]
         },
         "naefs_ndgd_avg": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -458,7 +458,7 @@
             ]
         },
         "naefs_ndgd_spr": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -482,7 +482,7 @@
             ]
         },
         "nam3": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 6,
@@ -540,7 +540,7 @@
             ]
         },
         "nam12": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 6,
