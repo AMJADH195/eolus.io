@@ -185,7 +185,7 @@ def getLastAvailableTimestamp (model, prev=0):
 
 
 def getNumberOfHours (modelName):
-    model = models["modelName"]
+    model = models[modelName]
     fh = model["startTime"]
     i = 0
     while True:
