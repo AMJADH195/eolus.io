@@ -184,6 +184,18 @@ def getLastAvailableTimestamp (model, prev=0):
     return checkedTime
 
 
+def getNumberOfHours (modelName):
+    model = models["modelName"]
+    fh = model["startTime"]
+    i = 0
+    while True:
+        fh = addAppropriateFhStep (modelName, fh)
+        i += 1
+
+        if fh > model["endTime"]:
+            return i
+
+
 def getModelStatus (modelName):
     try:
         curr.execute ("SELECT status FROM eolus3.models WHERE model LIKE '" + modelName + "'")
@@ -453,13 +465,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         except:
             log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
 
-        try:
-            curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName + " WHERE grib_var = %s",(band["shorthand"],))
-            numBands = curr.fetchone()[0]
-        except:
-            resetPgConnection()
-            log ("Couldn't get the number of bands this raster should have.", "ERROR", indentLevel=2, remote=True, model=modelName)
-            return False
+        numBands = getNumberOfHours (modelName)
 
         try:
             gribFile = gdal.Open (downloadFileName + ".tif")
@@ -615,13 +621,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         log ("Warping failed -- " + downloadFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
-    try:
-        curr.execute ("SELECT COUNT(*) FROM eolus3." + tableName)
-        numBands = curr.fetchone()[0] + 1
-    except:
-        resetPgConnection()
-        log ("Couldn't get the number of bands this raster should have.", "ERROR", indentLevel=2, remote=True, model=modelName)
-        return False
+    numBands = getNumberOfHours (modelName)
 
     bands = makeModelBandArray(modelName, force=True)
     if bands == None:
