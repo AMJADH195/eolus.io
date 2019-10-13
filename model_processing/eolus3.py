@@ -268,7 +268,7 @@ def createBandTable (modelName, tableName):
     try:
         while not populated:
             fullFh = getFullFh (modelName, fh)
-            if len(bands) == 0:
+            if bands == None or len(bands) == 0:
                 curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band) VALUES (%s, %s, %s)", (fullFh, "WAITING", str(i)))
                 conn.commit ()
             else:
