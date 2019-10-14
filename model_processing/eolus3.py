@@ -990,7 +990,7 @@ def main():
         print ()
 
     if processed:
-        log ("✓ Model processing complete.", "NOTICE", indentLevel=0, remote=True, model=modelName)
+        log ("✓ Model processing complete.", "INFO", indentLevel=0, remote=True, model=modelName)
         printLine ()
         print ()
         print ()
@@ -1014,7 +1014,7 @@ def main():
         killScript (0)
 
     if processed:
-        log ("✓ Model processing complete.", "NOTICE", indentLevel=0, remote=True, model=modelName)
+        log ("✓ Model processing complete.", "INFO", indentLevel=0, remote=True, model=modelName)
         printLine ()
         print ()
         print ()
