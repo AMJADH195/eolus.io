@@ -740,7 +740,7 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
     fileExists = checkIfModelFhAvailable (modelName, timestamp, fullFh)
 
     if fileExists:
-        log ("· Start processing fh " + fullFh + ".", "NOTICE",remote=True, model=modelName, indentLevel=1)
+        log ("· Start processing fh " + fullFh + ".", "INFO",remote=True, model=modelName, indentLevel=1)
         if band is None:
             try:
                 success = downloadFullFile (modelName, timestamp, fullFh, tableName)
