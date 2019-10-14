@@ -12,6 +12,8 @@ from time import sleep
 from osgeo import ogr, gdal, osr, gdalconst
 from datetime import datetime, timedelta, tzinfo, time
 
+sys.setrecursionlimit (10**8)
+
 conn = None
 curr = None
 http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=5.0, read=10.0),cert_reqs='CERT_REQUIRED',ca_certs=certifi.where())
@@ -496,7 +498,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         tif = None
         log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     except:
-        log ("Couldn't write band to TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        log ("Couldn't write band to TIF | band: {band['shorthand']} | fh: {fh}.", "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
     
     try:
