@@ -865,7 +865,7 @@ def clean ():
     retentionDays = str(config["retentionDays"])
     log (f"· Deleting rasters from {config['mapfileDir']} older than {retentionDays} days.", "DEBUG", indentLevel=0)
     try:
-        os.system (f'find {config["mapFileDir"]}/*/* -mtime +' + retentionDays + ' -exec rm {} \;')
+        os.system (f'find {config["mapfileDir"]}/*/* -mtime +' + retentionDays + ' -exec rm {} \;')
         os.system (f'find {config["tempDir"]}/*/* -mtime +' + retentionDays + ' -exec rm {} \;')
     except:
         log (f"· Couldn't delete old rasters from {config['mapfileDir']}.", "WARN", indentLevel=0, remote=True)
