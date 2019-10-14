@@ -498,7 +498,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         tif = None
         log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     except:
-        log ("Couldn't write band to TIF | band: {band['shorthand']} | fh: {fh}.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        log (f"Couldn't write band to TIF | band: {band['shorthand']} | fh: {fh}.", "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
     
     try:
@@ -562,7 +562,7 @@ def getByteRange (band, idxFile, contentLength):
             log (f"· Bytes {startByte} to {endByte}", "DEBUG", indentLevel=2)
             if startByte == endByte:
                 return None
-                
+
             return startByte + "-" + endByte
         else:
             log (f"· Couldn't find band def in index file.", "WARN", indentLevel=2, remote=True)
