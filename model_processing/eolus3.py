@@ -407,7 +407,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
     byteRange = getByteRange (band, url + ".idx", contentLength)
 
-    if not byteRange:
+    if not byteRange or byteRange == None:
         log (f"· Band {band['shorthand']} doesn't exist for fh {fh}.", "WARN", remote=True, indentLevel=2, model=modelName)
         try:
             curr.execute ("DELETE FROM eolus3." + tableName + " WHERE fh = %s AND grib_var = %s", (fh,band["shorthand"]))
@@ -560,6 +560,9 @@ def getByteRange (band, idxFile, contentLength):
                 endByte = contentLength
 
             log (f"· Bytes {startByte} to {endByte}", "DEBUG", indentLevel=2)
+            if startByte == endByte:
+                return None
+                
             return startByte + "-" + endByte
         else:
             log (f"· Couldn't find band def in index file.", "WARN", indentLevel=2, remote=True)
