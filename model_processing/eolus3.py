@@ -400,6 +400,10 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
     try:
         response = requests.head(url)
+        if response.status_code == 200 or response.status_code == None or response == None:
+            log (f"· This index file is not ready yet. " + url, "WARN", remote=True, indentLevel=2, model=modelName)
+            return False
+            
         contentLength = str(response.headers["Content-Length"])
     except:
         log (f"· Couldn't get header of " + url, "ERROR", remote=True, indentLevel=2, model=modelName)
