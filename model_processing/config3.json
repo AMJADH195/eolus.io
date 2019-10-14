@@ -58,6 +58,10 @@
             "idxName": "500 mb",
             "gribName": "50000-ISBL"
         },
+        "600mb": {
+            "idxName": "600 mb",
+            "gribName": "60000-ISBL"
+        },
         "700mb": {
             "idxName": "700 mb",
             "gribName": "70000-ISBL"
