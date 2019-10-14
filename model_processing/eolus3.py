@@ -899,7 +899,10 @@ def init():
     agents = getAgentCount ()
     if agents < config["maxAgents"]:
         addAgent ()
-        main ()
+        try:
+            main ()
+        except:
+            killScript (1)
     else:
         print ("Too many agents already processing.")
 
