@@ -603,7 +603,7 @@
             },
             "imageWidth": 480,
             "index": true,
-            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conus.hiresf%T.tm00.grib2",
+            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.awphys%T.tm00.grib2",
             "filetype": "grib2",
             "bands": [
                 { "var": "TMP", "level": "sfc" },
