@@ -77,6 +77,10 @@
         "ctl": {
             "idxName": "cloud top",
             "gribName": "0-CTL"
+        },
+        "base": {
+            "idxName": "cloud base",
+            "gribName": "TODO"
         }
     },
     "models": {
@@ -190,13 +194,39 @@
                 { "var": "REFC", "level": "eatmcsl" },
                 { "var": "RETOP", "level": "eatmcsl" },
                 { "var": "REFC", "level": "eatmcsl" },
+                { "var": "VIL", "level": "eatmcsl" },
                 { "var": "TCDC", "level": "eatmcsl" },
                 { "var": "VIS", "level": "sfc" },
                 { "var": "WEASD", "level": "sfc" },
                 { "var": "CAPE", "level": "sfc" },
                 { "var": "CIN", "level": "sfc" },
                 { "var": "4LFTX", "level": "180to0mb" },
+                { "var": "HGT", "level": "base" },
                 { "var": "APCP", "level": "sfc", "timeRange": 1 }
+            ]
+        },
+        "hiresw_arw_5": {
+            "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "imageWidth": 480,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 0,
+            "endTime": 48,
+            "fhStep": {
+                "0": 1
+            },
+            "index": true,
+            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.arw_5km.f%T.conus.grib2",
+            "filetype": "grib2",
+            "bands": [
+                { "var": "LTNG", "level": "sfc" },
+                { "var": "GUST", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" }
             ]
         },
         "hiresw_nmmb_2p5": {
@@ -225,13 +255,39 @@
                 { "var": "REFC", "level": "eatmcsl" },
                 { "var": "RETOP", "level": "eatmcsl" },
                 { "var": "REFC", "level": "eatmcsl" },
+                { "var": "VIL", "level": "eatmcsl" },
                 { "var": "TCDC", "level": "eatmcsl" },
                 { "var": "VIS", "level": "sfc" },
                 { "var": "WEASD", "level": "sfc" },
                 { "var": "CAPE", "level": "sfc" },
                 { "var": "CIN", "level": "sfc" },
                 { "var": "4LFTX", "level": "180to0mb" },
+                { "var": "HGT", "level": "base" },
                 { "var": "APCP", "level": "sfc", "timeRange": 1 }
+            ]
+        },
+        "hiresw_nmmb_5": {
+            "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "imageWidth": 480,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 0,
+            "endTime": 48,
+            "fhStep": {
+                "0": 1
+            },
+            "index": true,
+            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
+            "filetype": "grib2",
+            "bands": [
+                { "var": "LTNG", "level": "sfc" },
+                { "var": "GUST", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" }
             ]
         },
         "href_avrg": {
