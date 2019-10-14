@@ -27,7 +27,7 @@
         "sleepTime": 1,
         "maxTime": 0,
         "retentionDays": 2,
-        "maxAgents": 3
+        "maxAgents": 4
     },
     "levelMaps": {
         "sfc": {
@@ -212,7 +212,7 @@
                 "0": 1
             },
             "index": true,
-            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
+            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_2p5km.f%T.conus.grib2",
             "filetype": "grib2",
             "bands": [
                 { "var": "TMIN", "level": "2m" },
