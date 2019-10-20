@@ -56,11 +56,11 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $model) || strlen($model) < 3) {
     $errors[] = "Invalid model.";
 }
 
-if (!preg_match('/^[a-zA-Z0-9_]+$/', $fcstLvl)) {
+if (!preg_match('/^[a-zA-Z0-9_]+$/', $fcstLvl) && !$useBands) {
     $errors[] = "Invalid level.";
 }
 
-if (!preg_match('/^[a-zA-Z0-9_]+$/', $fcstVar)) {
+if (!preg_match('/^[a-zA-Z0-9_]+$/', $fcstVar) && !$useBands) {
     $errors[] = "Invalid var.";
 }
 
