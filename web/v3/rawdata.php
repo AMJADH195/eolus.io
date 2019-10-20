@@ -16,20 +16,21 @@ $fcstLvl = $_GET['level'];
 //  --- or ---
 $bands = $_GET['bands'];
 
+$useBands = (!isset($fcstVar) || !isset($fcstLvl));
+
 header('Content-type: application/json');
 
-if (isset($bands) && (isset($fcstVar) || isset($fcstLvl))) {
+if (isset($bands) && !$useBands) {
     $errors[] = "'Bands' parameter cannot be used in conjuction with var/level.";
 }
 
-if (!isset($bands) && (!isset($fcstVar) || !isset($fcstLvl))) {
+if (!isset($bands) && $useBands) {
     $errors[] = "Var/level or bands parameters must be set.";
 }
 
-
-if (!preg_match('/^[0-9,]+$/', $bands) && (!isset($fcstVar) || !isset($fcstLvl))) {
+if (!preg_match('/^[0-9,]+$/', $bands) && $useBands) {
     $errors[] = "Invalid bands.";
-} else {
+} else if ($useBands) {
     $bandArr = explode(",", $bands);
     $bandList = join(" -b ", $bandArr);
     $bands = "-b " . $bandList;
