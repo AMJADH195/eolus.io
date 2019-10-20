@@ -27,7 +27,7 @@ if (!isset($bands) && (!isset($fcstVar) || !isset($fcstLvl))) {
 }
 
 
-if (!preg_match('/^[0-9,]+$/', $bands)) {
+if (!preg_match('/^[0-9,]+$/', $bands) && (!isset($fcstVar) || !isset($fcstLvl))) {
     $errors[] = "Invalid bands.";
 } else {
     $bandArr = explode(",", $bands);
