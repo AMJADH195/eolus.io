@@ -41,42 +41,34 @@ if (!is_numeric($year) || strlen($year) != 4) {
 
 if (!is_numeric($month) || strlen($month) != 2) {
     $errors[] = "Invalid month.";
-    exit (1);
 }
 
 if (!is_numeric($day) || strlen($day) != 2) {
     $errors[] = "Invalid day.";
-    exit (1);
 }
 
 if (!is_numeric($hour) || strlen($hour) != 2) {
     $errors[] = "Invalid hour.";
-    exit (1);
 }
 
 if (!preg_match('/^[a-zA-Z0-9_]+$/', $model) || strlen($model) < 3) {
     $errors[] = "Invalid model.";
-    exit (1);
 }
 
 if (!preg_match('/^[a-zA-Z0-9_]+$/', $fcstLvl)) {
     $errors[] = "Invalid level.";
-    exit (1);
 }
 
 if (!preg_match('/^[a-zA-Z0-9_]+$/', $fcstVar)) {
     $errors[] = "Invalid var.";
-    exit (1);
 }
 
 if (!is_numeric($lat)) {
     $errors[] = "Invalid lat.";
-    exit (1);
 }
 
 if (!is_numeric($lng)) {
     $errors[] = "Invalid lng.";
-    exit (1);
 }
 
 if (isset($_GET['debug'])) {
@@ -85,7 +77,6 @@ if (isset($_GET['debug'])) {
 
 if ((float) $lat > 90 || (float) $lat < -90 || (float) $lng > 180 || (float) $lng < -180 ) {
     $errors[] = "Invalid bounds.";
-    exit (1);
 }
 
 $prefix = "/map/{$model}/{$model}_${year}{$month}{$day}_{$hour}Z_";
@@ -111,7 +102,7 @@ if (isset ($bands)) {
     exit (0);
 }
 else {
-    $filename = $prefix . $fcstVar . "_" . $fcstLvl ".tif";
+    $filename = $prefix . $fcstVar . "_" . $fcstLvl . ".tif";
     $cmd = "gdallocationinfo -valonly -wgs84 {$filename} {$lng} {$lat}";
     exec($cmd, $output, $return_var );
     if ($return_var > 0) {
