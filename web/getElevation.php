@@ -22,7 +22,7 @@ if ((float) $lat > 90 || (float) $lat < -90 || (float) $lng > 180 || (float) $ln
     echo "Invalid bounds.";
     exit (1);
 }
-$dem = "/map/wx_2p5_dem.tif";
+$dem = "/map/wx_2p5_dem.tiff";
 $elev = "";
 $error = "";
 
