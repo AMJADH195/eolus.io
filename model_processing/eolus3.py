@@ -684,7 +684,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                 gribNumBands = gribFile.RasterCount
                 bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
                 tif = gdal.Open (targetFileName, gdalconst.GA_Update)
-                for i in range (1, gribNumBands):
+                for i in range (1, gribNumBands + 1):
                     try:
                         fileBand = gribFile.GetRasterBand(i)
                         metadata = fileBand.GetMetadata()
