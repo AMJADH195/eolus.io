@@ -689,7 +689,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                         fileBand = gribFile.GetRasterBand(i)
                         metadata = fileBand.GetMetadata()
                         if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
-                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2)
+                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2, remote=True)
                             data = fileBand.ReadAsArray()
                             tif.GetRasterBand(bandNumber).WriteArray(data)
                             break
