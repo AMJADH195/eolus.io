@@ -47,6 +47,10 @@ class UTC(tzinfo):
 utc = UTC()
 
 def killScript (exitCode): 
+    if exitCode:
+        resetPgConnection ()
+        log ("Exiting on failure.", "ERROR", remote=True)
+
     try:
         if agentLogged:
             removeAgent ()
