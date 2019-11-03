@@ -1,6 +1,6 @@
 <StyledLayerDescriptor version="1.0.0">
   <NamedLayer>
-    <Name>eolus</Name>
+    <Name>eolus3</Name>
     <UserStyle>
       <Title>xxx</Title>
       <FeatureTypeStyle>
