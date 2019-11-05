@@ -24,7 +24,7 @@ directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 gdal.UseExceptions()
 
 try:
-    with open (directory + '/config3.json') as f:
+    with open (directory + '/config.json') as f:
         data = json.load(f)
 except:
     print ("Error: Config file does not exist or is corrupt.")
@@ -53,18 +53,27 @@ def killScript (exitCode):
 
     try:
         if agentLogged:
-            removeAgent ()
+            if not conn.closed:
+                removeAgent ()
+            else:
+                try:
+                    conn = sqlConnect ()
+                    curr = conn.cursor()
+                    removeAgent()
+                except:
+                    os._exit(exitCode)
 
         curr.close()
         conn.close()
     except:
         log ("No connection to close.", "DEBUG")
-    sys.exit (exitCode)
+    os._exit (exitCode)
 
 
 def resetPgConnection ():
-    conn.cancel ()
-    conn.reset ()
+    if not conn.closed:
+        conn.cancel ()
+        conn.reset ()
 
 
 def addAgent ():

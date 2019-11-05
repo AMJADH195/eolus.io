@@ -6,12 +6,20 @@
             "user": "eolus"
         },
         "bounds": {
-            "top": "42",
-            "right": "260",
-            "bottom": "36",
-            "left": "249"
+            "colorado": {
+                "top": "42",
+                "right": "-100",
+                "bottom": "36",
+                "left": "-111"
+            },
+            "na": {
+                "top": "80",
+                "right": "-60",
+                "bottom": "20",
+                "left": "-180"
+            }
         },
-        "tempDir": "./tempWxData/",
+        "tempDir": "./tempWxData",
         "mapfileDir": "/map",
         "logFile": "model_update.log",
         "debug": false,
@@ -19,683 +27,628 @@
         "sleepTime": 1,
         "maxTime": 0,
         "retentionDays": 2,
-        "maxConcurrentProcessing": 3,
-        "downloadTypes": {
-            "GRIBFILTER": {
-                "gribFilterExtension": ".pl?",
-                "gribFilterBaseUrl": "nomads.ncep.noaa.gov/cgi-bin/filter_",
-                "gribFilterParams": "&subregion=",
-                "connectionProtocol": "https://",
-                "nomadsBaseUrl": "nomads.ncep.noaa.gov/pub/data/nccf/com/"
-            }
+        "maxAgents": 4
+    },
+    "levelMaps": {
+        "sfc": {
+            "idxName": "surface",
+            "gribName": "0-SFC"
+        },
+        "2m": { 
+            "idxName": "2 m above ground",
+            "gribName": "2-HTGL"
+        },
+        "10m": { 
+            "idxName": "10 m above ground",
+            "gribName": "10-HTGL"
+        },
+        "80m": { 
+            "idxName": "80 m above ground",
+            "gribName": "80-HTGL"
+        },
+        "0to6000m": { 
+            "idxName": "0-6000 m above ground",
+            "gribName": "0-6000-HTGL"
+        },
+        "180to0mb": {
+            "idxName": "180-0 mb above ground",
+            "gribName": "18000-0-SPDL"
+        },
+        "500mb": {
+            "idxName": "500 mb",
+            "gribName": "50000-ISBL"
+        },
+        "600mb": {
+            "idxName": "600 mb",
+            "gribName": "60000-ISBL"
+        },
+        "700mb": {
+            "idxName": "700 mb",
+            "gribName": "70000-ISBL"
+        },
+        "850mb": {
+            "idxName": "850 mb",
+            "gribName": "85000-ISBL"
+        },
+        "eatmcsl": {
+            "idxName": "entire atmosphere (considered as a single layer)",
+            "gribName": "0-EATM"
+        },
+        "eatm": {
+            "idxName": "entire atmosphere",
+            "gribName": "0-RESERVED(10)"
+        },
+        "ctl": {
+            "idxName": "cloud top",
+            "gribName": "0-CTL"
+        },
+        "base": {
+            "idxName": "cloud base",
+            "gribName": "TODO"
         }
     },
     "models": {
         "gefs_pgrb2ap5_avg": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 384,
-            "imageWidth": 64,
-            "downloadType": "FILESERIES",
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/gens/prod/gefs.%D/%H/pgrb2ap5/geavg.t%Hz.pgrb2a.0p50.f%T",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-
-                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
-
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-
-                {"gribVar": "PRES", "gribLevel": "0-SFC"},
-                {"gribVar": "HGT", "gribLevel": "50000-ISBL"}
+            "imageWidth": 240,
+            "index": true,
+            "bands": [
+                { "var": "TMP", "level": "2m" },
+                { "var": "RH", "level": "2m" },
+                { "var": "UGRD", "level": "10m" },
+                { "var": "VGRD", "level": "10m" },
+                { "var": "UGRD", "level": "500mb" },
+                { "var": "VGRD", "level": "500mb" },
+                { "var": "UGRD", "level": "700mb" },
+                { "var": "VGRD", "level": "700mb" },
+                { "var": "UGRD", "level": "850mb" },
+                { "var": "VGRD", "level": "850mb" },
+                { "var": "APCP", "level": "sfc" },
+                { "var": "SNOD", "level": "sfc" },
+                { "var": "WEASD", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "TCDC", "level": "eatm" },
+                { "var": "CAPE", "level": "180to0mb" },
+                { "var": "CIN", "level": "180to0mb" },
+                { "var": "PRES", "level": "sfc" },
+                { "var": "HGT", "level": "500mb" }
             ]
         },
         "gefs_pgrb2ap5_spr": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 384,
-            "imageWidth": 64,
-            "downloadType": "FILESERIES",
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/gens/prod/gefs.%D/%H/pgrb2ap5/gespr.t%Hz.pgrb2a.0p50.f%T",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-
-                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
-
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-
-                {"gribVar": "PRES", "gribLevel": "0-SFC"},
-                {"gribVar": "HGT", "gribLevel": "50000-ISBL"}
-            ]
-        },
-        "gfs": {
-            "enabled": false,
-            "updateFrequency": 6,
-            "updateOffset": 0,
-            "startTime": 0,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "gfs_0p25_1hr",
-            "gribDirectory": "/gfs.%D%H",
-            "filetype": "grib2",
-            "baseDirectory": "gfs/prod",
-            "gribFilename": "gfs.t%Hz.pgrb2.0p25.f%T",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "TMP", "gribLevel": "80-HTGL"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC"},
-                {"gribVar": "LFTX", "gribLevel": "0-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "0-SFC"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CAPE", "gribLevel": "25500-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "25500-0-SPDL"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "USTM", "gribLevel": "6000-0-HTGL"},
-                {"gribVar": "VSTM", "gribLevel": "6000-0-HTGL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
-                {"gribVar": "CPOFP", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"}
+            "imageWidth": 240,
+            "index": true,
+            "bands": [
+                { "var": "TMP", "level": "2m" },
+                { "var": "RH", "level": "2m" },
+                { "var": "UGRD", "level": "10m" },
+                { "var": "VGRD", "level": "10m" },
+                { "var": "UGRD", "level": "500mb" },
+                { "var": "VGRD", "level": "500mb" },
+                { "var": "UGRD", "level": "700mb" },
+                { "var": "VGRD", "level": "700mb" },
+                { "var": "UGRD", "level": "850mb" },
+                { "var": "VGRD", "level": "850mb" },
+                { "var": "APCP", "level": "sfc" },
+                { "var": "SNOD", "level": "sfc" },
+                { "var": "WEASD", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "TCDC", "level": "eatm" },
+                { "var": "CAPE", "level": "180to0mb" },
+                { "var": "CIN", "level": "180to0mb" },
+                { "var": "PRES", "level": "sfc" },
+                { "var": "HGT", "level": "500mb" }
             ]
         },
         "hiresw_arw_2p5": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "imageWidth": 480,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 48,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
+            "fhStep": {
+                "0": 1
+            },
+            "index": true,
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.arw_2p5km.f%T.conus.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMIN", "gribLevel": "2-HTGL"},
-                {"gribVar": "TMAX", "gribLevel": "2-HTGL"},
-
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-
-                {"gribVar": "4LFTX", "gribLevel": "0-SFC"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"}
-            ]
-        },
-        "hiresw_nmmb_2p5": {
-            "enabled": true,
-            "updateFrequency": 12,
-            "updateOffset": 0,
-            "startTime": 0,
-            "endTime": 48,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
-            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_2p5km.f%T.conus.grib2",
-            "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMIN", "gribLevel": "2-HTGL"},
-                {"gribVar": "TMAX", "gribLevel": "2-HTGL"},
-
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-                
-                {"gribVar": "4LFTX", "gribLevel": "0-SFC"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"}
+            "bands": [
+                { "var": "TMIN", "level": "2m" },
+                { "var": "TMAX", "level": "2m" },
+                { "var": "TMP", "level": "80m" },
+                { "var": "UGRD", "level": "10m" },
+                { "var": "VGRD", "level": "10m" },
+                { "var": "RH", "level": "2m" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "RETOP", "level": "eatmcsl" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "VIL", "level": "eatmcsl" },
+                { "var": "TCDC", "level": "eatmcsl" },
+                { "var": "VIS", "level": "sfc" },
+                { "var": "WEASD", "level": "sfc" },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "CIN", "level": "sfc" },
+                { "var": "4LFTX", "level": "180to0mb" },
+                { "var": "HGT", "level": "base" },
+                { "var": "APCP", "level": "sfc", "timeRange": 1 }
             ]
         },
         "hiresw_arw_5": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "imageWidth": 480,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 48,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
+            "fhStep": {
+                "0": 1
+            },
+            "index": true,
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.arw_5km.f%T.conus.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                
-
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC"},
-                {"gribVar": "USTM", "gribLevel": "6000-0-HTGL"},
-                {"gribVar": "VSTM", "gribLevel": "6000-0-HTGL"},
-
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "LTNG", "gribLevel": "0-SFC"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-
-                {"gribVar": "4LFTX", "gribLevel": "0-SFC"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"}
+            "bands": [
+                { "var": "LTNG", "level": "sfc" },
+                { "var": "GUST", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" }
+            ]
+        },
+        "hiresw_nmmb_2p5": {
+            "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "imageWidth": 480,
+            "updateFrequency": 12,
+            "updateOffset": 0,
+            "startTime": 0,
+            "endTime": 48,
+            "fhStep": {
+                "0": 1
+            },
+            "index": true,
+            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_2p5km.f%T.conus.grib2",
+            "filetype": "grib2",
+            "bands": [
+                { "var": "TMIN", "level": "2m" },
+                { "var": "TMAX", "level": "2m" },
+                { "var": "TMP", "level": "80m" },
+                { "var": "UGRD", "level": "10m" },
+                { "var": "VGRD", "level": "10m" },
+                { "var": "RH", "level": "2m" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "RETOP", "level": "eatmcsl" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "VIL", "level": "eatmcsl" },
+                { "var": "TCDC", "level": "eatmcsl" },
+                { "var": "VIS", "level": "sfc" },
+                { "var": "WEASD", "level": "sfc" },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "CIN", "level": "sfc" },
+                { "var": "4LFTX", "level": "180to0mb" },
+                { "var": "HGT", "level": "base" },
+                { "var": "APCP", "level": "sfc", "timeRange": 1 }
             ]
         },
         "hiresw_nmmb_5": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "imageWidth": 480,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 48,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
+            "fhStep": {
+                "0": 1
+            },
+            "index": true,
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                
-
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC"},
-                {"gribVar": "USTM", "gribLevel": "6000-0-HTGL"},
-                {"gribVar": "VSTM", "gribLevel": "6000-0-HTGL"},
-
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "LTNG", "gribLevel": "0-SFC"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-
-                {"gribVar": "4LFTX", "gribLevel": "0-SFC"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"}
+            "bands": [
+                { "var": "LTNG", "level": "sfc" },
+                { "var": "GUST", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" }
             ]
         },
         "href_avrg": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
             "endTime": 36,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
+            "imageWidth": 480,
+            "index": false,
+            "fhStep": {
+                "0": 1
+            },
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.avrg.f%T.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-                {"gribVar": "REFD", "gribLevel": "1000-HTGL"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"}
+            "bands": [
+                { "var": "APCP01", "level": "sfc" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "RETOP", "level": "eatmcsl" }
             ]
         },
         "href_mean": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
             "endTime": 36,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
+            "imageWidth": 480,
+            "index": false,
+            "fhStep": {
+                "0": 1
+            },
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.mean.f%T.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "85000-ISBL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "85000-ISBL"},
-                {"gribVar": "VGRD", "gribLevel": "85000-ISBL"}
+            "bands": [
+                { "var": "APCP01", "level": "sfc" },
+                { "var": "TMP", "level": "2m" },
+                { "var": "TMP", "level": "850mb" },
+                { "var": "TMP", "level": "700mb" },
+                { "var": "TMP", "level": "500mb" },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "CIN", "level": "sfc" },
+                { "var": "TCDC", "level": "eatmcsl" },
+                { "var": "DPT", "level": "2m" },
+                { "var": "RH", "level": "850mb" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "VIS", "level": "sfc" },
+                { "var": "WEASD", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "UGRD", "level": "850mb" },
+                { "var": "VGRD", "level": "850mb" },
+                { "var": "UGRD", "level": "700mb" },
+                { "var": "VGRD", "level": "700mb" }
             ]
         },
         "href_pmmn": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
             "endTime": 36,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
+            "imageWidth": 480,
+            "index": false,
+            "fhStep": {
+                "0": 1
+            },
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.pmmn.f%T.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-                {"gribVar": "REFD", "gribLevel": "1000-HTGL"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"}
+            "bands": [
+                { "var": "APCP01", "level": "sfc" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "RETOP", "level": "eatmcsl" }
             ]
-        },
-        "href_prob": {
-            "enabled": true,
-            "updateFrequency": 12,
-            "updateOffset": 0,
-            "startTime": 1,
-            "endTime": 36,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
-            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.prob.f%T.grib2",
-            "filetype": "grib2"
         },
         "href_sprd": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 1,
             "endTime": 36,
-            "imageWidth": 400,
-            "downloadType": "FILESERIES",
+            "imageWidth": 480,
+            "index": false,
+            "fhStep": {
+                "0": 1
+            },
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.sprd.f%T.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-                {"gribVar": "REFD", "gribLevel": "1000-HTGL"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "85000-ISBL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "85000-ISBL"},
-                {"gribVar": "VGRD", "gribLevel": "85000-ISBL"}
+            "bands": [
+                { "var": "APCP01", "level": "sfc" },
+                { "var": "TMP", "level": "2m" },
+                { "var": "TMP", "level": "850mb" },
+                { "var": "TMP", "level": "700mb" },
+                { "var": "TMP", "level": "500mb" },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "CIN", "level": "sfc" },
+                { "var": "TCDC", "level": "eatmcsl" },
+                { "var": "DPT", "level": "2m" },
+                { "var": "RH", "level": "850mb" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "VIS", "level": "sfc" },
+                { "var": "WEASD", "level": "sfc" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "UGRD", "level": "850mb" },
+                { "var": "VGRD", "level": "850mb" },
+                { "var": "UGRD", "level": "700mb" },
+                { "var": "VGRD", "level": "700mb" }
             ]
         },
         "hrrr": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 1,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 18,
             "extEndTime": 36,
-            "imageWidth": 720,
-            "downloadType": "FILESERIES",
+            "index": true,
+            "imageWidth": 480,
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/hrrr/prod/hrrr.%D/conus/hrrr.t%Hz.wrfsfcf%T.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "REFC", "gribLevel": "0-RESERVED(10)"},
-                {"gribVar": "RETOP", "gribLevel": "0-CTL"},
-                {"gribVar": "VERIL", "gribLevel": "0-RESERVED(10)"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "TCDC", "gribLevel": "0-RESERVED(10)"},
-
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "HAIL", "gribLevel": "0-RESERVED(10)"},
-                {"gribVar": "LTNG", "gribLevel": "0-RESERVED(10)"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP01", "gribLevel": "0-SFC"},
-
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
-
-                {"gribVar": "ASNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
-
-                {"gribVar": "GUST", "gribLevel": "0-SFC"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
-                {"gribVar": "USTM", "gribLevel": "0-6000-HTGL"},
-                {"gribVar": "VSTM", "gribLevel": "0-6000-HTGL"},
-
-                {"gribVar": "TMP", "gribLevel": "0-SFC"},
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"}
-            ]
-        },
-        "naefs_bc_avg": {
-            "enabled": false,
-            "updateFrequency": 6,
-            "updateOffset": 0,
-            "startTime": 3,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "naefsbc",
-            "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
-            "filetype": "grib2",
-            "baseDirectory": "naefs/prod",
-            "gribFilename": "naefs_gespr.t%Hz.pgrb2a.0p50_bcf%T",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VVEL", "gribLevel": "85000-ISBL"}
-            ]
-        },
-        "naefs_bc_spr": {
-            "enabled": false,
-            "updateFrequency": 6,
-            "updateOffset": 0,
-            "startTime": 3,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "naefsbc",
-            "gribDirectory": "/naefs.%D/%H/pgrb2ap5_bc",
-            "filetype": "grib2",
-            "baseDirectory": "naefs/prod",
-            "gribFilename": "naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VVEL", "gribLevel": "85000-ISBL"}
-            ]
-        },
-        "naefs_ndgd_avg": {
-            "enabled": true,
-            "updateFrequency": 6,
-            "updateOffset": 0,
-            "startTime": 3,
-            "endTime": 192,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "naefsbc_ndgd",
-            "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
-            "filetype": "grib2",
-            "baseDirectory": "naefs/prod",
-            "gribFilename": "naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
-            ]
-        },
-        "naefs_ndgd_spr": {
-            "enabled": true,
-            "updateFrequency": 6,
-            "updateOffset": 0,
-            "startTime": 3,
-            "endTime": 192,
-            "gribFilterName": "naefsbc_ndgd",
-            "downloadType": "GRIBFILTER",
-            "gribDirectory": "/naefs.%D/%H/ndgd_gb2",
-            "filetype": "grib2",
-            "baseDirectory": "naefs/prod",
-            "gribFilename": "naefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "WIND", "gribLevel": "10-HTGL"},
-                {"gribVar": "WDIR", "gribLevel": "10-HTGL"}
+            "fhStep": {
+                "0": 1
+            },
+            "bands": [
+                { "var": "REFC", "level": "eatm" },
+                { "var": "RETOP", "level": "ctl"},
+                { "var": "VIL", "level": "eatm"},
+                { "var": "VIS", "level": "sfc"},
+                { "var": "TCDC", "level": "eatm"},
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "HAIL", "level": "eatm"},
+                { "var": "LTNG", "level": "eatm"},
+                { "var": "PRATE", "level": "sfc" },
+                { "var": "APCP", "level": "sfc", "timeRange": 1 },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "CIN", "level": "sfc" },
+                { "var": "4LFTX", "level": "180to0mb" },
+                { "var": "ASNOW", "level": "sfc" },
+                { "var": "WEASD", "level": "sfc" },
+                { "var": "SNOD", "level": "sfc" },
+                { "var": "GUST", "level": "sfc" },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "UGRD", "level": "10m" },
+                { "var": "VGRD", "level": "10m" },
+                { "var": "UGRD", "level": "500mb" },
+                { "var": "VGRD", "level": "500mb" },
+                { "var": "UGRD", "level": "700mb" },
+                { "var": "VGRD", "level": "700mb" },
+                { "var": "UGRD", "level": "850mb" },
+                { "var": "VGRD", "level": "850mb" },
+                { "var": "USTM", "level": "0to6000m" },
+                { "var": "VSTM", "level": "0to6000m" },
+                { "var": "TMP", "level": "sfc" },
+                { "var": "TMP", "level": "2m" },
+                { "var": "TMP", "level": "850mb" },
+                { "var": "TMP", "level": "700mb" },
+                { "var": "TMP", "level": "500mb" },
+                { "var": "DPT", "level": "2m" },
+                { "var": "RH", "level": "2m" },
+                { "var": "PWAT", "level": "eatmcsl" }
             ]
         },
         "naefs_anom": {
             "enabled": true,
+            "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
+            "readTimeout": 300,
             "startTime": 3,
             "endTime": 384,
-            "imageWidth": 128,
-            "downloadType": "FILESERIES",
+            "imageWidth": 720,
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
+            "index": false,
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/pgrb2ap5_an/naefs_geavg.t%Hz.pgrb2a.0p50_anvf%T",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "HGT", "gribLevel": "50000-ISBL"},
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"}
+            "bands": [
+                {"var": "HGT", "level": "500mb"},
+                {"var": "TMP", "level": "2m"}
+            ]
+        },
+        "naefs_ndgd_avg": {
+            "enabled": true,
+            "bounds": "colorado",
+            "updateFrequency": 6,
+            "updateOffset": 0,
+            "readTimeout": 300,
+            "startTime": 3,
+            "endTime": 384,
+            "imageWidth": 480,
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
+            "index": false,
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/ndgd_gb2/naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
+            "filetype": "grib2",
+            "bands": [
+                {"var": "TMP", "level": "2m"},
+                {"var": "DPT", "level": "2m"},
+                {"var": "RH", "level": "2m"},
+                {"var": "UGRD", "level": "10m"},
+                {"var": "VGRD", "level": "10m"}
+            ]
+        },
+        "naefs_ndgd_spr": {
+            "enabled": true,
+            "bounds": "colorado",
+            "updateFrequency": 6,
+            "updateOffset": 0,
+            "readTimeout": 300,
+            "startTime": 3,
+            "endTime": 384,
+            "imageWidth": 480,
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
+            "index": false,
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/ndgd_gb2/naefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
+            "filetype": "grib2",
+            "bands": [
+                {"var": "TMP", "level": "2m"},
+                {"var": "DPT", "level": "2m"},
+                {"var": "RH", "level": "2m"},
+                {"var": "UGRD", "level": "10m"},
+                {"var": "VGRD", "level": "10m"}
             ]
         },
         "nam3": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 60,
-            "imageWidth": 720,
-            "downloadType": "FILESERIES",
+            "fhStep": {
+                "0": 1
+            },
+            "imageWidth": 480,
+            "index": true,
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-CTL"},
-                {"gribVar": "REFD", "gribLevel": "1-HYBL"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "CPOFP", "gribLevel": "0-SFC"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
-                {"gribVar": "LTNG", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"}
+            "bands": [
+                { "var": "TMP", "level": "sfc" },
+                { "var": "TMP", "level": "2m" },
+                { "var": "TMAX", "level": "2m" },
+                { "var": "TMIN", "level": "2m" },
+                { "var": "TMP", "level": "500mb" },
+                { "var": "TMP", "level": "600mb" },
+                { "var": "TMP", "level": "700mb" },
+                { "var": "TMP", "level": "850mb" },
+                { "var": "DPT", "level": "2m" },
+                { "var": "RH", "level": "2m" },
+                { "var": "GUST", "level": "sfc" },
+                { "var": "4LFTX", "level": "180to0mb" },
+                { "var": "CAPE", "level": "180to0mb" },
+                { "var": "CIN", "level": "180to0mb" },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "CIN", "level": "sfc" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "TCDC", "level": "eatmcsl" },
+                { "var": "VIS", "level": "sfc" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "RETOP", "level": "eatmcsl" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "PRATE", "level": "sfc" },
+                { "var": "LTNG", "level": "sfc" },
+                { "var": "SNOD", "level": "sfc" },
+                { "var": "SNOM", "level": "sfc" },
+                { "var": "APCP", "level": "sfc" }
             ]
         },
         "nam12": {
             "enabled": true,
+            "bounds": "colorado",
+            "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
             "startTime": 0,
             "endTime": 84,
-            "imageWidth": 164,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "nam",
-            "gribDirectory": "/nam.%D",
+            "fhStep": {
+                "0": 1,
+                "36": 3
+            },
+            "imageWidth": 480,
+            "index": true,
+            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.awphys%T.tm00.grib2",
             "filetype": "grib2",
-            "baseDirectory": "nam/prod",
-            "gribFilename": "nam.t%Hz.awphys%T.tm00.grib2",
-            "variables": [
-                "4LFTX",
-                "ACPCP",
-                "APCP",
-                "CAPE",
-                "CFRZR",
-                "CICEP",
-                "CIN",
-                "CRAIN",
-                "CSNOW",
-                "DPT",
-                "GUST",
-                "LFTX",
-                "LTNG",
-                "PRES",
-                "PWAT",
-                "REFC",
-                "REFD",
-                "RETOP",
-                "RH",
-                "SNOD",
-                "SNOWC",
-                "TCDC",
-                "TMP",
-                "UGRD",
-                "VGRD",
-                "VIS",
-                "WEASD"
-            ],
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "TMP", "gribLevel": "80-HTGL"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "80-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "80-HTGL"},
-                {"gribVar": "GUST", "gribLevel": "0-SFC"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-CTL"},
-                {"gribVar": "REFD", "gribLevel": "1-HYBL"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
-                {"gribVar": "LTNG", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOWC", "gribLevel": "0-SFC"}
-            ]
-        },
-        "nbm": {
-            "enabled": false,
-            "updateFrequency": 1,
-            "updateOffset": 0,
-            "startTime": 1,
-            "endTime": 150,
-            "interval": 1,
-            "downloadType": "FILESERIES",
-            "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/blend/prod/blend.%D/%H/grib2/blend.t%Hz.master.f%T.co.grib2",
-            "filetype": "grib2",
-            "extractBandsByMetadata": [
-                {"gribVar": "CEIL", "gribLevel": "0-CEIL"},
-                {"gribVar": "CEIL", "gribLevel": "0-CBL"},
-                {"gribVar": "Td", "gribLevel": "2-HTGL"},
-                {"gribVar": "RETOP", "gribLevel": "0-CTL"},
-                {"gribVar": "Wx", "gribLevel": "0-0-SFC"},
-                {"gribVar": "TSTM01", "gribLevel": "0-SFC"},
-                {"gribVar": "QPF01", "gribLevel": "0-SFC"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "Sky", "gribLevel": "0-SFC"},
-                {"gribVar": "SnowAmt01", "gribLevel": "0-SFC"},
-                {"gribVar": "T", "gribLevel": "2-HTGL"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "WindDir", "gribLevel": "10-HTGL"},
-                {"gribVar": "WindGust", "gribLevel": "10-HTGL"},
-                {"gribVar": "WindSpd", "gribLevel": "10-HTGL"}
+            "bands": [
+                { "var": "TMP", "level": "sfc" },
+                { "var": "TMP", "level": "2m" },
+                { "var": "TMAX", "level": "2m" },
+                { "var": "TMIN", "level": "2m" },
+                { "var": "TMP", "level": "500mb" },
+                { "var": "TMP", "level": "600mb" },
+                { "var": "TMP", "level": "700mb" },
+                { "var": "TMP", "level": "850mb" },
+                { "var": "DPT", "level": "2m" },
+                { "var": "RH", "level": "2m" },
+                { "var": "GUST", "level": "sfc" },
+                { "var": "4LFTX", "level": "180to0mb" },
+                { "var": "CAPE", "level": "180to0mb" },
+                { "var": "CIN", "level": "180to0mb" },
+                { "var": "CAPE", "level": "sfc" },
+                { "var": "CIN", "level": "sfc" },
+                { "var": "PWAT", "level": "eatmcsl" },
+                { "var": "TCDC", "level": "eatmcsl" },
+                { "var": "VIS", "level": "sfc" },
+                { "var": "REFC", "level": "eatmcsl" },
+                { "var": "RETOP", "level": "eatmcsl" },
+                { "var": "CSNOW", "level": "sfc" },
+                { "var": "CICEP", "level": "sfc" },
+                { "var": "CFRZR", "level": "sfc" },
+                { "var": "CRAIN", "level": "sfc" },
+                { "var": "LTNG", "level": "sfc" },
+                { "var": "SNOD", "level": "sfc" },
+                { "var": "APCP", "level": "sfc", "timeRange": 3 }
             ]
         },
         "sref_mean": {
             "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 0,
-            "endTime": 0,
-            "imageWidth": 48,
-            "downloadType": "FILESERIES",
+            "startTime": 1,
+            "endTime": 1,
+            "imageWidth": 240,
+            "fhStep": {
+                "0": 1
+            },
+            "bounds": "colorado",
+            "readTimeout": 3600,
+            "index": false,
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2"
         },
@@ -703,10 +656,15 @@
             "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 0,
-            "endTime": 0,
-            "imageWidth": 128,
-            "downloadType": "FILESERIES",
+            "startTime": 1,
+            "endTime": 1,
+            "imageWidth": 480,
+            "fhStep": {
+                "0": 1
+            },
+            "bounds": "colorado",
+            "readTimeout": 3600,
+            "index": false,
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.mean_ds_3hrly.grib2"
         },
@@ -714,10 +672,15 @@
             "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 0,
-            "endTime": 0,
-            "imageWidth": 48,
-            "downloadType": "FILESERIES",
+            "startTime": 1,
+            "endTime": 1,
+            "imageWidth": 240,
+            "fhStep": {
+                "0": 1
+            },
+            "bounds": "colorado",
+            "readTimeout": 3600,
+            "index": false,
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.spread_3hrly.grib2"
         },
@@ -725,261 +688,169 @@
             "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 0,
-            "endTime": 0,
-            "imageWidth": 128,
-            "downloadType": "FILESERIES",
+            "startTime": 1,
+            "endTime": 1,
+            "imageWidth": 480,
+            "fhStep": {
+                "0": 1
+            },
+            "bounds": "colorado",
+            "readTimeout": 3600,
+            "index": false,
             "filetype": "grib2",
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.spread_ds_3hrly.grib2"
         },
-        "sref_prob": {
-            "enabled": true,
-            "updateFrequency": 6,
-            "updateOffset": 3,
-            "startTime": 0,
-            "endTime": 0,
-            "imageWidth": 48,
-            "downloadType": "FILESERIES",
-            "filetype": "grib2",
-            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.prob_3hrly.grib2"
-        },
-        "sref_arw_ctl": {
-            "enabled": false,
-            "updateFrequency": 6,
-            "updateOffset": 3,
-            "startTime": 0,
-            "endTime": 87,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "sref_132",
-            "gribDirectory": "/sref.%D/%H/pgrb",
-            "filetype": "grib2",
-            "baseDirectory": "sref/prod",
-            "gribFilename": "sref_arw.t%Hz.pgrb132.ctl.f%T.grib2",
-            "variables": [
-                "4LFTX",
-                "ACPCP",
-                "APCP",
-                "CAPE",
-                "CFRZR",
-                "CICE",
-                "CICEP",
-                "CIN",
-                "CRAIN",
-                "CSNOW",
-                "DPT",
-                "ICEC",
-                "LFTX",
-                "NCPCP",
-                "PRATE",
-                "PWAT",
-                "REFC",
-                "RETOP",
-                "RH",
-                "SNOM",
-                "SNOWC",
-                "SNOWD",
-                "TCDC",
-                "TMP",
-                "UGRD",
-                "VGRD",
-                "VIS",
-                "WEASD"
-            ],
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOWC", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOM", "gribLevel": "0-SFC"}
-            ]
-        },
-        "sref_nmb_ctl": {
-            "enabled": false,
-            "updateFrequency": 6,
-            "updateOffset": 3,
-            "startTime": 0,
-            "endTime": 87,
-            "downloadType": "GRIBFILTER",
-            "gribFilterName": "sref_132",
-            "gribDirectory": "/sref.%D/%H/pgrb",
-            "filetype": "grib2",
-            "baseDirectory": "sref/prod",
-            "gribFilename": "sref_nmb.t%Hz.pgrb132.ctl.f%T.grib2",
-            "variables": [
-                "4LFTX",
-                "ACPCP",
-                "APCP",
-                "CAPE",
-                "CFRZR",
-                "CICE",
-                "CICEP",
-                "CIN",
-                "CRAIN",
-                "CSNOW",
-                "DPT",
-                "ICEC",
-                "LFTX",
-                "NCPCP",
-                "PRATE",
-                "PWAT",
-                "REFC",
-                "RETOP",
-                "RH",
-                "SNOM",
-                "SNOWC",
-                "SNOWD",
-                "TCDC",
-                "TMP",
-                "UGRD",
-                "VGRD",
-                "VIS",
-                "WEASD"
-            ],
-            "extractBandsByMetadata": [
-                {"gribVar": "TMP", "gribLevel": "2-HTGL"},
-                {"gribVar": "TMP", "gribLevel": "0-SFC"},
-                {"gribVar": "DPT", "gribLevel": "2-HTGL"},
-                {"gribVar": "RH", "gribLevel": "2-HTGL"},
-                {"gribVar": "UGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "VGRD", "gribLevel": "10-HTGL"},
-                {"gribVar": "4LFTX", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "LFTX", "gribLevel": "50000-100000-ISBL"},
-                {"gribVar": "CAPE", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CIN", "gribLevel": "18000-0-SPDL"},
-                {"gribVar": "CAPE", "gribLevel": "0-SFC"},
-                {"gribVar": "CIN", "gribLevel": "0-SFC"},
-                {"gribVar": "PWAT", "gribLevel": "0-EATM"},
-                {"gribVar": "TCDC", "gribLevel": "0-EATM"},
-                {"gribVar": "VIS", "gribLevel": "0-SFC"},
-                {"gribVar": "REFC", "gribLevel": "0-EATM"},
-                {"gribVar": "RETOP", "gribLevel": "0-EATM"},
-                {"gribVar": "CSNOW", "gribLevel": "0-SFC"},
-                {"gribVar": "CICEP", "gribLevel": "0-SFC"},
-                {"gribVar": "CFRZR", "gribLevel": "0-SFC"},
-                {"gribVar": "CRAIN", "gribLevel": "0-SFC"},
-                {"gribVar": "PRATE", "gribLevel": "0-SFC"},
-                {"gribVar": "APCP03", "gribLevel": "0-SFC"},
-                {"gribVar": "WEASD", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOWC", "gribLevel": "0-SFC"},
-                {"gribVar": "SNOM", "gribLevel": "0-SFC"}
-            ]
-        },
-        "wpc_snow_25pct": {
+        "wpc_snow_12h_25pct": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
             "endTime": 72,
-            "interval": 6,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_25pt_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW25", "level": "sfc"}
+            ]
         },
-        "wpc_snow_50pct": {
+        "wpc_snow_12h_50pct": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
             "endTime": 72,
-            "interval": 6,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_50pt_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW50", "level": "sfc"}
+            ]
         },
-        "wpc_snow_75pct": {
+        "wpc_snow_12h_75pct": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
             "endTime": 72,
-            "interval": 6,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_75pt_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW75", "level": "sfc"}
+            ]
         },
-        "wpc_snow_sigma": {
+        "wpc_snow_12h_sigma": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
             "endTime": 72,
-            "interval": 6,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmsigma_12h_snow_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW", "level": "sfc"}
+            ]
         },
-        "wpc_snow_tot_25pct": {
+        "wpc_snow_72h_25pct": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
             "endTime": 72,
-            "interval": 1,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_25pt_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW25", "level": "sfc"}
+            ]
         },
-        "wpc_snow_tot_50pct": {
+        "wpc_snow_72h_50pct": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
             "endTime": 72,
-            "interval": 1,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_50pt_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW50", "level": "sfc"}
+            ]
         },
-        "wpc_snow_tot_75pct": {
+        "wpc_snow_72h_75pct": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
             "endTime": 72,
-            "interval": 1,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_75pt_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW75", "level": "sfc"}
+            ]
         },
-        "wpc_snow_tot_sigma": {
+        "wpc_snow_72h_sigma": {
             "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
             "endTime": 72,
-            "interval": 1,
+            "fhStep": {
+                "0": 6
+            },
+            "bounds": "colorado",
+            "readTimeout": 300,
+            "index": false,
             "imageWidth": 720,
-            "downloadType": "FILESERIES",
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmsigma_72h_snow_%D%Hf0%T.grb",
-            "filetype": "grib2"
+            "filetype": "grib2",
+            "bands": [
+                { "var": "ASNOW", "level": "sfc"}
+            ]
         }
     }
 }
