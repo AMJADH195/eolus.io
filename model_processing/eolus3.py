@@ -837,7 +837,7 @@ def checkIfModelFhAvailable (modelName, timestamp, fh):
     log ("· Checking URL: " + url, "DEBUG", remote=True, indentLevel=1, model=modelName)
 
     try:
-        ret = requests.head(url)
+        ret = requests.head(url, timeout=(30, 120))
 
         if ret.status_code == 200 or ret.status_code == None:
             log (" ✓ Found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
