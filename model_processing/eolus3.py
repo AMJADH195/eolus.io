@@ -47,26 +47,23 @@ class UTC(tzinfo):
 utc = UTC()
 
 def killScript (exitCode): 
-    if exitCode:
+    if exitCode != 0:
         resetPgConnection ()
         log ("Exiting on failure.", "ERROR", remote=True)
 
-    try:
-        if agentLogged:
-            if not conn.closed:
-                removeAgent ()
-            else:
-                try:
-                    conn = sqlConnect ()
-                    curr = conn.cursor()
-                    removeAgent()
-                except:
-                    os._exit(exitCode)
-
-        curr.close()
-        conn.close()
-    except:
-        log ("No connection to close.", "DEBUG")
+    if agentLogged:
+        try:
+            removeAgent ()
+        except:
+            log ("Could not remove agent, trying again.", "ERROR", remote=True)
+            try:
+                conn = sqlConnect ()
+                curr = conn.cursor()
+                removeAgent()
+            except:
+                os._exit(exitCode)
+    curr.close()
+    conn.close()
     os._exit (exitCode)
 
 
