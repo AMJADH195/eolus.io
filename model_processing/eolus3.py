@@ -47,6 +47,7 @@ class UTC(tzinfo):
 utc = UTC()
 
 def killScript (exitCode): 
+    global conn, curr
     if exitCode != 0:
         resetPgConnection ()
         log ("Exiting on failure.", "ERROR", remote=True)
@@ -62,8 +63,11 @@ def killScript (exitCode):
                 removeAgent()
             except:
                 os._exit(exitCode)
-    curr.close()
-    conn.close()
+    try:
+        curr.close()
+        conn.close()
+    except:
+        log ("Couldn't close connection.", "ERROR")
     os._exit (exitCode)
 
 
