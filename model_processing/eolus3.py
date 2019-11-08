@@ -50,7 +50,7 @@ def killScript (exitCode):
     global conn, curr
     if exitCode != 0:
         resetPgConnection ()
-        log ("Exiting on failure.", "ERROR", remote=True)
+        log ("Exiting on failure.", "ERROR")
 
     if agentLogged:
         try:
@@ -473,8 +473,10 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         outFile.FlushCache()
         outFile = None
         gribFile = None
-    except:
+    except Exception as e:
         log ("Warping failed -- " + downloadFileName, "ERROR", remote=True)
+        log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
+        log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
     # check to see if the working raster exists
@@ -498,8 +500,10 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             newRaster.SetGeoTransform (list(geoTransform))
             gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
             log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-        except:
-            log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        except Exception as e:
+            log ("Couldn't create the new TIF: " + targetFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
+            log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
+            log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
             return False
 
     log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | bandNumber: {str(bandNumber)}", "NOTICE", indentLevel=2, remote=True, model=modelName)
@@ -627,6 +631,11 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         epsg4326.ImportFromEPSG(4326)
 
         log ("· Warping downloaded data.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        try:
+            os.remove (downloadFileName + ".tif")
+        except:
+            log ("No old file to remove.", "DEBUG")
+
         gribFile = gdal.Open (downloadFileName)
         outFile = gdal.Warp(
             downloadFileName + ".tif", 
@@ -714,8 +723,10 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                 tif.FlushCache()
                 gribFile = None
                 tif = None
-            except:
+            except Exception as e:
                 log ("Couldn't write bands to the tiff. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
+                log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
+                log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
                 return False
 
     try:
