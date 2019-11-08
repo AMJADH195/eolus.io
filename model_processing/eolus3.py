@@ -792,7 +792,11 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
         log ("Couldn't get remaining count from table " + tableName + ".", "ERROR", indentLevel=1, remote=True, model=modelName)
         killScript(1)
 
-    log ("· There are " + str(numBandsRemaining) + " remaining bands to process.", "DEBUG", indentLevel=1)
+    noun = "bands"
+    if band is None:
+        noun = "forecast hours"
+
+    log ("· There are " + str(numBandsRemaining) + " remaining " + noun + " to process.", "DEBUG", indentLevel=1)
 
     if numBandsRemaining == 0:
         log ("· Deleting table " + tableName + ".", "NOTICE", indentLevel=1, remote=True, model=modelName)
