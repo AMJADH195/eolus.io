@@ -1025,8 +1025,8 @@ def main():
     log ("No new updates are waiting. Checking models in progress.", "INFO", indentLevel=0)
     print ()
     for modelName in processingModels:
+        print ()
         print (modelName + " ----- ")
-
         processed = findModelStepToProcess (modelName)
 
     if not processed:
