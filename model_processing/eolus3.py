@@ -1038,7 +1038,7 @@ def main():
         killScript (0)
 
     if processed:
-        log ("✓ Processing  step complete.", "INFO", indentLevel=0, remote=True, model=modelName)
+        log ("✓ Processing step complete.", "INFO", indentLevel=0, remote=True, model=modelName)
         printLine ()
         print ()
         print ()
