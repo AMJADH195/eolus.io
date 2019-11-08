@@ -1027,17 +1027,19 @@ def main():
     printLine ()
     log ("No new updates are waiting. Checking models in progress.", "INFO", indentLevel=0)
     print ()
+    oneProcessed = False
     for modelName in processingModels:
         print ()
         print (modelName + " ----- ")
-        processed = findModelStepToProcess (modelName)
+        if findModelStepToProcess (modelName):
+            oneProcessed = True
 
-    if not processed:
+    if not oneProcessed:
         printLine ()
         print ()
         killScript (0)
 
-    if processed:
+    if oneProcessed:
         log ("✓ Processing step complete.", "INFO", indentLevel=0, remote=True, model=modelName)
         printLine ()
         print ()
