@@ -1028,8 +1028,6 @@ def main():
         print (modelName + " ----- ")
 
         processed = findModelStepToProcess (modelName)
-        if processed:
-            break
 
     if not processed:
         log ("No models waiting to process.", "INFO", indentLevel=0)
