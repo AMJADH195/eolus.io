@@ -476,7 +476,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         gribFile = None
     except Exception as e:
         log ("Warping failed -- " + downloadFileName, "ERROR", remote=True)
-        log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+        log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
     # check to see if the working raster exists
@@ -502,7 +502,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         except Exception as e:
             log ("Couldn't create the new TIF: " + targetFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
-            log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+            log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
             return False
 
     log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | bandNumber: {str(bandNumber)}", "NOTICE", indentLevel=2, remote=True, model=modelName)
@@ -520,7 +520,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     except Exception as e:
         log (f"Couldn't write band to TIF | band: {band['shorthand']} | fh: {fh}.", "ERROR", indentLevel=2, remote=True, model=modelName)
-        log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+        log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
     
     try:
@@ -725,7 +725,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                 tif = None
             except Exception as e:
                 log ("Couldn't write bands to the tiff. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
-                log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+                log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
                 return False
 
     try:
