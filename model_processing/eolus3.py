@@ -634,7 +634,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
         try:
             os.remove (downloadFileName + ".tif")
         except:
-            log ("No old file to remove.", "DEBUG")
+            log ("· No old file to remove.", "DEBUG", indentLevel=2)
 
         gribFile = gdal.Open (downloadFileName)
         outFile = gdal.Warp(
@@ -855,7 +855,7 @@ def checkIfModelFhAvailable (modelName, timestamp, fh):
         ret = requests.head(url, timeout=(30, 120))
 
         if ret.status_code == 200 or ret.status_code == None:
-            log (" ✓ Found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
+            log ("✓ Found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
             return True
         else:
             log ("× Not found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
