@@ -1040,6 +1040,8 @@ def main():
         killScript (0)
 
     if oneProcessed:
+        print ()
+        printLine ()
         log ("✓ Processing step complete.", "INFO", indentLevel=0, remote=True, model=modelName)
         printLine ()
         print ()
