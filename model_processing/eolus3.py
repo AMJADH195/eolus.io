@@ -501,7 +501,6 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         except Exception as e:
             log ("Couldn't create the new TIF: " + targetFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
-            log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
             log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
             return False
 
@@ -518,8 +517,9 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         gribFile = None
         tif = None
         log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
-    except:
+    except Exception as e:
         log (f"Couldn't write band to TIF | band: {band['shorthand']} | fh: {fh}.", "ERROR", indentLevel=2, remote=True, model=modelName)
+        log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
     
     try:
@@ -724,7 +724,6 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                 tif = None
             except Exception as e:
                 log ("Couldn't write bands to the tiff. " + fh + ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
-                log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
                 log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
                 return False
 
