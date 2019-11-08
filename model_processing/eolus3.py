@@ -367,7 +367,7 @@ def findModelStepToProcess(modelName):
 
     else:
         try:
-            log ("× Not done. Undoing.", "INFO", remote=True, indentLevel=1, model=modelName)
+            log ("· Setting back to waiting.", "INFO", remote=True, indentLevel=1, model=modelName)
             curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.utcnow(), fullFh))
             conn.commit ()
         except:
