@@ -475,7 +475,6 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         gribFile = None
     except Exception as e:
         log ("Warping failed -- " + downloadFileName, "ERROR", remote=True)
-        log (e, "ERROR", indentLevel=2, remote=True, model=modelName)
         log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
