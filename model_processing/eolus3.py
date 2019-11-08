@@ -1004,7 +1004,6 @@ def main():
                 startProcessingModel (modelName, timestamp)
                 findModelStepToProcess (modelName)
                 processed = True
-                break
 
         elif status == "PROCESSING":
             processingModels.append (modelName)
@@ -1039,7 +1038,7 @@ def main():
         killScript (0)
 
     if processed:
-        log ("✓ Model processing complete.", "INFO", indentLevel=0, remote=True, model=modelName)
+        log ("✓ Processing  step complete.", "INFO", indentLevel=0, remote=True, model=modelName)
         printLine ()
         print ()
         print ()
