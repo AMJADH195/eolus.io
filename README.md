@@ -5,7 +5,11 @@ More information:
 https://medium.com/@potion_cellar/automated-weather-model-processing-with-foss4g-lessons-learned-8aaaeda1e3bc
 
 # What's Here
+`./db` has the Postgres db schema for the metadata (e.g. what models are currently processing)
+
 `./model_processing` contains python code and JSON configuration for grabbing weather model data off the internet (via NCEP NOMADS), processing it, and organizing it on the file system.  This script is designed to be run on a regular basis from, for example, a cron job.
+
+`./map` contains the MapServer mapfile.
 
 `./web` contains the PHP files which provide some mechanisms for basic model retrieval and viewing the logs / processing status.
 
