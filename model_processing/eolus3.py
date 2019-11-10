@@ -306,6 +306,7 @@ def findModelStepToProcess(modelName):
     found = False
     model = models[modelName]
     fh = model["startTime"]
+    origBand = -1
 
     try:
         curr.execute ("SELECT timestamp FROM eolus3.models WHERE model = %s", (modelName,))
@@ -319,18 +320,18 @@ def findModelStepToProcess(modelName):
         log ("Couldn't get the timetamp for model " + modelName, "ERROR", remote=True)
 
     try:
-        curr.execute ("SELECT fh, grib_var FROM eolus3." + tableName + " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
+        curr.execute ("SELECT fh, grib_var, band FROM eolus3." + tableName + " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
         res = curr.fetchone()
         if not res or len(res) == 0:
             return False
         fullFh = res[0]
         gribVar = res[1]
+        origBand = res[2]
 
     except:
         resetPgConnection()
         log ("Couldn't get the status of a timestep from " + tableName, "ERROR", remote=True)
         return False
-        
 
     band = None
 
@@ -368,8 +369,17 @@ def findModelStepToProcess(modelName):
     else:
         try:
             log ("· Setting back to waiting.", "INFO", remote=True, indentLevel=1, model=modelName)
-            curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.utcnow(), fullFh))
-            conn.commit ()
+
+            curr.execute ("SELECT * FROM eolus3." + tableName + " WHERE fh = '" + fullFh + "' AND grib_var = '" + gribVar + "'")
+            res = curr.fetchone()
+
+            if not res or len(res) == 0:
+                curr.execute ("INSERT INTO eolus3." + tableName + " SET (fh, status, band, grib_var) = (%s, %s, %s, %s)", (fullFh, "WAITING", origBand, gribVar))
+                conn.commit ()
+                
+            else:
+                curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.utcnow(), fullFh))
+                conn.commit ()
         except:
             resetPgConnection()
             log ("Couldn't set a status to back to waiting in " + tableName + "... This will need manual intervention.", "ERROR", remote=True)
