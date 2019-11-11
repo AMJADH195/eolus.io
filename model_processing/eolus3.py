@@ -370,19 +370,26 @@ def findModelStepToProcess(modelName):
         try:
             log ("· Setting back to waiting.", "INFO", remote=True, indentLevel=1, model=modelName)
 
+            log ("· Trying to retrieve the band that was used.", "SPEC", remote=True, indentLevel=1, model=modelName)
             curr.execute ("SELECT * FROM eolus3." + tableName + " WHERE fh = '" + fullFh + "' AND grib_var = '" + gribVar + "'")
             res = curr.fetchone()
+            log ("· Retrieved", "SPEC", remote=True, indentLevel=1, model=modelName)
 
             if not res or len(res) == 0:
+                log ("·  Insert back in...", "SPEC", remote=True, indentLevel=1, model=modelName)
                 curr.execute ("INSERT INTO eolus3." + tableName + " SET (fh, status, band, grib_var) = (%s, %s, %s, %s)", (fullFh, "WAITING", origBand, gribVar))
                 conn.commit ()
+                log ("· Inserted.", "SPEC", remote=True, indentLevel=1, model=modelName)
                 
             else:
+                log ("·  Update", "SPEC", remote=True, indentLevel=1, model=modelName)
                 curr.execute ("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" + bandStr, ("WAITING", datetime.utcnow(), fullFh))
                 conn.commit ()
-        except:
+                log ("·  Updated", "SPEC", remote=True, indentLevel=1, model=modelName)
+        except Exception as e:
             resetPgConnection()
             log ("Couldn't set a status to back to waiting in " + tableName + "... This will need manual intervention.", "ERROR", remote=True)
+            log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
         return False
 
 
