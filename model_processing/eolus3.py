@@ -380,7 +380,7 @@ def findModelStepToProcess(modelName):
 
             if not res or len(res) == 0:
                 log ("·  Insert back in...", "SPEC", remote=True, indentLevel=1, model=modelName)
-                curr.execute ("INSERT INTO eolus3." + tableName + " SET (fh, status, band, grib_var) = (%s, %s, %s, %s)", (fullFh, "WAITING", origBand, gribVar))
+                curr.execute ("INSERT INTO eolus3." + tableName + " (fh, status, band, grib_var) VALUES (%s,%s,%s,%s)", (fullFh, "WAITI NG", origBand, gribVar))
                 conn.commit ()
                 log ("· Inserted.", "SPEC", remote=True, indentLevel=1, model=modelName)
                 
