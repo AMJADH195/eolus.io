@@ -371,7 +371,10 @@ def findModelStepToProcess(modelName):
             log ("· Setting back to waiting.", "INFO", remote=True, indentLevel=1, model=modelName)
 
             log ("· Trying to retrieve the band that was used.", "SPEC", remote=True, indentLevel=1, model=modelName)
-            curr.execute ("SELECT * FROM eolus3." + tableName + " WHERE fh = '" + fullFh + "' AND grib_var = '" + gribVar + "'")
+            if gribVar is not None:
+                curr.execute ("SELECT * FROM eolus3." + tableName + " WHERE fh = '" + fullFh + "' AND grib_var = '" + gribVar + "'")
+            else:
+                curr.execute ("SELECT * FROM eolus3." + tableName + " WHERE fh = '" + fullFh + "'")
             res = curr.fetchone()
             log ("· Retrieved", "SPEC", remote=True, indentLevel=1, model=modelName)
 
