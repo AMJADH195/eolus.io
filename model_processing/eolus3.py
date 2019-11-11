@@ -447,7 +447,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         except:
             resetPgConnection()
             log ("Couldn't delete an unusable band from the table. " + fh + ", table " + tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
-        return False
+        return True
 
 
     log (f"↓ Downloading band {band['shorthand']} for fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
