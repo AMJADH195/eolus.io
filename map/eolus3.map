@@ -52,6 +52,9 @@ MAP
    "date" "[0-9]{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])"
    "time" "(2[0-3]|[01][0-9])"
    "var" ".*"
+   "lbl_start" ".*"
+   "lbl_end" ".*"
+   "lbl_round" "[0-9]+"
    "model" ".*"
    "resampling" ".*"
    "band" "[0-9]+"
@@ -79,12 +82,13 @@ MAP
    STYLE
     WIDTH 2
    END
+   TEXT ('%lbl_start%' + tostring([con],"%.%lbl_round%f") + '%lbl_end%')
    LABEL
     COLOR 0 0 0
     OUTLINECOLOR 255 255 255
     OUTLINEWIDTH 2
-    SIZE 6
-    FONT "bebas"
+    SIZE 8
+    FONT "robotoblack"
     TYPE truetype
     POSITION AUTO
    END
