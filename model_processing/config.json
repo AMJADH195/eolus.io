@@ -27,26 +27,26 @@
         "sleepTime": 1,
         "maxTime": 0,
         "retentionDays": 2,
-        "maxAgents": 4
+        "maxAgents": 3
     },
     "levelMaps": {
         "sfc": {
             "idxName": "surface",
             "gribName": "0-SFC"
         },
-        "2m": { 
+        "2m": {
             "idxName": "2 m above ground",
             "gribName": "2-HTGL"
         },
-        "10m": { 
+        "10m": {
             "idxName": "10 m above ground",
             "gribName": "10-HTGL"
         },
-        "80m": { 
+        "80m": {
             "idxName": "80 m above ground",
             "gribName": "80-HTGL"
         },
-        "0to6000m": { 
+        "0to6000m": {
             "idxName": "0-6000 m above ground",
             "gribName": "0-6000-HTGL"
         },
@@ -105,29 +105,98 @@
             "imageWidth": 240,
             "index": true,
             "bands": [
-                { "var": "TMP", "level": "2m" },
-                { "var": "RH", "level": "2m" },
-                { "var": "UGRD", "level": "10m" },
-                { "var": "VGRD", "level": "10m" },
-                { "var": "UGRD", "level": "500mb" },
-                { "var": "VGRD", "level": "500mb" },
-                { "var": "UGRD", "level": "700mb" },
-                { "var": "VGRD", "level": "700mb" },
-                { "var": "UGRD", "level": "850mb" },
-                { "var": "VGRD", "level": "850mb" },
-                { "var": "APCP", "level": "sfc" },
-                { "var": "SNOD", "level": "sfc" },
-                { "var": "WEASD", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "TCDC", "level": "eatm" },
-                { "var": "CAPE", "level": "180to0mb" },
-                { "var": "CIN", "level": "180to0mb" },
-                { "var": "PRES", "level": "sfc" },
-                { "var": "HGT", "level": "500mb" }
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "APCP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "SNOD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "WEASD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatm"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CIN",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "PRES",
+                    "level": "sfc"
+                },
+                {
+                    "var": "HGT",
+                    "level": "500mb"
+                }
             ]
         },
         "gefs_pgrb2ap5_spr": {
@@ -147,29 +216,98 @@
             "imageWidth": 240,
             "index": true,
             "bands": [
-                { "var": "TMP", "level": "2m" },
-                { "var": "RH", "level": "2m" },
-                { "var": "UGRD", "level": "10m" },
-                { "var": "VGRD", "level": "10m" },
-                { "var": "UGRD", "level": "500mb" },
-                { "var": "VGRD", "level": "500mb" },
-                { "var": "UGRD", "level": "700mb" },
-                { "var": "VGRD", "level": "700mb" },
-                { "var": "UGRD", "level": "850mb" },
-                { "var": "VGRD", "level": "850mb" },
-                { "var": "APCP", "level": "sfc" },
-                { "var": "SNOD", "level": "sfc" },
-                { "var": "WEASD", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "TCDC", "level": "eatm" },
-                { "var": "CAPE", "level": "180to0mb" },
-                { "var": "CIN", "level": "180to0mb" },
-                { "var": "PRES", "level": "sfc" },
-                { "var": "HGT", "level": "500mb" }
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "APCP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "SNOD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "WEASD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatm"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CIN",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "PRES",
+                    "level": "sfc"
+                },
+                {
+                    "var": "HGT",
+                    "level": "500mb"
+                }
             ]
         },
         "hiresw_arw_2p5": {
@@ -188,25 +326,83 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.arw_2p5km.f%T.conus.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "TMIN", "level": "2m" },
-                { "var": "TMAX", "level": "2m" },
-                { "var": "TMP", "level": "80m" },
-                { "var": "UGRD", "level": "10m" },
-                { "var": "VGRD", "level": "10m" },
-                { "var": "RH", "level": "2m" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "RETOP", "level": "eatmcsl" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "VIL", "level": "eatmcsl" },
-                { "var": "TCDC", "level": "eatmcsl" },
-                { "var": "VIS", "level": "sfc" },
-                { "var": "WEASD", "level": "sfc" },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "CIN", "level": "sfc" },
-                { "var": "4LFTX", "level": "180to0mb" },
-                { "var": "HGT", "level": "base" },
-                { "var": "APCP", "level": "sfc", "timeRange": 1 }
+                {
+                    "var": "TMIN",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMAX",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "80m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "RETOP",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIL",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "WEASD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "4LFTX",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "HGT",
+                    "level": "base"
+                },
+                {
+                    "var": "APCP",
+                    "level": "sfc",
+                    "timeRange": 1
+                }
             ]
         },
         "hiresw_arw_5": {
@@ -225,12 +421,30 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.arw_5km.f%T.conus.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "LTNG", "level": "sfc" },
-                { "var": "GUST", "level": "sfc" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" }
+                {
+                    "var": "LTNG",
+                    "level": "sfc"
+                },
+                {
+                    "var": "GUST",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                }
             ]
         },
         "hiresw_nmmb_2p5": {
@@ -249,25 +463,83 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_2p5km.f%T.conus.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "TMIN", "level": "2m" },
-                { "var": "TMAX", "level": "2m" },
-                { "var": "TMP", "level": "80m" },
-                { "var": "UGRD", "level": "10m" },
-                { "var": "VGRD", "level": "10m" },
-                { "var": "RH", "level": "2m" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "RETOP", "level": "eatmcsl" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "VIL", "level": "eatmcsl" },
-                { "var": "TCDC", "level": "eatmcsl" },
-                { "var": "VIS", "level": "sfc" },
-                { "var": "WEASD", "level": "sfc" },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "CIN", "level": "sfc" },
-                { "var": "4LFTX", "level": "180to0mb" },
-                { "var": "HGT", "level": "base" },
-                { "var": "APCP", "level": "sfc", "timeRange": 1 }
+                {
+                    "var": "TMIN",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMAX",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "80m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "RETOP",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIL",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "WEASD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "4LFTX",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "HGT",
+                    "level": "base"
+                },
+                {
+                    "var": "APCP",
+                    "level": "sfc",
+                    "timeRange": 1
+                }
             ]
         },
         "hiresw_nmmb_5": {
@@ -286,12 +558,30 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/hiresw.%D/hiresw.t%Hz.nmmb_5km.f%T.conus.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "LTNG", "level": "sfc" },
-                { "var": "GUST", "level": "sfc" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" }
+                {
+                    "var": "LTNG",
+                    "level": "sfc"
+                },
+                {
+                    "var": "GUST",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                }
             ]
         },
         "href_avrg": {
@@ -310,9 +600,18 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.avrg.f%T.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "APCP01", "level": "sfc" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "RETOP", "level": "eatmcsl" }
+                {
+                    "var": "APCP01",
+                    "level": "sfc"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "RETOP",
+                    "level": "eatmcsl"
+                }
             ]
         },
         "href_mean": {
@@ -331,27 +630,90 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.mean.f%T.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "APCP01", "level": "sfc" },
-                { "var": "TMP", "level": "2m" },
-                { "var": "TMP", "level": "850mb" },
-                { "var": "TMP", "level": "700mb" },
-                { "var": "TMP", "level": "500mb" },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "CIN", "level": "sfc" },
-                { "var": "TCDC", "level": "eatmcsl" },
-                { "var": "DPT", "level": "2m" },
-                { "var": "RH", "level": "850mb" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "VIS", "level": "sfc" },
-                { "var": "WEASD", "level": "sfc" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "UGRD", "level": "850mb" },
-                { "var": "VGRD", "level": "850mb" },
-                { "var": "UGRD", "level": "700mb" },
-                { "var": "VGRD", "level": "700mb" }
+                {
+                    "var": "APCP01",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "850mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "700mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "500mb"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "850mb"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "WEASD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb"
+                }
             ]
         },
         "href_pmmn": {
@@ -370,9 +732,18 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.pmmn.f%T.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "APCP01", "level": "sfc" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "RETOP", "level": "eatmcsl" }
+                {
+                    "var": "APCP01",
+                    "level": "sfc"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "RETOP",
+                    "level": "eatmcsl"
+                }
             ]
         },
         "href_sprd": {
@@ -391,27 +762,90 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/hiresw/prod/href.%D/ensprod/href.t%Hz.conus.sprd.f%T.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "APCP01", "level": "sfc" },
-                { "var": "TMP", "level": "2m" },
-                { "var": "TMP", "level": "850mb" },
-                { "var": "TMP", "level": "700mb" },
-                { "var": "TMP", "level": "500mb" },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "CIN", "level": "sfc" },
-                { "var": "TCDC", "level": "eatmcsl" },
-                { "var": "DPT", "level": "2m" },
-                { "var": "RH", "level": "850mb" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "VIS", "level": "sfc" },
-                { "var": "WEASD", "level": "sfc" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "UGRD", "level": "850mb" },
-                { "var": "VGRD", "level": "850mb" },
-                { "var": "UGRD", "level": "700mb" },
-                { "var": "VGRD", "level": "700mb" }
+                {
+                    "var": "APCP01",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "850mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "700mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "500mb"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "850mb"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "WEASD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb"
+                }
             ]
         },
         "hrrr": {
@@ -431,45 +865,163 @@
                 "0": 1
             },
             "bands": [
-                { "var": "REFC", "level": "eatm" },
-                { "var": "RETOP", "level": "ctl"},
-                { "var": "VIL", "level": "eatm"},
-                { "var": "VIS", "level": "sfc"},
-                { "var": "TCDC", "level": "eatm"},
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "HAIL", "level": "eatm"},
-                { "var": "LTNG", "level": "eatm"},
-                { "var": "PRATE", "level": "sfc" },
-                { "var": "APCP", "level": "sfc", "timeRange": 1 },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "CIN", "level": "sfc" },
-                { "var": "4LFTX", "level": "180to0mb" },
-                { "var": "ASNOW", "level": "sfc" },
-                { "var": "WEASD", "level": "sfc" },
-                { "var": "SNOD", "level": "sfc" },
-                { "var": "GUST", "level": "sfc" },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "UGRD", "level": "10m" },
-                { "var": "VGRD", "level": "10m" },
-                { "var": "UGRD", "level": "500mb" },
-                { "var": "VGRD", "level": "500mb" },
-                { "var": "UGRD", "level": "700mb" },
-                { "var": "VGRD", "level": "700mb" },
-                { "var": "UGRD", "level": "850mb" },
-                { "var": "VGRD", "level": "850mb" },
-                { "var": "USTM", "level": "0to6000m" },
-                { "var": "VSTM", "level": "0to6000m" },
-                { "var": "TMP", "level": "sfc" },
-                { "var": "TMP", "level": "2m" },
-                { "var": "TMP", "level": "850mb" },
-                { "var": "TMP", "level": "700mb" },
-                { "var": "TMP", "level": "500mb" },
-                { "var": "DPT", "level": "2m" },
-                { "var": "RH", "level": "2m" },
-                { "var": "PWAT", "level": "eatmcsl" }
+                {
+                    "var": "REFC",
+                    "level": "eatm"
+                },
+                {
+                    "var": "RETOP",
+                    "level": "ctl"
+                },
+                {
+                    "var": "VIL",
+                    "level": "eatm"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatm"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "HAIL",
+                    "level": "eatm"
+                },
+                {
+                    "var": "LTNG",
+                    "level": "eatm"
+                },
+                {
+                    "var": "PRATE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "APCP",
+                    "level": "sfc",
+                    "timeRange": 1
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "4LFTX",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "ASNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "WEASD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "SNOD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "GUST",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "USTM",
+                    "level": "0to6000m"
+                },
+                {
+                    "var": "VSTM",
+                    "level": "0to6000m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "850mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "700mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "500mb"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                }
             ]
         },
         "naefs_anom": {
@@ -489,8 +1041,68 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/pgrb2ap5_an/naefs_geavg.t%Hz.pgrb2a.0p50_anvf%T",
             "filetype": "grib2",
             "bands": [
-                {"var": "HGT", "level": "500mb"},
-                {"var": "TMP", "level": "2m"}
+                {
+                    "var": "HGT",
+                    "level": "500mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                }
+            ]
+        },
+        "naefs_bc_avg": {
+            "enabled": true,
+            "bounds": "na",
+            "updateFrequency": 6,
+            "updateOffset": 0,
+            "readTimeout": 300,
+            "startTime": 3,
+            "endTime": 384,
+            "imageWidth": 720,
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
+            "index": false,
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/pgrb2ap5_bc/naefs_geavg.t%Hz.pgrb2a.0p50_bcf%T",
+            "filetype": "grib2",
+            "bands": [
+                {
+                    "var": "HGT",
+                    "level": "500mb"
+                },
+                {
+                    "var": "PRES",
+                    "level": "sfc"
+                }
+            ]
+        },
+        "naefs_bc_spr": {
+            "enabled": true,
+            "bounds": "na",
+            "updateFrequency": 6,
+            "updateOffset": 0,
+            "readTimeout": 300,
+            "startTime": 3,
+            "endTime": 384,
+            "imageWidth": 720,
+            "fhStep": {
+                "0": 3,
+                "192": 6
+            },
+            "index": false,
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/pgrb2ap5_bc/naefs_gespr.t%Hz.pgrb2a.0p50_bcf%T",
+            "filetype": "grib2",
+            "bands": [
+                {
+                    "var": "HGT",
+                    "level": "500mb"
+                },
+                {
+                    "var": "PRES",
+                    "level": "sfc"
+                }
             ]
         },
         "naefs_ndgd_avg": {
@@ -510,11 +1122,26 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/ndgd_gb2/naefs.t%Hz.geavg.f%T.conus_ext_2p5.grib2",
             "filetype": "grib2",
             "bands": [
-                {"var": "TMP", "level": "2m"},
-                {"var": "DPT", "level": "2m"},
-                {"var": "RH", "level": "2m"},
-                {"var": "UGRD", "level": "10m"},
-                {"var": "VGRD", "level": "10m"}
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                }
             ]
         },
         "naefs_ndgd_spr": {
@@ -534,11 +1161,26 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/naefs/prod/naefs.%D/%H/ndgd_gb2/naefs.t%Hz.gespr.f%T.conus_ext_2p5.grib2",
             "filetype": "grib2",
             "bands": [
-                {"var": "TMP", "level": "2m"},
-                {"var": "DPT", "level": "2m"},
-                {"var": "RH", "level": "2m"},
-                {"var": "UGRD", "level": "10m"},
-                {"var": "VGRD", "level": "10m"}
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                }
             ]
         },
         "nam3": {
@@ -557,36 +1199,126 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.conusnest.hiresf%T.tm00.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "TMP", "level": "sfc" },
-                { "var": "TMP", "level": "2m" },
-                { "var": "TMAX", "level": "2m" },
-                { "var": "TMIN", "level": "2m" },
-                { "var": "TMP", "level": "500mb" },
-                { "var": "TMP", "level": "600mb" },
-                { "var": "TMP", "level": "700mb" },
-                { "var": "TMP", "level": "850mb" },
-                { "var": "DPT", "level": "2m" },
-                { "var": "RH", "level": "2m" },
-                { "var": "GUST", "level": "sfc" },
-                { "var": "4LFTX", "level": "180to0mb" },
-                { "var": "CAPE", "level": "180to0mb" },
-                { "var": "CIN", "level": "180to0mb" },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "CIN", "level": "sfc" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "TCDC", "level": "eatmcsl" },
-                { "var": "VIS", "level": "sfc" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "RETOP", "level": "eatmcsl" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "PRATE", "level": "sfc" },
-                { "var": "LTNG", "level": "sfc" },
-                { "var": "SNOD", "level": "sfc" },
-                { "var": "SNOM", "level": "sfc" },
-                { "var": "APCP", "level": "sfc" }
+                {
+                    "var": "TMP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMAX",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMIN",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "500mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "600mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "700mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "850mb"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "GUST",
+                    "level": "sfc"
+                },
+                {
+                    "var": "4LFTX",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CIN",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "RETOP",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PRATE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "LTNG",
+                    "level": "sfc"
+                },
+                {
+                    "var": "SNOD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "SNOM",
+                    "level": "sfc"
+                },
+                {
+                    "var": "APCP",
+                    "level": "sfc"
+                }
             ]
         },
         "nam12": {
@@ -606,34 +1338,119 @@
             "url": "https://nomads.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.%D/nam.t%Hz.awphys%T.tm00.grib2",
             "filetype": "grib2",
             "bands": [
-                { "var": "TMP", "level": "sfc" },
-                { "var": "TMP", "level": "2m" },
-                { "var": "TMAX", "level": "2m" },
-                { "var": "TMIN", "level": "2m" },
-                { "var": "TMP", "level": "500mb" },
-                { "var": "TMP", "level": "600mb" },
-                { "var": "TMP", "level": "700mb" },
-                { "var": "TMP", "level": "850mb" },
-                { "var": "DPT", "level": "2m" },
-                { "var": "RH", "level": "2m" },
-                { "var": "GUST", "level": "sfc" },
-                { "var": "4LFTX", "level": "180to0mb" },
-                { "var": "CAPE", "level": "180to0mb" },
-                { "var": "CIN", "level": "180to0mb" },
-                { "var": "CAPE", "level": "sfc" },
-                { "var": "CIN", "level": "sfc" },
-                { "var": "PWAT", "level": "eatmcsl" },
-                { "var": "TCDC", "level": "eatmcsl" },
-                { "var": "VIS", "level": "sfc" },
-                { "var": "REFC", "level": "eatmcsl" },
-                { "var": "RETOP", "level": "eatmcsl" },
-                { "var": "CSNOW", "level": "sfc" },
-                { "var": "CICEP", "level": "sfc" },
-                { "var": "CFRZR", "level": "sfc" },
-                { "var": "CRAIN", "level": "sfc" },
-                { "var": "LTNG", "level": "sfc" },
-                { "var": "SNOD", "level": "sfc" },
-                { "var": "APCP", "level": "sfc", "timeRange": 3 }
+                {
+                    "var": "TMP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMAX",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMIN",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "500mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "600mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "700mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "850mb"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "GUST",
+                    "level": "sfc"
+                },
+                {
+                    "var": "4LFTX",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CIN",
+                    "level": "180to0mb"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "TCDC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "REFC",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "RETOP",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "LTNG",
+                    "level": "sfc"
+                },
+                {
+                    "var": "SNOD",
+                    "level": "sfc"
+                },
+                {
+                    "var": "APCP",
+                    "level": "sfc",
+                    "timeRange": 3
+                }
             ]
         },
         "sref_mean": {
@@ -716,7 +1533,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_25pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW25", "level": "sfc"}
+                {
+                    "var": "ASNOW25",
+                    "level": "sfc"
+                }
             ]
         },
         "wpc_snow_12h_50pct": {
@@ -735,7 +1555,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_50pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW50", "level": "sfc"}
+                {
+                    "var": "ASNOW50",
+                    "level": "sfc"
+                }
             ]
         },
         "wpc_snow_12h_75pct": {
@@ -754,7 +1577,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmprcntil_12hsnow_75pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW75", "level": "sfc"}
+                {
+                    "var": "ASNOW75",
+                    "level": "sfc"
+                }
             ]
         },
         "wpc_snow_12h_sigma": {
@@ -773,7 +1599,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_12hr/2.5kmsigma_12h_snow_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW", "level": "sfc"}
+                {
+                    "var": "ASNOW",
+                    "level": "sfc"
+                }
             ]
         },
         "wpc_snow_72h_25pct": {
@@ -792,7 +1621,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_25pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW25", "level": "sfc"}
+                {
+                    "var": "ASNOW25",
+                    "level": "sfc"
+                }
             ]
         },
         "wpc_snow_72h_50pct": {
@@ -811,7 +1643,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_50pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW50", "level": "sfc"}
+                {
+                    "var": "ASNOW50",
+                    "level": "sfc"
+                }
             ]
         },
         "wpc_snow_72h_75pct": {
@@ -830,7 +1665,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmprcntil_72hsnow_75pt_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW75", "level": "sfc"}
+                {
+                    "var": "ASNOW75",
+                    "level": "sfc"
+                }
             ]
         },
         "wpc_snow_72h_sigma": {
@@ -849,7 +1687,10 @@
             "url": "https://ftp.wpc.ncep.noaa.gov/pwpf/conus_2.5km/2.5kmpwpf_72hr/2.5kmsigma_72h_snow_%D%Hf0%T.grb",
             "filetype": "grib2",
             "bands": [
-                { "var": "ASNOW", "level": "sfc"}
+                {
+                    "var": "ASNOW",
+                    "level": "sfc"
+                }
             ]
         }
     }
