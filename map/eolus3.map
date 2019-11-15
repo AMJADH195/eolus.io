@@ -42,4 +42,36 @@ MAP
   PROCESSING "CLOSE_CONNECTION=ALWAYS"
   PROCESSING "RESAMPLE=%resampling%"
  END
+
+ LAYER
+  NAME eolus3_contours
+  TYPE LINE
+  STATUS OFF
+  VALIDATION
+   "date" "[0-9]{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])"
+   "time" "(2[0-3]|[01][0-9])"
+   "var" ".*"
+   "model" ".*"
+   "resampling" ".*"
+   "band" "[0-9]+"
+   "interval" "[0-9]+"
+  END
+  PROJECTION
+   "init=epsg:4326"
+  END
+  METADATA
+   "wms_title" "eolus3_contours"
+   "wms_srs"   "EPSG:4326 EPSG:3857"
+   "wms_extent" "-180 80 -60 20"
+   "wms_enable_request" "*"
+   "wms_formatlist" "image/png,image/jpeg"
+  END
+  CONNECTIONTYPE CONTOUR
+  DATA "/map/%model%/%model%_%date%_%time%Z_%var%.tif"
+  PROCESSING "BANDS=%band%"
+  PROCESSING "CLOSE_CONNECTION=ALWAYS"
+  PROCESSING "RESAMPLE=%resampling%"
+  PROCESSING "CONTOUR_ITEM=%var%"
+  PROCESSING "CONTOUR_INTERVAL=%interval%"
+  LABELITEM "%var%"
 END
