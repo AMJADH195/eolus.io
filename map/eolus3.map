@@ -84,7 +84,6 @@ MAP
    END
    TEXT ('%lbl_start%' + tostring([con],"%.%lbl_round%f") + '%lbl_end%')
    LABEL
-    COLOR 0 0 0
     OUTLINECOLOR 255 255 255
     OUTLINEWIDTH 2
     SIZE 8
