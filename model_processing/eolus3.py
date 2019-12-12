@@ -423,8 +423,10 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
 
     fileName = getBaseFileName (modelName, timestamp, band)
     targetDir = config["mapfileDir"] + "/" + modelName + "/" 
+    targetRawDir = config["mapfileDir"] + "/rawdata/" + modelName + "/" 
     downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
     targetFileName = targetDir + fileName + ".tif"
+    targetRawFileName = targetRawDir + fileName + ".tif"
 
     try:
         response = requests.head(url)
@@ -486,6 +488,18 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             resampleAlg=gdal.GRA_CubicSpline)
         outFile.FlushCache()
         outFile = None
+
+        outFile = gdal.Warp(
+            downloadFileName + "_unscaled.tif", 
+            gribFile, 
+            format='GTiff', 
+            outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
+            dstSRS=epsg4326,
+            creationOptions=["COMPRESS=deflate","ZLEVEL=9"],
+            resampleAlg=gdal.GRA_CubicSpline)
+        outFile.FlushCache()
+        outFile = None
+
         gribFile = None
     except Exception as e:
         log ("Warping failed -- " + downloadFileName, "ERROR", remote=True)
@@ -508,13 +522,39 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
             width = gribFile.RasterXSize
             height = gribFile.RasterYSize
 
-            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
+            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float32)
             newRaster.SetProjection (gribFile.GetProjection())
             newRaster.SetGeoTransform (list(geoTransform))
             gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
             log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
         except Exception as e:
             log ("Couldn't create the new TIF: " + targetFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
+            log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+            return False
+
+    # check to see if the working raster exists
+    if not os.path.exists(targetRawFileName):
+        log (f"· Creating output master TIF | {targetRawFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        try:
+            os.makedirs (targetRawDir)
+        except:
+            log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+
+        numBands = getNumberOfHours (modelName)
+
+        try:
+            gribFile = gdal.Open (downloadFileName + "_unscaled.tif")
+            geoTransform = gribFile.GetGeoTransform()
+            width = gribFile.RasterXSize
+            height = gribFile.RasterYSize
+
+            newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float32)
+            newRaster.SetProjection (gribFile.GetProjection())
+            newRaster.SetGeoTransform (list(geoTransform))
+            gdal.GetDriverByName('GTiff').CreateCopy (targetRawFileName, newRaster, 0)
+            log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+        except Exception as e:
+            log ("Couldn't create the new TIF: " + targetRawFileName, "ERROR", indentLevel=2, remote=True, model=modelName)
             log (repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
             return False
 
@@ -528,6 +568,14 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         tif = gdal.Open (targetFileName, gdalconst.GA_Update)
         tif.GetRasterBand(bandNumber).WriteArray(data)
         tif.FlushCache()
+
+        gribFile = gdal.Open (downloadFileName + "_unscaled.tif")
+        data = gribFile.GetRasterBand(1).ReadAsArray()
+
+        tif = gdal.Open (targetRawFileName, gdalconst.GA_Update)
+        tif.GetRasterBand(bandNumber).WriteArray(data)
+        tif.FlushCache()
+
         gribFile = None
         tif = None
         log (f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
@@ -539,6 +587,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
     try:
         os.remove(downloadFileName)
         os.remove(downloadFileName + ".tif")
+        os.remove(downloadFileName + "_unscaled.tif")
     except:
         log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
     
@@ -622,6 +671,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
     fileName = getBaseFileName (modelName, timestamp, None)
     targetDir = config["mapfileDir"] + "/" + modelName + "/" 
+    targetRawDir = config["mapfileDir"] + "/rawdata/" + modelName + "/" 
     downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
 
     log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
@@ -659,6 +709,17 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
             width=width,
             resampleAlg=gdal.GRA_CubicSpline)
         outFile.FlushCache()
+
+        outFile = gdal.Warp(
+            downloadFileName + "_unscaled.tif", 
+            gribFile, 
+            format='GTiff', 
+            outputBounds=[bounds["left"], bounds["bottom"], bounds["right"], bounds["top"]], 
+            dstSRS=epsg4326,
+            creationOptions=["COMPRESS=deflate","ZLEVEL=9"],
+            resampleAlg=gdal.GRA_CubicSpline)
+        outFile.FlushCache()
+
         outFile = None
         gribFile = None
 
@@ -672,14 +733,17 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
     if bands == None:
         try:
             os.makedirs (targetDir)
+            os.makedirs(targetRawDir)
         except:
             log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
 
         targetFileName = targetDir + getBaseFileName (modelName, timestamp, None) + "_t" + fh + ".tif"
+        targetRawFileName = targetRawDir + getBaseFileName (modelName, timestamp, None) + "_t" + fh + ".tif"
         log ("· Copying to " + targetFileName, "NOTICE", indentLevel=2, remote=True, model=modelName)
 
         try:
             shutil.copyfile (downloadFileName + ".tif", targetFileName)
+            shutil.copyfile(downloadFileName + "_unscaled.tif", targetRawFileName)
         except:
             log ("Couldn't copy.","ERROR", indentLevel=2, remote=True, model=modelName)
             return False
@@ -689,6 +753,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
         for band in bands:
             targetFileName = targetDir + getBaseFileName (modelName, timestamp, band) + ".tif"
+            targetRawFileName = targetRawDir + getBaseFileName(modelName, timestamp, band) + ".tif"
             if not os.path.exists(targetFileName):
                 log (f"· Creating output master TIF with {str(numBands) } bands | {targetFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
                 try:
@@ -702,7 +767,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                     width = gribFile.RasterXSize
                     height = gribFile.RasterYSize
 
-                    newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float64)
+                    newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float32)
                     newRaster.SetProjection (gribFile.GetProjection())
                     newRaster.SetGeoTransform (list(geoTransform))
                     gdal.GetDriverByName('GTiff').CreateCopy (targetFileName, newRaster, 0)
@@ -713,6 +778,31 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                     log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
                     return False
 
+            if not os.path.exists(targetRawFileName):
+                log (f"· Creating output master TIF with {str(numBands) } bands | {targetRawFileName}", "NOTICE", indentLevel=2, remote=True, model=modelName)
+                try:
+                    os.makedirs (targetRawDir)
+                except:
+                    log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+
+                try:
+                    gribFile = gdal.Open (downloadFileName + "_unscaled.tif")
+                    geoTransform = gribFile.GetGeoTransform()
+                    width = gribFile.RasterXSize
+                    height = gribFile.RasterYSize
+
+                    newRaster = gdal.GetDriverByName('MEM').Create('', width, height, numBands, gdal.GDT_Float32)
+                    newRaster.SetProjection (gribFile.GetProjection())
+                    newRaster.SetGeoTransform (list(geoTransform))
+                    gdal.GetDriverByName('GTiff').CreateCopy (targetRawFileName, newRaster, 0)
+                    gribFile = None
+                    newRaster = None
+                    log ("✓ Output master TIF created.", "NOTICE", indentLevel=2, remote=True, model=modelName)
+                except:
+                    log ("Couldn't create the new TIF.", "ERROR", indentLevel=2, remote=True, model=modelName)
+                    return False
+
+
             log (f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}", "NOTICE", indentLevel=2, remote=True, model=modelName)
             # Copy the downloaded band to this temp file
             try:
@@ -720,6 +810,23 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                 gribNumBands = gribFile.RasterCount
                 bandLevel = getLevelNameForLevel(band["band"]["level"], "gribName")
                 tif = gdal.Open (targetFileName, gdalconst.GA_Update)
+                for i in range (1, gribNumBands + 1):
+                    try:
+                        fileBand = gribFile.GetRasterBand(i)
+                        metadata = fileBand.GetMetadata()
+                        if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
+                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2, remote=True)
+                            data = fileBand.ReadAsArray()
+                            tif.GetRasterBand(bandNumber).WriteArray(data)
+                            break
+
+                    except:
+                        log (f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}", "WARN", indentLevel=2, remote=True, model=modelName)
+
+                tif.FlushCache()
+
+                gribFile = gdal.Open(downloadFileName + "_unscaled.tif")
+                tif = gdal.Open (targetRawFileName, gdalconst.GA_Update)
                 for i in range (1, gribNumBands + 1):
                     try:
                         fileBand = gribFile.GetRasterBand(i)
@@ -744,6 +851,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
     try:
         os.remove(downloadFileName)
         os.remove(downloadFileName + ".tif")
+        os.remove(downloadFileName + "_unscaled.tif")
     except:
         log (f"× Could not delete a temp file ({downloadFileName}).", "WARN", indentLevel=2, remote=True, model=modelName)
 
