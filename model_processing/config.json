@@ -90,7 +90,7 @@
     "models": {
         "gefs_pgrb2ap5_avg": {
             "enabled": true,
-            "bounds": "colorado",
+            "bounds": "na",
             "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -201,7 +201,7 @@
         },
         "gefs_pgrb2ap5_spr": {
             "enabled": true,
-            "bounds": "colorado",
+            "bounds": "na",
             "readTimeout": 300,
             "updateFrequency": 6,
             "updateOffset": 0,
