@@ -512,7 +512,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         try:
             os.makedirs (targetDir)
         except:
-            log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+            log ("· Directory already exists.", "INFO", indentLevel=2, remote=False, model=modelName)
 
         numBands = getNumberOfHours (modelName)
 
@@ -538,7 +538,7 @@ def downloadBand (modelName, timestamp, fh, band, tableName):
         try:
             os.makedirs (targetRawDir)
         except:
-            log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+            log ("· Directory already exists.", "INFO", indentLevel=2, remote=False, model=modelName)
 
         numBands = getNumberOfHours (modelName)
 
@@ -677,6 +677,8 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
     try:
         os.makedirs(targetDir)
         os.makedirs (targetRawDir)
+    except:
+        log ("· Directory already exists.", "INFO", indentLevel=2, remote=False, model=modelName)
 
     log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
@@ -787,7 +789,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                 try:
                     os.makedirs (targetRawDir)
                 except:
-                    log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+                    log ("· Directory already exists.", "INFO", indentLevel=2, remote=False, model=modelName)
 
                 try:
                     gribFile = gdal.Open (downloadFileName + "_unscaled.tif")
