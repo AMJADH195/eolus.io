@@ -674,6 +674,10 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
     targetRawDir = config["mapfileDir"] + "/rawdata/" + modelName + "/" 
     downloadFileName = config["tempDir"] + "/" + fileName + "_t" + fh  + "." + model["filetype"]
 
+    try:
+        os.makedirs(targetDir)
+        os.makedirs (targetRawDir)
+
     log (f"↓ Downloading fh {fh}.", "NOTICE", indentLevel=2, remote=True, model=modelName)
     try:
         response = http.request('GET',url,retries=5)
@@ -815,7 +819,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                         fileBand = gribFile.GetRasterBand(i)
                         metadata = fileBand.GetMetadata()
                         if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
-                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2, remote=True)
+                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2, remote=False)
                             data = fileBand.ReadAsArray()
                             tif.GetRasterBand(bandNumber).WriteArray(data)
                             break
@@ -832,7 +836,7 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
                         fileBand = gribFile.GetRasterBand(i)
                         metadata = fileBand.GetMetadata()
                         if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
-                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2, remote=True)
+                            log ("· Band " +  band["band"]["var"] + " found.", "DEBUG", indentLevel=2, remote=False)
                             data = fileBand.ReadAsArray()
                             tif.GetRasterBand(bandNumber).WriteArray(data)
                             break
