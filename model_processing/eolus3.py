@@ -676,7 +676,11 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
 
     try:
         os.makedirs(targetDir)
-        os.makedirs (targetRawDir)
+    except:
+        log ("· Directory already exists.", "INFO", indentLevel=2, remote=False, model=modelName)
+
+    try:
+        os.makedirs(targetRawDir)
     except:
         log ("· Directory already exists.", "INFO", indentLevel=2, remote=False, model=modelName)
 
@@ -739,9 +743,13 @@ def downloadFullFile (modelName, timestamp, fh, tableName):
     if bands == None:
         try:
             os.makedirs (targetDir)
-            os.makedirs(targetRawDir)
         except:
             log ("· Directory already exists.", "INFO", indentLevel=2, remote=True, model=modelName)
+
+        try:
+            os.makedirs(targetRawDir)
+        except:
+            log ("· Directory already exists.", "INFO", indentLevel=2, remote=False, model=modelName)
 
         targetFileName = targetDir + getBaseFileName (modelName, timestamp, None) + "_t" + fh + ".tif"
         targetRawFileName = targetRawDir + getBaseFileName (modelName, timestamp, None) + "_t" + fh + ".tif"
