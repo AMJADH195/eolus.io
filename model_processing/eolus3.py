@@ -1,227 +1,47 @@
-import psycopg2
-import urllib3
-import requests
-import json
-import os
+from eolus_lib.config import config, data, layerMaps
+import eolus_lib.http_manager as http_manager
+from eolus_lib.logger import log
+import eolus_lib.pg_connection_manager as pg
+import eolus_lib.model_tools as model_tools
+
 import sys
-import shutil
-import os.path
-import argparse
-import certifi
-from time import sleep
+import os
 from osgeo import ogr, gdal, osr, gdalconst
-from datetime import datetime, timedelta, tzinfo, time
 
 sys.setrecursionlimit (10**8)
 
-conn = None
-curr = None
-http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=5.0, read=10.0),cert_reqs='CERT_REQUIRED',ca_certs=certifi.where())
-pid = str(os.getpid())
 agentLogged = False
 
-directory = os.path.dirname(os.path.realpath(__file__)) + "/"
 gdal.UseExceptions()
 
-try:
-    with open (directory + '/config.json') as f:
-        data = json.load(f)
-except:
-    print ("Error: Config file does not exist or is corrupt.")
-    sys.exit (1)
-
-config = data["config"]
-levelMaps = data["levelMaps"]
-models = data["models"]
-
-ZERO = timedelta(0)
-
-class UTC(tzinfo):
-    def utcoffset(self, dt):
-        return ZERO
-    def tzname(self, dt):
-        return "UTC"
-    def dst(self, dt):
-        return ZERO
-
-utc = UTC()
-
-def killScript (exitCode): 
-    global conn, curr
+def killScript (exitCode):
     if exitCode != 0:
-        resetPgConnection ()
+        pg.reset ()
         log ("Exiting on failure.", "ERROR")
 
     if agentLogged:
         try:
-            removeAgent ()
+            pg.remove_agent ()
         except:
             log ("Could not remove agent, trying again.", "ERROR", remote=True)
             try:
-                conn = sqlConnect ()
-                curr = conn.cursor()
-                removeAgent()
+                pg.connect()
+                pg.remove_agent()
             except:
                 os._exit(exitCode)
     try:
-        curr.close()
-        conn.close()
+        pg.close()
     except:
         log ("Couldn't close connection.", "ERROR")
     os._exit (exitCode)
 
 
-def resetPgConnection ():
-    if not conn.closed:
-        conn.cancel ()
-        conn.reset ()
 
 
-def addAgent ():
-    global agentLogged
-    try:
-        curr.execute ("INSERT INTO eolus3.agents (pid, start_time) VALUES (%s, %s)", (pid, datetime.utcnow()))
-        conn.commit ()
-        agentLogged = True
-    except:
-        log ("Couldn't add agent.", "ERROR")
-        killScript (1)
 
 
-def removeAgent ():
-    log ("Removing agent " + pid, "DEBUG")
-    try:
-        curr.execute ("DELETE FROM eolus3.agents WHERE pid = %s", (pid,))
-        conn.commit ()
-        agentLogged = False
-    except:
-        resetPgConnection ()
-        log ("Couldn't add agent.", "ERROR", remote=True)
 
 
-def getAgentCount ():
-    try:
-        curr.execute ("SELECT COUNT(*) FROM eolus3.agents")
-        conn.commit () 
-        result = curr.fetchone()
-        return result[0]
-    except:
-        resetPgConnection ()
-        log ("Couldn't get agent count.", "ERROR", remote=True)
-        killScript (1)
-
-
-def log (text, level, indentLevel=0, remote=False, model=''):
-    timestamp = datetime.utcnow()
-    timeStr = timestamp.strftime("%H:%M:%S")
-    indents = ""
-
-    for i in range (0, indentLevel):
-        indents += "   "
-
-    print (f"[{level}\t| {timeStr}] {indents}{text}")
-
-    if remote:
-        try:
-            curr.execute ("INSERT INTO eolus3.log (model, level, timestamp, agent, message) VALUES (%s, %s, %s, %s, %s)", (model, level, timestamp, pid, text))
-            conn.commit ()
-        except:
-            print ("Wasn't logged remotely :(")
-            resetPgConnection()
-
-
-def sqlConnect():
-    log ("Connecting to database [" + config["postgres"]["host"] + "]", "INFO") 
-    return psycopg2.connect (
-        host=config["postgres"]["host"],
-        port=5432,
-        dbname=config["postgres"]["db"],
-        user=config["postgres"]["user"],
-        sslmode="require")
-
-
-def printLine():
-    print ("-----------------")
-
-
-def makeUrl (modelName, modelDate, modelHour, fh):
-    model = models[modelName]
-    return model["url"].replace("%D",modelDate).replace("%H",modelHour).replace("%T", fh)
-
-
-def endModelProcessing (modelName):
-
-    clean ()
-
-    try:
-        log ("✓ This model is completely finished processing.", "INFO", remote=True, model=modelName)
-        curr.execute ("UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", modelName))
-        conn.commit ()
-        updateRunStatus(modelName)
-    except:
-        resetPgConnection()
-        log ("Couldn't mark model as complete.", "ERROR", remote=True, model=modelName)
-
-
-def addModelToDb (modelName):
-    try:
-        log ("✓ Added model to models table.", "INFO", indentLevel=1, remote=True, model=modelName)
-        curr.execute ("INSERT INTO eolus3.models (model, status) VALUES (%s, %s)", (modelName, "WAITING"))
-        conn.commit ()
-    except:
-        resetPgConnection()
-        log ("Couldn't add model to db.", "ERROR", remote=True, model=modelName)
-        killScript (1)
-
-
-def getLastAvailableTimestamp (model, prev=0):
-    now = datetime.utcnow()
-    startOfDay = now - timedelta(
-        hours=now.hour, 
-        minutes=now.minute, 
-        seconds=now.second, 
-        microseconds=now.microsecond
-    )
-    yesterdayMidnight = startOfDay - timedelta(days=1)
-
-    startOfDateChecker = yesterdayMidnight + timedelta(hours=model["updateOffset"])
-
-    maxTime = now - timedelta (hours=prev*model["updateFrequency"])
-    nowNotExceeded = True
-    checkedTime = startOfDateChecker
-    while nowNotExceeded:
-        if checkedTime + timedelta(hours=(model["updateFrequency"])) > maxTime:
-            break
-        else:
-            checkedTime = checkedTime + timedelta(hours=(model["updateFrequency"]))
-
-    log (f"· Last available timestamp, {str(prev)} runs ago: {str(checkedTime)}", "DEBUG", indentLevel=1)
-
-    return checkedTime
-
-
-def getNumberOfHours (modelName):
-    model = models[modelName]
-    fh = model["startTime"]
-    i = 0
-    while True:
-        fh = addAppropriateFhStep (modelName, fh)
-        i += 1
-
-        if fh > model["endTime"]:
-            return i
-
-
-def getModelStatus (modelName):
-    try:
-        curr.execute ("SELECT status FROM eolus3.models WHERE model LIKE '" + modelName + "'")
-        result = curr.fetchone()
-
-        return result[0]
-
-    except:
-        resetPgConnection()
-        return None
 
 
 def startProcessingModel (modelName, timestamp):
@@ -258,9 +78,6 @@ def startProcessingModel (modelName, timestamp):
 
 
 
-def getFullFh (modelName, fh):
-    model = models[modelName]
-    return str(fh).rjust (len(str(model["endTime"])), '0')
 
 
 def createBandTable (modelName, tableName):
@@ -389,23 +206,6 @@ def findModelStepToProcess(modelName):
         return False
 
 
-def getModelStepStatus (tableName, fullFh):
-    try:
-        curr.execute ("SELECT status FROM eolus3." + tableName + " WHERE fh = %s", (fullFh,))
-        return curr.fetchone()[0]
-    except:
-        resetPgConnection()
-        log ("Couldn't get status for fh " + fullFh + " in table " + tableName, "ERROR", remote=True)
-
-
-def getBaseFileName (modelName, timestamp, band):
-    date = timestamp.strftime ("%Y%m%d")
-    time = timestamp.strftime ("%HZ")
-    file = modelName + "_" + date + "_" + time
-    if band is not None:
-        return file + "_" + band["shorthand"]
-    else:
-        return file
 
 
 def downloadBand (modelName, timestamp, fh, band, tableName):
@@ -948,19 +748,7 @@ def processModelStep (modelName, tableName, fullFh, timestamp, band):
     return processed
 
     
-# This iterates a fh by the appropriate step size,
-# given the fh. This is for models where the fh step size
-# increases after a certain hour.
-def addAppropriateFhStep (modelName, fh):
-    model = models[modelName]
 
-    for key in reversed(sorted(model["fhStep"].keys())):
-
-        if fh >= int(key):
-            return fh + model["fhStep"][key]
-
-    log ("× Couldn't match the appropriate step size.", "WARN", indentLevel=1, remote=True, model=modelName)
-    return fh
 
 
 def makeModelBandArray (modelName, force=False):
@@ -980,81 +768,15 @@ def makeModelBandArray (modelName, force=False):
     return modelBandArray
 
 
-def getLevelNameForLevel (levelShorthand, nameType):
-    return levelMaps[levelShorthand][nameType]
 
 
-def checkIfModelFhAvailable (modelName, timestamp, fh):
-    model = models[modelName]
-    url = makeUrl (modelName, timestamp.strftime("%Y%m%d"), timestamp.strftime("%H"), fh)
-    log ("· Checking URL: " + url, "DEBUG", remote=True, indentLevel=1, model=modelName)
-
-    try:
-        ret = requests.head(url, timeout=(30, 120))
-
-        if ret.status_code == 200 or ret.status_code == None:
-            log ("✓ Found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
-            return True
-        else:
-            log ("× Not found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
-
-    except:
-        log ("× Not found.", "DEBUG", remote=True, indentLevel=1, model=modelName)
-    
-    return False
 
 
-def modelTimestampMatches (modelName, timestamp):
-    try:
-        curr.execute ("SELECT timestamp FROM eolus3.models WHERE model = %s", (modelName,))
-        modelTime = str(curr.fetchone()[0])[0:16]
-        tTime = str(timestamp)[0:16]
-        return modelTime == tTime
-    except:
-        resetPgConnection()
-        return False
-
-
-def updateRunStatus (modelName):
-    try:
-        curr.execute ("UPDATE eolus3.run_status SET status = 'COMPLETE' WHERE model = '" + modelName + "'")
-        conn.commit ()
-    except:
-        resetPgConnection()
-        log (f"!!! Could not update run_status!", "ERROR", indentLevel=0, remote=True, model=modelName)
-
-
-def clean ():
-    retentionDays = str(config["retentionDays"])
-    log (f"· Deleting rasters from {config['mapfileDir']} older than {retentionDays} days.", "DEBUG", indentLevel=0)
-    try:
-        os.system (f'find {config["mapfileDir"]}/*/* -mtime +' + retentionDays + ' -exec rm {} \;')
-        os.system (f'find {config["tempDir"]}/* -mtime +' + retentionDays + ' -exec rm {} \;')
-    except:
-        log (f"· Couldn't delete old rasters from {config['mapfileDir']}.", "WARN", indentLevel=0, remote=True)
-
-    log (f"· Cleaning logs older than {retentionDays} days.", "DEBUG", indentLevel=0)
-    try:
-        curr.execute ("DELETE FROM eolus3.log WHERE timestamp < now() - interval '" + retentionDays + " days'")
-        conn.commit ()
-        curr.execute ("DELETE FROM eolus3.run_status WHERE timestamp < now() - interval '" + retentionDays + " days'")
-        conn.commit ()
-    except:
-        resetPgConnection()
-        log (f"· Couldn't delete old logs.", "WARN", indentLevel=0, remote=True)
 
 
 def init():
     global conn, curr
 
-    # It's THAT kind of script :)
-    print ('''
-    ╔══════════════════════════════╗
-    ║ ░█▀▀ █▀█ █░░ █░░█ █▀▀ █▀▀█░░ ║
-    ║  █▀▀ █░█ █░░ █░░█ ▀▀█ ░░▀▄░  ║
-    ║  ▀▀▀ ▀▀▀ ▀▀▀ ░▀▀▀ ▀▀▀ █▄▄█   ║
-    ╚══════════════════════════════╝
-    ''')
 
     try:
         conn = sqlConnect ()
@@ -1081,6 +803,8 @@ def init():
 
 
 def main():
+
+    eolus_lib.hello.sayHello()
 
     processingModels = []
     processed = False
