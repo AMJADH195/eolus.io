@@ -1,4 +1,5 @@
 from eolus_lib.logger import log
+from eolus_lib.config import config, models, levelMaps
 import psycopg2
 import os
 
@@ -40,7 +41,7 @@ def remove_agent():
         ConnectionPool.conn.commit()
         return True
     except:
-        reset_pg_connection()
+        reset()
         return False
 
 
@@ -51,27 +52,37 @@ def can_do_work():
         result = ConnectionPool.curr.fetchone()
         return result[0] == 0
     except:
-        reset_pg_connection()
+        reset()
         log("Couldn't get agent count.", "ERROR", remote=True)
         return False
 
 
 def connect():
-    log("Connecting to database [" + config["postgres"]["host"] + "]", "INFO")
-    ConnectionPool.conn = psycopg2.connect(
-        host=config["postgres"]["host"],
-        port=5432,
-        dbname=config["postgres"]["db"],
-        user=config["postgres"]["user"],
-        sslmode="require")
+    try:
+        log("Connecting to database [" +
+            config["postgres"]["host"] + "]", "INFO")
 
-    ConnectionPool.curr = ConnectionPool.conn.cursor()
+        ConnectionPool.conn = psycopg2.connect(
+            host=config["postgres"]["host"],
+            port=5432,
+            dbname=config["postgres"]["db"],
+            user=config["postgres"]["user"],
+            sslmode="require")
+
+        ConnectionPool.curr = ConnectionPool.conn.cursor()
+        return True
+
+    except psycopg2.Error as e:
+        log("Could not connect to postgres.", "ERROR")
+        print(str(e))
+        print(str(e.pgerror))
+        return False
 
 
 def clean():
     ConnectionPool.curr.execute(
-        "DELETE FROM eolus3.log WHERE timestamp < now() - interval '" + retentionDays + " days'")
+        "DELETE FROM eolus3.log WHERE timestamp < now() - interval '" + config["retentionDays"] + " days'")
     ConnectionPool.conn.commit()
     ConnectionPool.curr.execute(
-        "DELETE FROM eolus3.run_status WHERE timestamp < now() - interval '" + retentionDays + " days'")
+        "DELETE FROM eolus3.run_status WHERE timestamp < now() - interval '" + config["retentionDays"]  + " days'")
     ConnectionPool.conn.commit()

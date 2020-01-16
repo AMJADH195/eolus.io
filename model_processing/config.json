@@ -27,7 +27,7 @@
         "sleepTime": 1,
         "maxTime": 0,
         "retentionDays": 2,
-        "maxAgents": 3
+        "maxThreads": 3
     },
     "levelMaps": {
         "sfc": {
