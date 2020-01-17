@@ -1,27 +1,20 @@
-from eolus_lib.config import config
+from eolus_lib.config import config, models
 from eolus_lib.logger import log
+import eolus_lib.model_tools as model_tools
 import eolus_lib.pg_connection_manager as pg
 
-def start_processing_model(model_name, timestamp):
+def start(model_name, timestamp):
 
-    model = models[model_name]
     formatted_timestamp = timestamp.strftime('%Y%m%d_%HZ')
 
     log(f"· Started processing {model_name} | {formatted_timestamp} -- making table(s).",
         "INFO", indentLevel=1, remote=True, model=model_name)
 
-    try:
-        pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s",
-                     ("MAKINGTABLE", timestamp, model_name))
-        pg.ConnectionPool.conn.commit()
-    except:
-        pg.reset()
-        killScript(1)
+    make_model_band_array(model_name)
+    table_name = model_name + "_" + formatted_timestamp
 
-    modelBandArray = makeModelBandArray(model_name)
-    tableName = model_name + "_" + formatted_timestamp
-
-    createBandTable(model_name, tableName)
+    if not create_band_table(model_name, table_name):
+        return False
 
     try:
         pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s",
@@ -39,14 +32,17 @@ def start_processing_model(model_name, timestamp):
         pg.reset()
         log("Could not set the model status back to processing! This requires manual intervention.",
             "ERROR", remote=True)
+        return False
+
+    return True
 
 
-def createBandTable(modelName, tableName):
-    log(f"· Creating table | {tableName}", "NOTICE",
-        indentLevel=1, remote=True, model=modelName)
+def create_band_table(model_name, table_name):
+    log(f"· Creating table | {table_name}", "NOTICE",
+        indentLevel=1, remote=True, model=model_name)
     try:
-        model = models[modelName]
-        pg.ConnectionPool.curr.execute("CREATE TABLE eolus3." + tableName +
+        model = models[model_name]
+        pg.ConnectionPool.curr.execute("CREATE TABLE eolus3." + table_name +
                      " (fh text, status text, band integer, start_time timestamp with time zone, grib_var text, agent text) WITH ( OIDS = FALSE )")
         pg.ConnectionPool.conn.commit()
 
@@ -54,27 +50,27 @@ def createBandTable(modelName, tableName):
         pg.reset()
         log("Could not create table. This will probably need to be manually fixed.",
             "ERROR", remote=True)
-        return
+        return False
 
     fh = model["startTime"]
     i = 1
 
     populated = False
 
-    bands = makeModelBandArray(modelName)
+    bands = make_model_band_array(model_name)
     try:
         while not populated:
-            fullFh = getFullFh(modelName, fh)
+            full_fh = getfull_fh(model_name, fh)
             if bands == None or len(bands) == 0:
-                pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + tableName +
-                             " (fh, status, band) VALUES (%s, %s, %s)", (fullFh, "WAITING", str(i)))
+                pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + table_name +
+                             " (fh, status, band) VALUES (%s, %s, %s)", (full_fh, "WAITING", str(i)))
                 pg.ConnectionPool.conn.commit()
             else:
                 for band in bands:
-                    pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + tableName + " (fh, status, band, grib_var) VALUES (%s, %s, %s, %s)",
-                                 (fullFh, "WAITING", str(i), band["shorthand"]))
+                    pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + table_name + " (fh, status, band, grib_var) VALUES (%s, %s, %s, %s)",
+                                 (full_fh, "WAITING", str(i), band["shorthand"]))
                     pg.ConnectionPool.conn.commit()
-            fh = addAppropriateFhStep(modelName, fh)
+            fh = model_tools.add_appropriate_fh_step(model_name, fh)
             i += 1
 
             if fh > model["endTime"]:
@@ -82,181 +78,182 @@ def createBandTable(modelName, tableName):
     except:
         pg.reset()
         log("An error ocpg.ConnectionPool.curred while making the table (" +
-            tableName + ").", "ERROR", remote=True, model=modelName)
+            table_name + ").", "ERROR", remote=True, model=model_name)
         return
 
 
-def findModelStepToProcess(modelName):
+def find_model_step_to_process(model_name):
     found = False
-    model = models[modelName]
+    model = models[model_name]
     fh = model["startTime"]
-    origBand = -1
+    orig_band = -1
 
     try:
         pg.ConnectionPool.curr.execute(
-            "SELECT timestamp FROM eolus3.models WHERE model = %s", (modelName,))
+            "SELECT timestamp FROM eolus3.models WHERE model = %s", (model_name,))
         timestamp = pg.ConnectionPool.curr.fetchone()[0]
 
-        formattedTimestamp = timestamp.strftime('%Y%m%d_%HZ')
-        tableName = modelName + "_" + formattedTimestamp
+        formatted_timestamp = timestamp.strftime('%Y%m%d_%HZ')
+        table_name = model_name + "_" + formatted_timestamp
 
     except:
         pg.reset()
         log("Couldn't get the timetamp for model " +
-            modelName, "ERROR", remote=True)
+            model_name, "ERROR", remote=True)
 
     try:
-        pg.ConnectionPool.curr.execute("SELECT fh, grib_var, band FROM eolus3." + tableName +
+        # TODO PUT LIKE WHERE fh, grib_var, band not in whatever is currently in model_processing_pool
+        pg.ConnectionPool.curr.execute("SELECT fh, grib_var, band FROM eolus3." + table_name +
                      " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
         res = pg.ConnectionPool.curr.fetchone()
         if not res or len(res) == 0:
             return False
-        fullFh = res[0]
-        gribVar = res[1]
-        origBand = res[2]
+        full_fh = res[0]
+        grib_var = res[1]
+        orig_band = res[2]
 
     except:
         pg.reset()
         log("Couldn't get the status of a timestep from " +
-            tableName, "ERROR", remote=True)
+            table_name, "ERROR", remote=True)
         return False
 
     band = None
 
-    if not gribVar:
+    if not grib_var:
         band = None
     else:
-        modelBandArray = makeModelBandArray(modelName)
-        for bandItem in modelBandArray:
-            if bandItem["shorthand"] == gribVar:
+        model_band_array = makeModelBandArray(model_name)
+        for bandItem in model_band_array:
+            if bandItem["shorthand"] == grib_var:
                 band = bandItem
                 break
 
-    bandStr = ""
+    band_str = ""
     if band:
-        bandStr = " AND grib_var = '" + band["shorthand"] + "'"
+        band_str = " AND grib_var = '" + band["shorthand"] + "'"
 
-    bandInfoStr = ""
+    band_info_str = ""
     if band is not None:
-        bandInfoStr = " | Band: " + band["shorthand"]
+        band_info_str = " | Band: " + band["shorthand"]
 
     try:
-        pg.ConnectionPool.curr.execute("UPDATE eolus3." + tableName + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" +
-                     bandStr, ("PROCESSING", datetime.utcnow(), pid, fullFh))
+        pg.ConnectionPool.curr.execute("UPDATE eolus3." + table_name + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" +
+                     band_str, ("PROCESSING", datetime.utcnow(), pid, full_fh))
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()
         log("Couldn't set a status to processing in " +
-            tableName, "ERROR", remote=True)
+            table_name, "ERROR", remote=True)
 
-    log("· Attempting to process fh " + fullFh + bandInfoStr,
-        "INFO", remote=True, indentLevel=1, model=modelName)
-    processed = processModelStep(modelName, tableName, fullFh, timestamp, band)
+    log("· Attempting to process fh " + full_fh + band_info_str,
+        "INFO", remote=True, indentLevel=1, model=model_name)
+    processed = process(model_name, table_name, full_fh, timestamp, band)
 
     if processed:
-        log("✓ Done.", "INFO", remote=True, indentLevel=1, model=modelName)
+        log("✓ Done.", "INFO", remote=True, indentLevel=1, model=model_name)
         return True
 
     else:
         try:
             log("· Setting back to waiting.", "INFO",
-                remote=True, indentLevel=1, model=modelName)
-            if gribVar is not None:
-                pg.ConnectionPool.curr.execute("SELECT * FROM eolus3." + tableName +
-                             " WHERE fh = '" + fullFh + "' AND grib_var = '" + gribVar + "'")
+                remote=True, indentLevel=1, model=model_name)
+            if grib_var is not None:
+                pg.ConnectionPool.curr.execute("SELECT * FROM eolus3." + table_name +
+                             " WHERE fh = '" + full_fh + "' AND grib_var = '" + grib_var + "'")
             else:
                 pg.ConnectionPool.curr.execute("SELECT * FROM eolus3." +
-                             tableName + " WHERE fh = '" + fullFh + "'")
+                             table_name + " WHERE fh = '" + full_fh + "'")
             res = pg.ConnectionPool.curr.fetchone()
 
             if not res or len(res) == 0:
-                pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + tableName +
-                             " (fh, status, band, grib_var) VALUES (%s,%s,%s,%s)", (fullFh, "WAITING", origBand, gribVar))
+                pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + table_name +
+                             " (fh, status, band, grib_var) VALUES (%s,%s,%s,%s)", (full_fh, "WAITING", orig_band, grib_var))
                 pg.ConnectionPool.conn.commit()
 
             else:
-                pg.ConnectionPool.curr.execute("UPDATE eolus3." + tableName + " SET (status, start_time) = (%s, %s) WHERE fh = %s" +
-                             bandStr, ("WAITING", datetime.utcnow(), fullFh))
+                pg.ConnectionPool.curr.execute("UPDATE eolus3." + table_name + " SET (status, start_time) = (%s, %s) WHERE fh = %s" +
+                             band_str, ("WAITING", datetime.utcnow(), full_fh))
                 pg.ConnectionPool.conn.commit()
         except Exception as e:
             pg.reset()
-            log("Couldn't set a status to back to waiting in " + tableName +
+            log("Couldn't set a status to back to waiting in " + table_name +
                 "... This will need manual intervention.", "ERROR", remote=True)
-            log(repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+            log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
 
-def downloadBand(modelName, timestamp, fh, band, tableName):
-    model = models[modelName]
+def download_band(model_name, timestamp, fh, band, table_name):
+    model = models[model_name]
 
     try:
         pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." +
-                     tableName + " WHERE fh = %s", (fh,))
-        bandNumber = pg.ConnectionPool.curr.fetchone()[0]
+                     table_name + " WHERE fh = %s", (fh,))
+        band_number = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
         log("Couldn't get the next band to process, fh " + fh + ", table " +
-            tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
+            table_name, "ERROR", remote=True, indentLevel=2, model=model_name)
         return False
 
-    url = makeUrl(modelName, timestamp.strftime(
+    url = model_tools.make_url(model_name, timestamp.strftime(
         "%Y%m%d"), timestamp.strftime("%H"), fh)
 
-    fileName = getBaseFileName(modelName, timestamp, band)
-    targetDir = config["mapfileDir"] + "/" + modelName + "/"
-    targetRawDir = config["mapfileDir"] + "/rawdata/" + modelName + "/"
-    downloadFileName = config["tempDir"] + "/" + \
-        fileName + "_t" + fh + "." + model["filetype"]
-    targetFileName = targetDir + fileName + ".tif"
-    targetRawFileName = targetRawDir + fileName + ".tif"
+    file_name = model_tools.get_base_file_name(model_name, timestamp, band)
+    target_dir = config["mapfileDir"] + "/" + model_name + "/"
+    target_raw_dir = config["mapfileDir"] + "/rawdata/" + model_name + "/"
+    download_filename = config["tempDir"] + "/" + \
+        file_name + "_t" + fh + "." + model["filetype"]
+    target_filename = target_dir + file_name + ".tif"
+    target_raw_filename = target_raw_dir + file_name + ".tif"
 
     try:
         response = requests.head(url)
         if response.status_code != 200 or response.status_code == None or response == None:
             log(f"· This index file is not ready yet. " + url,
-                "WARN", remote=True, indentLevel=2, model=modelName)
+                "WARN", remote=True, indentLevel=2, model=model_name)
             return False
 
-        contentLength = str(response.headers["Content-Length"])
+        content_length = str(response.headers["Content-Length"])
     except:
         log(f"· Couldn't get header of " + url, "ERROR",
-            remote=True, indentLevel=2, model=modelName)
+            remote=True, indentLevel=2, model=model_name)
         return False
 
-    byteRange = getByteRange(band, url + ".idx", contentLength)
+    byte_range = getbyte_range(band, url + ".idx", content_length)
 
-    if not byteRange or byteRange == None:
+    if not byte_range or byte_range == None:
         log(f"· Band {band['shorthand']} doesn't exist for fh {fh}.",
-            "WARN", remote=True, indentLevel=2, model=modelName)
+            "WARN", remote=True, indentLevel=2, model=model_name)
         try:
-            pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + tableName +
+            pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + table_name +
                          " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
             pg.ConnectionPool.conn.commit()
         except:
             pg.reset()
             log("Couldn't delete an unusable band from the table. " + fh + ", table " +
-                tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
+                table_name, "ERROR", remote=True, indentLevel=2, model=model_name)
         return True
 
     log(f"↓ Downloading band {band['shorthand']} for fh {fh}.",
-        "NOTICE", indentLevel=2, remote=True, model=modelName)
+        "NOTICE", indentLevel=2, remote=True, model=model_name)
     try:
         response = http.request('GET', url,
                                 headers={
-                                    'Range': 'bytes=' + byteRange
+                                    'Range': 'bytes=' + byte_range
                                 },
                                 retries=5)
 
-        f = open(downloadFileName, 'wb')
+        f = open(download_filename, 'wb')
         f.write(response.data)
         f.close()
     except:
         log("Couldn't read the band -- the request likely timed out. " + fh +
-            ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
+            ", table " + table_name, "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     log(f"✓ Downloaded band {band['shorthand']} for fh {fh}.",
-        "NOTICE", indentLevel=2, remote=True, model=modelName)
+        "NOTICE", indentLevel=2, remote=True, model=model_name)
 
     bounds = config["bounds"][model["bounds"]]
     width = model["imageWidth"]
@@ -265,148 +262,148 @@ def downloadBand(modelName, timestamp, fh, band, tableName):
     epsg4326.ImportFromEPSG(4326)
 
     log("· Warping downloaded data.", "NOTICE",
-        indentLevel=2, remote=True, model=modelName)
+        indentLevel=2, remote=True, model=model_name)
     try:
-        gribFile = gdal.Open(downloadFileName)
-        outFile = gdal.Warp(
-            downloadFileName + ".tif",
-            gribFile,
+        grib_file = gdal.Open(download_filename)
+        out_file = gdal.Warp(
+            download_filename + ".tif",
+            grib_file,
             format='GTiff',
             outputBounds=[bounds["left"], bounds["bottom"],
                           bounds["right"], bounds["top"]],
             dstSRS=epsg4326,
             width=width,
             resampleAlg=gdal.GRA_CubicSpline)
-        outFile.FlushCache()
-        outFile = None
+        out_file.FlushCache()
+        out_file = None
 
-        outFile = gdal.Warp(
-            downloadFileName + "_unscaled.tif",
-            gribFile,
+        out_file = gdal.Warp(
+            download_filename + "_unscaled.tif",
+            grib_file,
             format='GTiff',
             outputBounds=[bounds["left"], bounds["bottom"],
                           bounds["right"], bounds["top"]],
             dstSRS=epsg4326,
             creationOptions=["COMPRESS=deflate", "ZLEVEL=9"],
             resampleAlg=gdal.GRA_CubicSpline)
-        outFile.FlushCache()
-        outFile = None
+        out_file.FlushCache()
+        out_file = None
 
-        gribFile = None
+        grib_file = None
     except Exception as e:
-        log("Warping failed -- " + downloadFileName, "ERROR", remote=True)
-        log(repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+        log("Warping failed -- " + download_filename, "ERROR", remote=True)
+        log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     # check to see if the working raster exists
-    if not os.path.exists(targetFileName):
-        log(f"· Creating output master TIF | {targetFileName}",
-            "NOTICE", indentLevel=2, remote=True, model=modelName)
+    if not os.path.exists(target_filename):
+        log(f"· Creating output master TIF | {target_filename}",
+            "NOTICE", indentLevel=2, remote=True, model=model_name)
         try:
-            os.makedirs(targetDir)
+            os.makedirs(target_dir)
         except:
             log("· Directory already exists.", "INFO",
-                indentLevel=2, remote=False, model=modelName)
+                indentLevel=2, remote=False, model=model_name)
 
-        numBands = getNumberOfHours(modelName)
+        num_bands = model_tools.get_number_of_hours(model_name)
 
         try:
-            gribFile = gdal.Open(downloadFileName + ".tif")
-            geoTransform = gribFile.GetGeoTransform()
-            width = gribFile.RasterXSize
-            height = gribFile.RasterYSize
+            grib_file = gdal.Open(download_filename + ".tif")
+            geo_transform = grib_file.GetGeoTransform()
+            width = grib_file.RasterXSize
+            height = grib_file.RasterYSize
 
-            newRaster = gdal.GetDriverByName('MEM').Create(
-                '', width, height, numBands, gdal.GDT_Float32)
-            newRaster.SetProjection(gribFile.GetProjection())
-            newRaster.SetGeoTransform(list(geoTransform))
+            new_raster = gdal.GetDriverByName('MEM').Create(
+                '', width, height, num_bands, gdal.GDT_Float32)
+            new_raster.SetProjection(grib_file.GetProjection())
+            new_raster.SetGeoTransform(list(geo_transform))
             gdal.GetDriverByName('GTiff').CreateCopy(
-                targetFileName, newRaster, 0)
+                target_filename, new_raster, 0)
             log("✓ Output master TIF created.", "NOTICE",
-                indentLevel=2, remote=True, model=modelName)
+                indentLevel=2, remote=True, model=model_name)
         except Exception as e:
-            log("Couldn't create the new TIF: " + targetFileName,
-                "ERROR", indentLevel=2, remote=True, model=modelName)
-            log(repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+            log("Couldn't create the new TIF: " + target_filename,
+                "ERROR", indentLevel=2, remote=True, model=model_name)
+            log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
             return False
 
     # check to see if the working raster exists
-    if not os.path.exists(targetRawFileName):
-        log(f"· Creating output master TIF | {targetRawFileName}",
-            "NOTICE", indentLevel=2, remote=True, model=modelName)
+    if not os.path.exists(target_raw_filename):
+        log(f"· Creating output master TIF | {target_raw_filename}",
+            "NOTICE", indentLevel=2, remote=True, model=model_name)
         try:
-            os.makedirs(targetRawDir)
+            os.makedirs(target_raw_dir)
         except:
             log("· Directory already exists.", "INFO",
-                indentLevel=2, remote=False, model=modelName)
+                indentLevel=2, remote=False, model=model_name)
 
-        numBands = getNumberOfHours(modelName)
+        num_bands = model_tools.get_number_of_hours(model_name)
 
         try:
-            gribFile = gdal.Open(downloadFileName + "_unscaled.tif")
-            geoTransform = gribFile.GetGeoTransform()
-            width = gribFile.RasterXSize
-            height = gribFile.RasterYSize
+            grib_file = gdal.Open(download_filename + "_unscaled.tif")
+            geo_transform = grib_file.GetGeoTransform()
+            width = grib_file.RasterXSize
+            height = grib_file.RasterYSize
 
-            newRaster = gdal.GetDriverByName('MEM').Create(
-                '', width, height, numBands, gdal.GDT_Float32)
-            newRaster.SetProjection(gribFile.GetProjection())
-            newRaster.SetGeoTransform(list(geoTransform))
+            new_raster = gdal.GetDriverByName('MEM').Create(
+                '', width, height, num_bands, gdal.GDT_Float32)
+            new_raster.SetProjection(grib_file.GetProjection())
+            new_raster.SetGeoTransform(list(geo_transform))
             gdal.GetDriverByName('GTiff').CreateCopy(
-                targetRawFileName, newRaster, 0)
+                target_raw_filename, new_raster, 0)
             log("✓ Output master TIF created.", "NOTICE",
-                indentLevel=2, remote=True, model=modelName)
+                indentLevel=2, remote=True, model=model_name)
         except Exception as e:
-            log("Couldn't create the new TIF: " + targetRawFileName,
-                "ERROR", indentLevel=2, remote=True, model=modelName)
-            log(repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+            log("Couldn't create the new TIF: " + target_raw_filename,
+                "ERROR", indentLevel=2, remote=True, model=model_name)
+            log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
             return False
 
-    log(f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | bandNumber: {str(bandNumber)}",
-        "NOTICE", indentLevel=2, remote=True, model=modelName)
+    log(f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | band_number: {str(band_number)}",
+        "NOTICE", indentLevel=2, remote=True, model=model_name)
 
     try:
         # Copy the downloaded band to this temp file
-        gribFile = gdal.Open(downloadFileName + ".tif")
-        data = gribFile.GetRasterBand(1).ReadAsArray()
+        grib_file = gdal.Open(download_filename + ".tif")
+        data = grib_file.GetRasterBand(1).ReadAsArray()
 
-        tif = gdal.Open(targetFileName, gdalconst.GA_Update)
-        tif.GetRasterBand(bandNumber).WriteArray(data)
+        tif = gdal.Open(target_filename, gdalconst.GA_Update)
+        tif.GetRasterBand(band_number).WriteArray(data)
         tif.FlushCache()
 
-        gribFile = gdal.Open(downloadFileName + "_unscaled.tif")
-        data = gribFile.GetRasterBand(1).ReadAsArray()
+        grib_file = gdal.Open(download_filename + "_unscaled.tif")
+        data = grib_file.GetRasterBand(1).ReadAsArray()
 
-        tif = gdal.Open(targetRawFileName, gdalconst.GA_Update)
-        tif.GetRasterBand(bandNumber).WriteArray(data)
+        tif = gdal.Open(target_raw_filename, gdalconst.GA_Update)
+        tif.GetRasterBand(band_number).WriteArray(data)
         tif.FlushCache()
 
-        gribFile = None
+        grib_file = None
         tif = None
         log(f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.",
-            "NOTICE", indentLevel=2, remote=True, model=modelName)
+            "NOTICE", indentLevel=2, remote=True, model=model_name)
     except Exception as e:
         log(f"Couldn't write band to TIF | band: {band['shorthand']} | fh: {fh}.",
-            "ERROR", indentLevel=2, remote=True, model=modelName)
-        log(repr(e), "ERROR", indentLevel=2, remote=True, model=modelName)
+            "ERROR", indentLevel=2, remote=True, model=model_name)
+        log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     try:
-        os.remove(downloadFileName)
-        os.remove(downloadFileName + ".tif")
-        os.remove(downloadFileName + "_unscaled.tif")
+        os.remove(download_filename)
+        os.remove(download_filename + ".tif")
+        os.remove(download_filename + "_unscaled.tif")
     except:
-        log(f"× Could not delete a temp file ({downloadFileName}).",
-            "WARN", indentLevel=2, remote=True, model=modelName)
+        log(f"× Could not delete a temp file ({download_filename}).",
+            "WARN", indentLevel=2, remote=True, model=model_name)
 
     try:
-        pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + tableName +
+        pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + table_name +
                      " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()
         log("Couldn't update the DB that this band was processed.",
-            "ERROR", indentLevel=2, remote=True, model=modelName)
+            "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     return True
@@ -417,50 +414,50 @@ def downloadBand(modelName, timestamp, fh, band, tableName):
 '''
 
 
-def getByteRange(band, idxFile, contentLength):
+def getbyte_range(band, idxFile, content_length):
     log(f"· Searching for band defs in index file {idxFile}",
         "DEBUG", indentLevel=2, remote=True)
     try:
         response = http.request('GET', idxFile)
         data = response.data.decode('utf-8')
-        varNameToFind = band["band"]["var"]
-        levelToFind = getLevelNameForLevel(band["band"]["level"], "idxName")
+        var_name_to_find = band["band"]["var"]
+        level_to_find = getLevelNameForLevel(band["band"]["level"], "idxName")
         found = False
-        startByte = None
-        endByte = None
+        start_byte = None
+        end_byte = None
 
         for line in data.splitlines():
             line = str(line)
             parts = line.split(':')
-            varName = parts[3]
+            var_name = parts[3]
             level = parts[4]
             time = parts[5]
 
             if found:
-                endByte = parts[1]
+                end_byte = parts[1]
                 break
 
-            if varName == varNameToFind and level == levelToFind:
+            if var_name == var_name_to_find and level == level_to_find:
                 if "timeRange" in band["band"].keys():
-                    rangeVal = time.split(" ", 1)[0]
-                    ranges = rangeVal.split("-")
+                    range_val = time.split(" ", 1)[0]
+                    ranges = range_val.split("-")
                     if (int(ranges[1]) - int(ranges[0])) != band["band"]["timeRange"]:
                         continue
 
                 log("✓ Found.", "DEBUG", indentLevel=2, remote=False)
                 found = True
-                startByte = parts[1]
+                start_byte = parts[1]
                 continue
 
         if found:
-            if endByte == None:
-                endByte = contentLength
+            if end_byte == None:
+                end_byte = content_length
 
-            log(f"· Bytes {startByte} to {endByte}", "DEBUG", indentLevel=2)
-            if startByte == endByte:
+            log(f"· Bytes {start_byte} to {end_byte}", "DEBUG", indentLevel=2)
+            if start_byte == end_byte:
                 return None
 
-            return startByte + "-" + endByte
+            return start_byte + "-" + end_byte
         else:
             log(f"· Couldn't find band def in index file.",
                 "WARN", indentLevel=2, remote=True)
@@ -471,52 +468,52 @@ def getByteRange(band, idxFile, contentLength):
         return None
 
 
-def downloadFullFile(modelName, timestamp, fh, tableName):
-    model = models[modelName]
+def downloadFullFile(model_name, timestamp, fh, table_name):
+    model = models[model_name]
     try:
         pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." +
-                     tableName + " WHERE fh = %s", (fh,))
-        bandNumber = pg.ConnectionPool.curr.fetchone()[0]
+                     table_name + " WHERE fh = %s", (fh,))
+        band_number = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
         log("Couldn't get the next fh to process, fh " + fh + ", table " +
-            tableName, "ERROR", remote=True, indentLevel=2, model=modelName)
+            table_name, "ERROR", remote=True, indentLevel=2, model=model_name)
         return False
 
-    url = makeUrl(modelName, timestamp.strftime(
+    url = makeUrl(model_name, timestamp.strftime(
         "%Y%m%d"), timestamp.strftime("%H"), fh)
 
-    fileName = getBaseFileName(modelName, timestamp, None)
-    targetDir = config["mapfileDir"] + "/" + modelName + "/"
-    targetRawDir = config["mapfileDir"] + "/rawdata/" + modelName + "/"
-    downloadFileName = config["tempDir"] + "/" + \
-        fileName + "_t" + fh + "." + model["filetype"]
+    file_name = model_tools.get_base_filename(model_name, timestamp, None)
+    target_dir = config["mapfileDir"] + "/" + model_name + "/"
+    target_raw_dir = config["mapfileDir"] + "/rawdata/" + model_name + "/"
+    download_filename = config["tempDir"] + "/" + \
+        file_name + "_t" + fh + "." + model["filetype"]
 
     try:
-        os.makedirs(targetDir)
+        os.makedirs(target_dir)
     except:
         log("· Directory already exists.", "INFO",
-            indentLevel=2, remote=False, model=modelName)
+            indentLevel=2, remote=False, model=model_name)
 
     try:
-        os.makedirs(targetRawDir)
+        os.makedirs(target_raw_dir)
     except:
         log("· Directory already exists.", "INFO",
-            indentLevel=2, remote=False, model=modelName)
+            indentLevel=2, remote=False, model=model_name)
 
     log(f"↓ Downloading fh {fh}.", "NOTICE",
-        indentLevel=2, remote=True, model=modelName)
+        indentLevel=2, remote=True, model=model_name)
     try:
         response = http.request('GET', url, retries=5)
 
-        f = open(downloadFileName, 'wb')
+        f = open(download_filename, 'wb')
         f.write(response.data)
         f.close()
         log(f"✓ Downloaded band fh {fh}.", "NOTICE",
-            indentLevel=2, remote=True, model=modelName)
+            indentLevel=2, remote=True, model=model_name)
     except:
         log("Couldn't read the fh -- the request likely timed out. " + fh +
-            ", table " + tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
+            ", table " + table_name, "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     bounds = config["bounds"][model["bounds"]]
@@ -527,253 +524,254 @@ def downloadFullFile(modelName, timestamp, fh, tableName):
         epsg4326.ImportFromEPSG(4326)
 
         log("· Warping downloaded data.", "NOTICE",
-            indentLevel=2, remote=True, model=modelName)
+            indentLevel=2, remote=True, model=model_name)
         try:
-            os.remove(downloadFileName + ".tif")
+            os.remove(download_filename + ".tif")
         except:
             log("· No old file to remove.", "DEBUG", indentLevel=2)
 
-        gribFile = gdal.Open(downloadFileName)
-        outFile = gdal.Warp(
-            downloadFileName + ".tif",
-            gribFile,
+        grib_file = gdal.Open(download_filename)
+        out_file = gdal.Warp(
+            download_filename + ".tif",
+            grib_file,
             format='GTiff',
             outputBounds=[bounds["left"], bounds["bottom"],
                           bounds["right"], bounds["top"]],
             dstSRS=epsg4326,
             width=width,
             resampleAlg=gdal.GRA_CubicSpline)
-        outFile.FlushCache()
+        out_file.FlushCache()
 
-        outFile = gdal.Warp(
-            downloadFileName + "_unscaled.tif",
-            gribFile,
+        out_file = gdal.Warp(
+            download_filename + "_unscaled.tif",
+            grib_file,
             format='GTiff',
             outputBounds=[bounds["left"], bounds["bottom"],
                           bounds["right"], bounds["top"]],
             dstSRS=epsg4326,
             creationOptions=["COMPRESS=deflate", "ZLEVEL=9"],
             resampleAlg=gdal.GRA_CubicSpline)
-        outFile.FlushCache()
+        out_file.FlushCache()
 
-        outFile = None
-        gribFile = None
+        out_file = None
+        grib_file = None
 
     except:
-        log("Warping failed -- " + downloadFileName, "ERROR",
-            indentLevel=2, remote=True, model=modelName)
+        log("Warping failed -- " + download_filename, "ERROR",
+            indentLevel=2, remote=True, model=model_name)
         return False
 
-    numBands = getNumberOfHours(modelName)
+    num_bands = model_tools.get_number_of_hours(model_name)
 
-    bands = makeModelBandArray(modelName, force=True)
+    bands = make_model_band_array(model_name, force=True)
     if bands == None:
         try:
-            os.makedirs(targetDir)
+            os.makedirs(target_dir)
         except:
             log("· Directory already exists.", "INFO",
-                indentLevel=2, remote=True, model=modelName)
+                indentLevel=2, remote=True, model=model_name)
 
         try:
-            os.makedirs(targetRawDir)
+            os.makedirs(target_raw_dir)
         except:
             log("· Directory already exists.", "INFO",
-                indentLevel=2, remote=False, model=modelName)
+                indentLevel=2, remote=False, model=model_name)
 
-        targetFileName = targetDir + \
-            getBaseFileName(modelName, timestamp, None) + "_t" + fh + ".tif"
-        targetRawFileName = targetRawDir + \
-            getBaseFileName(modelName, timestamp, None) + "_t" + fh + ".tif"
-        log("· Copying to " + targetFileName, "NOTICE",
-            indentLevel=2, remote=True, model=modelName)
+        target_filename = target_dir + \
+            model_tools.get_base_filename(model_name, timestamp, None) + "_t" + fh + ".tif"
+        target_raw_filename = target_raw_dir + \
+            model_tools.get_base_filename(model_name, timestamp, None) + "_t" + fh + ".tif"
+        log("· Copying to " + target_filename, "NOTICE",
+            indentLevel=2, remote=True, model=model_name)
 
         try:
-            shutil.copyfile(downloadFileName + ".tif", targetFileName)
-            shutil.copyfile(downloadFileName +
-                            "_unscaled.tif", targetRawFileName)
+            shutil.copyfile(download_filename + ".tif", target_filename)
+            shutil.copyfile(download_filename +
+                            "_unscaled.tif", target_raw_filename)
         except:
             log("Couldn't copy.", "ERROR", indentLevel=2,
-                remote=True, model=modelName)
+                remote=True, model=model_name)
             return False
 
     else:
         log(f"· Extracting bands for fh {fh}.", "INFO",
-            indentLevel=2, remote=True, model=modelName)
+            indentLevel=2, remote=True, model=model_name)
 
         for band in bands:
-            targetFileName = targetDir + \
-                getBaseFileName(modelName, timestamp, band) + ".tif"
-            targetRawFileName = targetRawDir + \
-                getBaseFileName(modelName, timestamp, band) + ".tif"
-            if not os.path.exists(targetFileName):
-                log(f"· Creating output master TIF with {str(numBands) } bands | {targetFileName}",
-                    "NOTICE", indentLevel=2, remote=True, model=modelName)
+            target_filename = target_dir + \
+                model_tools.get_base_filename(model_name, timestamp, band) + ".tif"
+            target_raw_filename = target_raw_dir + \
+                model_tools.get_base_filename(
+                    model_name, timestamp, band) + ".tif"
+            if not os.path.exists(target_filename):
+                log(f"· Creating output master TIF with {str(num_bands) } bands | {target_filename}",
+                    "NOTICE", indentLevel=2, remote=True, model=model_name)
                 try:
-                    os.makedirs(targetDir)
+                    os.makedirs(target_dir)
                 except:
                     log("· Directory already exists.", "INFO",
-                        indentLevel=2, remote=True, model=modelName)
+                        indentLevel=2, remote=True, model=model_name)
 
                 try:
-                    gribFile = gdal.Open(downloadFileName + ".tif")
-                    geoTransform = gribFile.GetGeoTransform()
-                    width = gribFile.RasterXSize
-                    height = gribFile.RasterYSize
+                    grib_file = gdal.Open(download_filename + ".tif")
+                    geo_transform = grib_file.GetGeoTransform()
+                    width = grib_file.RasterXSize
+                    height = grib_file.RasterYSize
 
-                    newRaster = gdal.GetDriverByName('MEM').Create(
-                        '', width, height, numBands, gdal.GDT_Float32)
-                    newRaster.SetProjection(gribFile.GetProjection())
-                    newRaster.SetGeoTransform(list(geoTransform))
+                    new_raster = gdal.GetDriverByName('MEM').Create(
+                        '', width, height, num_bands, gdal.GDT_Float32)
+                    new_raster.SetProjection(grib_file.GetProjection())
+                    new_raster.SetGeoTransform(list(geo_transform))
                     gdal.GetDriverByName('GTiff').CreateCopy(
-                        targetFileName, newRaster, 0)
-                    gribFile = None
-                    newRaster = None
+                        target_filename, new_raster, 0)
+                    grib_file = None
+                    new_raster = None
                     log("✓ Output master TIF created.", "NOTICE",
-                        indentLevel=2, remote=True, model=modelName)
+                        indentLevel=2, remote=True, model=model_name)
                 except:
                     log("Couldn't create the new TIF.", "ERROR",
-                        indentLevel=2, remote=True, model=modelName)
+                        indentLevel=2, remote=True, model=model_name)
                     return False
 
-            if not os.path.exists(targetRawFileName):
-                log(f"· Creating output master TIF with {str(numBands) } bands | {targetRawFileName}",
-                    "NOTICE", indentLevel=2, remote=True, model=modelName)
+            if not os.path.exists(target_raw_filename):
+                log(f"· Creating output master TIF with {str(num_bands) } bands | {target_raw_filename}",
+                    "NOTICE", indentLevel=2, remote=True, model=model_name)
                 try:
-                    os.makedirs(targetRawDir)
+                    os.makedirs(target_raw_dir)
                 except:
                     log("· Directory already exists.", "INFO",
-                        indentLevel=2, remote=False, model=modelName)
+                        indentLevel=2, remote=False, model=model_name)
 
                 try:
-                    gribFile = gdal.Open(downloadFileName + "_unscaled.tif")
-                    geoTransform = gribFile.GetGeoTransform()
-                    width = gribFile.RasterXSize
-                    height = gribFile.RasterYSize
+                    grib_file = gdal.Open(download_filename + "_unscaled.tif")
+                    geo_transform = grib_file.GetGeoTransform()
+                    width = grib_file.RasterXSize
+                    height = grib_file.RasterYSize
 
-                    newRaster = gdal.GetDriverByName('MEM').Create(
-                        '', width, height, numBands, gdal.GDT_Float32)
-                    newRaster.SetProjection(gribFile.GetProjection())
-                    newRaster.SetGeoTransform(list(geoTransform))
+                    new_raster = gdal.GetDriverByName('MEM').Create(
+                        '', width, height, num_bands, gdal.GDT_Float32)
+                    new_raster.SetProjection(grib_file.GetProjection())
+                    new_raster.SetGeoTransform(list(geo_transform))
                     gdal.GetDriverByName('GTiff').CreateCopy(
-                        targetRawFileName, newRaster, 0)
-                    gribFile = None
-                    newRaster = None
+                        target_raw_filename, new_raster, 0)
+                    grib_file = None
+                    new_raster = None
                     log("✓ Output master TIF created.", "NOTICE",
-                        indentLevel=2, remote=True, model=modelName)
+                        indentLevel=2, remote=True, model=model_name)
                 except:
                     log("Couldn't create the new TIF.", "ERROR",
-                        indentLevel=2, remote=True, model=modelName)
+                        indentLevel=2, remote=True, model=model_name)
                     return False
 
             log(f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}",
-                "NOTICE", indentLevel=2, remote=True, model=modelName)
+                "NOTICE", indentLevel=2, remote=True, model=model_name)
             # Copy the downloaded band to this temp file
             try:
-                gribFile = gdal.Open(downloadFileName + ".tif")
-                gribNumBands = gribFile.RasterCount
-                bandLevel = getLevelNameForLevel(
+                grib_file = gdal.Open(download_filename + ".tif")
+                gribnum_bands = grib_file.RasterCount
+                bandLevel = model_tools.get_level_name_for_level(
                     band["band"]["level"], "gribName")
-                tif = gdal.Open(targetFileName, gdalconst.GA_Update)
-                for i in range(1, gribNumBands + 1):
+                tif = gdal.Open(target_filename, gdalconst.GA_Update)
+                for i in range(1, gribnum_bands + 1):
                     try:
-                        fileBand = gribFile.GetRasterBand(i)
+                        fileBand = grib_file.GetRasterBand(i)
                         metadata = fileBand.GetMetadata()
                         if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
                             log("· Band " + band["band"]["var"] + " found.",
                                 "DEBUG", indentLevel=2, remote=False)
                             data = fileBand.ReadAsArray()
-                            tif.GetRasterBand(bandNumber).WriteArray(data)
+                            tif.GetRasterBand(band_number).WriteArray(data)
                             break
 
                     except:
                         log(f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}",
-                            "WARN", indentLevel=2, remote=True, model=modelName)
+                            "WARN", indentLevel=2, remote=True, model=model_name)
 
                 tif.FlushCache()
 
-                gribFile = gdal.Open(downloadFileName + "_unscaled.tif")
-                tif = gdal.Open(targetRawFileName, gdalconst.GA_Update)
-                for i in range(1, gribNumBands + 1):
+                grib_file = gdal.Open(download_filename + "_unscaled.tif")
+                tif = gdal.Open(target_raw_filename, gdalconst.GA_Update)
+                for i in range(1, gribnum_bands + 1):
                     try:
-                        fileBand = gribFile.GetRasterBand(i)
+                        fileBand = grib_file.GetRasterBand(i)
                         metadata = fileBand.GetMetadata()
                         if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
                             log("· Band " + band["band"]["var"] + " found.",
                                 "DEBUG", indentLevel=2, remote=False)
                             data = fileBand.ReadAsArray()
-                            tif.GetRasterBand(bandNumber).WriteArray(data)
+                            tif.GetRasterBand(band_number).WriteArray(data)
                             break
 
                     except:
                         log(f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}",
-                            "WARN", indentLevel=2, remote=True, model=modelName)
+                            "WARN", indentLevel=2, remote=True, model=model_name)
 
                 tif.FlushCache()
-                gribFile = None
+                grib_file = None
                 tif = None
             except Exception as e:
                 log("Couldn't write bands to the tiff. " + fh + ", table " +
-                    tableName, "ERROR", indentLevel=2, remote=True, model=modelName)
+                    table_name, "ERROR", indentLevel=2, remote=True, model=model_name)
                 log(repr(e), "ERROR", indentLevel=2,
-                    remote=True, model=modelName)
+                    remote=True, model=model_name)
                 return False
 
     try:
-        os.remove(downloadFileName)
-        os.remove(downloadFileName + ".tif")
-        os.remove(downloadFileName + "_unscaled.tif")
+        os.remove(download_filename)
+        os.remove(download_filename + ".tif")
+        os.remove(download_filename + "_unscaled.tif")
     except:
-        log(f"× Could not delete a temp file ({downloadFileName}).",
-            "WARN", indentLevel=2, remote=True, model=modelName)
+        log(f"× Could not delete a temp file ({download_filename}).",
+            "WARN", indentLevel=2, remote=True, model=model_name)
 
     try:
         pg.ConnectionPool.curr.execute("DELETE FROM eolus3." +
-                     tableName + " WHERE fh = %s", (fh,))
+                     table_name + " WHERE fh = %s", (fh,))
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()
         log("Couldn't update the DB that this band was processed.",
-            "ERROR", indentLevel=2, remote=True, model=modelName)
+            "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     return True
 
 
-def processModelStep(modelName, tableName, fullFh, timestamp, band):
-    model = models[modelName]
+def process(model_name, table_name, full_fh, timestamp, band):
+    model = models[model_name]
     processed = False
 
-    bandStr = ""
+    band_str = ""
     if band:
-        bandStr = " AND grib_var = '" + band["shorthand"] + "'"
+        band_str = " AND grib_var = '" + band["shorthand"] + "'"
 
     try:
-        pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." + tableName +
-                     " WHERE fh = '" + fullFh + "' " + bandStr)
-        bandNumber = pg.ConnectionPool.curr.fetchone()[0]
+        pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." + table_name +
+                     " WHERE fh = '" + full_fh + "' " + band_str)
+        band_number = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
         log("× Some other agent finished the model.", "NOTICE",
-            indentLevel=1, remote=True, model=modelName)
+            indentLevel=1, remote=True, model=model_name)
         killScript(0)
 
-    fileExists = checkIfModelFhAvailable(modelName, timestamp, fullFh)
+    fileExists = model_tools.check_if_model_fh_available(model_name, timestamp, full_fh)
 
     if fileExists:
-        log("· Start processing fh " + fullFh + ".", "INFO",
-            remote=True, model=modelName, indentLevel=1)
+        log("· Start processing fh " + full_fh + ".", "INFO",
+            remote=True, model=model_name, indentLevel=1)
         if band is None:
             try:
-                success = downloadFullFile(
-                    modelName, timestamp, fullFh, tableName)
+                success = download_full_file(
+                    model_name, timestamp, full_fh, table_name)
                 if not success:
                     return False
             except:
                 return False
         else:
             try:
-                success = downloadBand(
-                    modelName, timestamp, fullFh, band, tableName)
+                success = download_band(
+                    model_name, timestamp, full_fh, band, table_name)
                 if not success:
                     return False
             except:
@@ -784,50 +782,66 @@ def processModelStep(modelName, tableName, fullFh, timestamp, band):
     #delete the table if all steps are done
     try:
         pg.ConnectionPool.curr.execute("SELECT COUNT(*) FROM eolus3." +
-                     tableName + " WHERE status != 'DONE'")
-        numBandsRemaining = pg.ConnectionPool.curr.fetchone()[0]
+                     table_name + " WHERE status != 'DONE'")
+        num_bandsRemaining = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
-        log("Couldn't get remaining count from table " + tableName +
-            ".", "ERROR", indentLevel=1, remote=True, model=modelName)
-        killScript(1)
+        log("Couldn't get remaining count from table " + table_name +
+            ".", "ERROR", indentLevel=1, remote=True, model=model_name)
+        return False
 
     noun = "bands"
     if band is None:
         noun = "forecast hours"
 
-    log("· There are " + str(numBandsRemaining) + " remaining " +
+    log("· There are " + str(num_bandsRemaining) + " remaining " +
         noun + " to process.", "DEBUG", indentLevel=1)
 
-    if numBandsRemaining == 0:
-        log("· Deleting table " + tableName + ".", "NOTICE",
-            indentLevel=1, remote=True, model=modelName)
+    if num_bandsRemaining == 0:
+        log("· Deleting table " + table_name + ".", "NOTICE",
+            indentLevel=1, remote=True, model=model_name)
         try:
-            pg.ConnectionPool.curr.execute("DROP TABLE eolus3." + tableName)
+            pg.ConnectionPool.curr.execute("DROP TABLE eolus3." + table_name)
             pg.ConnectionPool.conn.commit()
         except:
             pg.reset()
-            log("Couldn't remove the table " + tableName + ".",
-                "ERROR", indentLevel=1, remote=True, model=modelName)
-            killScript(1)
+            log("Couldn't remove the table " + table_name + ".",
+                "ERROR", indentLevel=1, remote=True, model=model_name)
+            return False
 
-        endModelProcessing(modelName)
+        end(model_name)
 
     # If success, return True
     return processed
 
 
-def makeModelBandArray(modelName, force=False):
-    model = models[modelName]
+def make_model_band_array(model_name, force=False):
+    model = models[model_name]
     if not "bands" in model.keys():
         return None
 
-    modelBandArray = []
+    model_band_array = []
     if model["index"] or force:
         for band in model["bands"]:
-            modelBandArray.append({
+            model_band_array.append({
                 "shorthand": band["var"].lower() + "_" + band["level"].lower(),
                 "band": band
             })
 
-    return modelBandArray
+    return model_band_array
+
+def end(model_name):
+
+    file_tools.clean()
+
+    try:
+        log("✓ This model is completely finished processing.",
+            "INFO", remote=True, model=model_name)
+        pg.ConnectionPool.curr.execute(
+            "UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", model_name))
+        pg.ConnectionPool.conn.commit()
+        update_run_status(model_name)
+    except:
+        pg.reset()
+        log("Couldn't mark model as complete.",
+            "ERROR", remote=True, model=model_name)

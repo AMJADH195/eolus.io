@@ -3,13 +3,16 @@ from eolus_lib.config import config, layerMaps, models
 import eolus_lib.http_manager as http_manager
 from eolus_lib.logger import log, say_hello, print_line
 import eolus_lib.model_tools as model_tools
+import eolus_lib.processing as processing
 
 import sys
 import os
+import concurrent.futures
+import time
 from osgeo import ogr, gdal, osr, gdalconst
 
 agent_logged = False
-threads = 0
+current_processing_pool = {}
 
 gdal.UseExceptions()
 
@@ -53,20 +56,21 @@ def init():
     max_threads = config["maxThreads"]
 
     more_work_to_do = True
-    while (more_work_to_do):
-        if threads < max_threads:
-            more_work_to_do = do_work()
-        else:
-            sleep (1000)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        while (more_work_to_do):
+            time.sleep (1)
+            if len(current_processing_pool) < max_threads:
+                future = executor.submit(do_work())
+                more_work_to_do = future.result()
+            else:
+                time.sleep(10)
 
     log("No more processing to do. Goodbye.", "DEBUG")
     kill_me(0)
 
 
 def do_work():
-    global threads
-
-    current_processing_pool = {}
+    global threads, current_processing_pool
 
     processing_models = []
     processed = False
@@ -89,7 +93,6 @@ def do_work():
 
         log("· Status: " + str(status), "INFO", indentLevel=1)
 
-        # turn this into a loop you sociopath
         max_lookback = 2
         lookback = 0
         if status == None:
@@ -97,11 +100,14 @@ def do_work():
                 timestamp = model_tools.get_last_available_timestamp(
                     model, prev=lookback)
                 if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-                    model_tools.add_model_to_db(model_name)
-                    if processing.start (model_name, current_processing_pool):
-                        processed = processing.next_step(model_name, current_processing_pool)
+
+                    if model_name not in current_processing_pool:
+                        current_processing_pool[model_name]["status"] = "MAKINGTABLE"
+                        model_tools.add_model_to_db(model_name)
+                        processing.start(model_name, timestamp)
+                        del current_processing_pool[model_name]
                     
-                    break
+                    return True
 
                 lookback += 1
 
@@ -119,10 +125,15 @@ def do_work():
                     log("· It does -- checking if an update is available. Looked back " + str(lookback) + " runs",
                         "INFO", indentLevel=1)
                     if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-                        if processing.start(model_name, current_processing_pool):
-                            processed = processing.next_step(
-                                            model_name, current_processing_pool)
-                        break
+
+                        if model_name not in current_processing_pool:
+                            current_processing_pool[model_name]["status"] = "MAKINGTABLE"
+                            model_tools.add_model_to_db(model_name)
+                            processing.start(model_name, timestamp)
+                            del current_processing_pool[model_name]
+
+                        return True
+
                 else:
                     log("· Nope.", "INFO", indentLevel=1)
                     break
@@ -130,14 +141,11 @@ def do_work():
                 lookback += 1
 
         elif status == "PROCESSING":
-            processed = processing.next_step(
-                model_name, current_processing_pool)
-            
-        
+            processed = processing.next_step(model_name, current_processing_pool)
 
         print()
 
-    return processed
+        return processed
 
 
 if __name__ == "__main__":

@@ -11,23 +11,6 @@ def make_url(model_name, model_date, model_hour, fh):
     return model["url"].replace("%D", model_date).replace("%H", model_hour).replace("%T", fh)
 
 
-def end_processing(model_name):
-
-    file_tools.clean()
-
-    try:
-        log("✓ This model is completely finished processing.",
-            "INFO", remote=True, model=model_name)
-        pg.ConnectionPool.curr.execute(
-            "UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", model_name))
-        pg.ConnectionPool.conn.commit()
-        update_run_status(model_name)
-    except:
-        pg.reset()
-        log("Couldn't mark model as complete.",
-            "ERROR", remote=True, model=model_name)
-
-
 def add_model_to_db(model_name):
     try:
         log("✓ Added model to models table.", "INFO",
