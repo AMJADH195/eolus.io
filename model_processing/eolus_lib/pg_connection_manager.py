@@ -1,5 +1,6 @@
-from eolus_lib.logger import log
-from eolus_lib.config import config, models, levelMaps
+from .logger import log
+from .config import config, models, levelMaps
+from datetime import datetime
 import psycopg2
 import os
 
@@ -24,13 +25,14 @@ def close():
 
 def add_agent():
     try:
-        eolus_lib.pg_connection_manager.curr.execute(
+        ConnectionPool.curr.execute(
             "INSERT INTO eolus3.agents (pid, start_time) VALUES (%s, %s)", (pid, datetime.utcnow()))
-        eolus_lib.pg_connection_manager.conn.commit()
-        return True
-    except:
+        ConnectionPool.conn.commit()
+    except Exception as e:
         log("Couldn't add agent.", "ERROR")
+        log(repr(e), "ERROR", indentLevel=1, remote=True)
         return False
+    return True
 
 
 def remove_agent():
@@ -39,10 +41,11 @@ def remove_agent():
         ConnectionPool.curr.execute(
             "DELETE FROM eolus3.agents WHERE pid = %s", (pid,))
         ConnectionPool.conn.commit()
-        return True
     except:
         reset()
+        log("Couldn't remove agent.", "ERROR", remote=True)
         return False
+    return True
 
 
 def can_do_work():
@@ -51,9 +54,10 @@ def can_do_work():
         ConnectionPool.conn.commit()
         result = ConnectionPool.curr.fetchone()
         return result[0] == 0
-    except:
+    except Exception as e:
         reset()
         log("Couldn't get agent count.", "ERROR", remote=True)
+        log(repr(e), "ERROR", indentLevel=1, remote=True)
         return False
 
 
@@ -84,5 +88,5 @@ def clean():
         "DELETE FROM eolus3.log WHERE timestamp < now() - interval '" + config["retentionDays"] + " days'")
     ConnectionPool.conn.commit()
     ConnectionPool.curr.execute(
-        "DELETE FROM eolus3.run_status WHERE timestamp < now() - interval '" + config["retentionDays"]  + " days'")
+        "DELETE FROM eolus3.run_status WHERE timestamp < now() - interval '" + config["retentionDays"] + " days'")
     ConnectionPool.conn.commit()

@@ -1,9 +1,10 @@
-from eolus_lib.config import config, models, levelMaps
-from eolus_lib.logger import log
-import eolus_lib.file_tools as file_tools
-import eolus_lib.pg_connection_manager as pg
+from .config import config, models, levelMaps
+from .logger import log
+from . import file_tools as file_tools
+from . import pg_connection_manager as pg
 
 from datetime import datetime, timedelta, tzinfo, time
+import requests
 
 
 def make_url(model_name, model_date, model_hour, fh):
@@ -102,12 +103,13 @@ def check_if_model_fh_available(model_name, timestamp, fh):
                 indentLevel=1, model=model_name)
             return True
         else:
-            log("× Not found.", "DEBUG", remote=True,
+            log("× Not found -- Status code " + str(ret.status_code), "DEBUG", remote=True,
                 indentLevel=1, model=model_name)
 
-    except:
-        log("× Not found.", "DEBUG", remote=True,
+    except Exception as e:
+        log("× Not found -- Exception.", "DEBUG", remote=True,
             indentLevel=1, model=model_name)
+        log(repr(e), "ERROR", indentLevel=1, remote=True)
 
     return False
 
@@ -145,17 +147,6 @@ def get_base_filename(model_name, timestamp, band):
         return file
 
 
-def get_model_step_status(tableName, fullFh):
-    try:
-        pg.ConnectionPool.curr.execute("SELECT status FROM eolus3." +
-                                       tableName + " WHERE fh = %s", (fullFh,))
-        return pg.ConnectionPool.curr.fetchone()[0]
-    except:
-        pg.reset()
-        log("Couldn't get status for fh " + fullFh +
-            " in table " + tableName, "ERROR", remote=True)
-
-
 # This iterates a fh by the appropriate step size,
 # given the fh. This is for models where the fh step size
 # increases after a certain hour.
@@ -170,3 +161,61 @@ def add_appropriate_fh_step(model_name, fh):
     log("× Couldn't match the appropriate step size.",
         "WARN", indentLevel=1, remote=True, model=model_name)
     return fh
+
+
+def make_band_dict(model_name):
+    log(f"· Creating band dict.", "NOTICE",
+        indentLevel=1, remote=True, model=model_name)
+
+    band_dict = {}
+
+    model = models[model_name]
+
+    fh = model["startTime"]
+    i = 1
+
+    bands = make_model_band_array(model_name)
+
+    while True:
+        full_fh = get_full_fh(model_name, fh)
+        if bands == None or len(bands) == 0:
+            band_dict.update({
+                full_fh: {
+                    'retries': 0,
+                    'fh': full_fh,
+                    'band': str(i),
+                    'processing': False
+                }
+            })
+        else:
+            for band in bands:
+                band_dict.update({
+                    band["shorthand"] + "_" + full_fh: {
+                        'retries': 0,
+                        'fh': full_fh,
+                        'band': str(i),
+                        'varLevel': band['shorthand'],
+                        'processing': False
+                    }
+                })
+        fh = add_appropriate_fh_step(model_name, fh)
+        i += 1
+
+        if fh > model["endTime"]:
+            return band_dict
+
+
+def make_model_band_array(model_name, force=False):
+    model = models[model_name]
+    if not "bands" in model.keys():
+        return None
+
+    model_band_array = []
+    if model["index"] or force:
+        for band in model["bands"]:
+            model_band_array.append({
+                "shorthand": band["var"].lower() + "_" + band["level"].lower(),
+                "band": band
+            })
+
+    return model_band_array

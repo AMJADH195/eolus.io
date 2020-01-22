@@ -1,18 +1,19 @@
 import eolus_lib.pg_connection_manager as pg
-from eolus_lib.config import config, layerMaps, models
+from eolus_lib.config import config, levelMaps, models
 import eolus_lib.http_manager as http_manager
 from eolus_lib.logger import log, say_hello, print_line
 import eolus_lib.model_tools as model_tools
 import eolus_lib.processing as processing
 
-import sys
 import os
 import concurrent.futures
 import time
-from osgeo import ogr, gdal, osr, gdalconst
+from osgeo import gdal
+import pprint
 
 agent_logged = False
-current_processing_pool = {}
+processing_pool = {}
+pp = pprint.PrettyPrinter(indent=4)
 
 gdal.UseExceptions()
 
@@ -23,9 +24,8 @@ def kill_me(exit_code):
         log("Exiting on failure.", "ERROR")
 
     if agent_logged:
-        try:
-            pg.remove_agent()
-        except:
+        removed = pg.remove_agent()
+        if not removed:
             log("Could not remove agent, trying again.", "ERROR", remote=True)
             try:
                 pg.connect()
@@ -39,7 +39,21 @@ def kill_me(exit_code):
     os._exit(exit_code)
 
 
+def work_done(future):
+    global processing_pool
+    log("Thread finished.", "DEBUG")
+    result = future.result()
+    if result['success'] or processing_pool[result.model][result.id]['retries'] > 3:
+        if 'id' in result:
+            del processing_pool[result.model][result.id]
+    else:
+        if len(processing_pool) and 'id' in result:
+            processing_pool[result.model][result.id].retries += 1
+
+
 def init():
+    global agent_logged, processing_pool
+
     say_hello()
     if not pg.connect():
         kill_me(1)
@@ -52,100 +66,139 @@ def init():
         log("Another agent is running already. Goodbye.", "DEBUG")
         kill_me(0)
 
-    pg.add_agent()
-    max_threads = config["maxThreads"]
+    agent_logged = pg.add_agent()
+    if not agent_logged:
+        kill_me(1)
 
-    more_work_to_do = True
+    #max_threads = config["maxThreads"]
+    max_threads = 1
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        while (more_work_to_do):
-            time.sleep (1)
-            if len(current_processing_pool) < max_threads:
-                future = executor.submit(do_work())
-                more_work_to_do = future.result()
-            else:
-                time.sleep(10)
+        futures = {
+            executor.submit(do_work)
+        }
+
+        while futures:
+            done, futures = concurrent.futures.wait(
+                futures, return_when=concurrent.futures.FIRST_COMPLETED)
+
+            for fut in done:
+                work_done(fut)
+
+            if len(processing_pool) > 0:
+                for i in range(1, max_threads - len(futures)):
+                    time.sleep(1)
+                    futures.add(
+                        executor.submit(do_work)
+                    )
+                    log("Adding another thread.", "DEBUG")
+                    print("")
+                    print("")
+                    print("")
+                    print(len(futures))
+                    print("")
+                    print("")
+                    print("")
 
     log("No more processing to do. Goodbye.", "DEBUG")
     kill_me(0)
 
 
 def do_work():
-    global threads, current_processing_pool
+    global processing_pool
 
-    processing_models = []
-    processed = False
+    new_models = False
+    first_run = True
 
-    # Check only brand new models, or models that are waiting first
-    for model_name, model in models.items():
-        log("Checking " + model_name, "INFO", indentLevel=0)
+    while new_models or first_run:
+        first_run = False
+        new_models = False
+        # Check only brand new models, or models that are waiting first
+        for model_name, model in models.items():
+            log("Checking " + model_name, "INFO", indentLevel=0)
 
-        # Flag this model as disabled in the DB
-        if not model["enabled"]:
-            pg.ConnectionPool.curr.execute(
-                "UPDATE eolus3.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
-            pg.ConnectionPool.conn.commit()
-            log("× Disabled.", "DEBUG", indentLevel=1)
-            print()
-            continue
+            # Flag this model as disabled in the DB
+            if not model["enabled"]:
+                pg.ConnectionPool.curr.execute(
+                    "UPDATE eolus3.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
+                pg.ConnectionPool.conn.commit()
+                log("× Disabled.", "DEBUG", indentLevel=1)
+                print()
+                continue
 
-        status = model_tools.get_model_status(model_name)
-        model_fh = model_tools.get_full_fh(model_name, model["startTime"])
+            status = model_tools.get_model_status(model_name)
+            model_fh = model_tools.get_full_fh(model_name, model["startTime"])
 
-        log("· Status: " + str(status), "INFO", indentLevel=1)
+            log("· Status: " + str(status), "INFO", indentLevel=1)
 
-        max_lookback = 2
-        lookback = 0
-        if status == None:
-            while lookback < max_lookback:
-                timestamp = model_tools.get_last_available_timestamp(
-                    model, prev=lookback)
-                if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-
-                    if model_name not in current_processing_pool:
-                        current_processing_pool[model_name]["status"] = "MAKINGTABLE"
-                        model_tools.add_model_to_db(model_name)
-                        processing.start(model_name, timestamp)
-                        del current_processing_pool[model_name]
-                    
-                    return True
-
-                lookback += 1
-
-        elif status == "WAITING" or status == "DISABLED":
-            should_process = False
-            log("· Checking if this model needs to be processed.",
-                "INFO", indentLevel=1)
-
-            max_lookback = 2
+            max_lookback = 3
             lookback = 0
-            while lookback < max_lookback:
-                timestamp = model_tools.get_last_available_timestamp(
-                    model, prev=lookback)
-                if not model_tools.model_timestamp_matches(model_name, timestamp):
-                    log("· It does -- checking if an update is available. Looked back " + str(lookback) + " runs",
-                        "INFO", indentLevel=1)
+            if status == None:
+                while lookback < max_lookback:
+                    timestamp = model_tools.get_last_available_timestamp(
+                        model, prev=lookback)
                     if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
 
-                        if model_name not in current_processing_pool:
-                            current_processing_pool[model_name]["status"] = "MAKINGTABLE"
+                        if model_name not in processing_pool:
+                            processing_pool[model_name] = {
+                                'status': 'POPULATING'}
+                            processing_pool[model_name] = model_tools.make_band_dict(
+                                model_name)
                             model_tools.add_model_to_db(model_name)
                             processing.start(model_name, timestamp)
-                            del current_processing_pool[model_name]
+                            processing_pool[model_name]["status"] = "INPROGRESS"
+                            lookback = max_lookback
+                            new_models = True
 
-                        return True
+                    lookback += 1
 
-                else:
-                    log("· Nope.", "INFO", indentLevel=1)
-                    break
+            elif status == "WAITING" or status == "DISABLED":
+                log("· Checking if this model needs to be processed.",
+                    "INFO", indentLevel=1)
 
-                lookback += 1
+                max_lookback = 3
+                lookback = 0
+                while lookback < max_lookback:
+                    timestamp = model_tools.get_last_available_timestamp(
+                        model, prev=lookback)
+                    if not model_tools.model_timestamp_matches(model_name, timestamp):
+                        log("· It does -- checking if an update is available. Looked back " + str(lookback) + " runs",
+                            "INFO", indentLevel=1)
+                        if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
 
-        elif status == "PROCESSING":
-            processed = processing.next_step(model_name, current_processing_pool)
+                            if model_name not in processing_pool:
+                                processing_pool[model_name] = {
+                                    'status': 'POPULATING'}
+                                processing_pool[model_name] = model_tools.make_band_dict(
+                                    model_name)
+                                processing.start(model_name, timestamp)
+                                processing_pool[model_name]["status"] = "INPROGRESS"
+                                lookback = max_lookback
+                                new_models = True
 
-        print()
+                    else:
+                        log("· Nope.", "INFO", indentLevel=1)
+                        break
 
-        return processed
+                    lookback += 1
+
+            elif status == "PROCESSING":
+                print("YEAH DELETING " + model_name)
+                del processing_pool[model_name]
+
+                '''processed = processing.find_model_step_to_process(
+                model_name, processing_pool)
+                return {
+                    'success': processed,
+                    'id': processed_id,
+                    'model': processed_model
+                }'''
+
+            print()
+
+    return {
+        'success': True
+    }
 
 
 if __name__ == "__main__":

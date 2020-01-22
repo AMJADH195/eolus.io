@@ -1,24 +1,23 @@
-from eolus_lib.config import config, models
-from eolus_lib.logger import log
-import eolus_lib.model_tools as model_tools
-import eolus_lib.pg_connection_manager as pg
+from .config import config, models
+from .logger import log
+from . import file_tools as file_tools
+from . import model_tools as model_tools
+from . import pg_connection_manager as pg
+
+from datetime import datetime, timedelta, tzinfo, time
+import os
+
 
 def start(model_name, timestamp):
 
     formatted_timestamp = timestamp.strftime('%Y%m%d_%HZ')
 
-    log(f"· Started processing {model_name} | {formatted_timestamp} -- making table(s).",
+    log(f"· Started processing {model_name} | {formatted_timestamp}.",
         "INFO", indentLevel=1, remote=True, model=model_name)
-
-    make_model_band_array(model_name)
-    table_name = model_name + "_" + formatted_timestamp
-
-    if not create_band_table(model_name, table_name):
-        return False
 
     try:
         pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s",
-                     ("PROCESSING", timestamp, model_name))
+                                       ("PROCESSING", timestamp, model_name))
         pg.ConnectionPool.conn.commit()
 
         pg.ConnectionPool.curr.execute(
@@ -26,7 +25,7 @@ def start(model_name, timestamp):
         pg.ConnectionPool.conn.commit()
 
         pg.ConnectionPool.curr.execute("INSERT INTO eolus3.run_status (model, status, timestamp) VALUES (%s, %s, %s)",
-                     (model_name, "PROCESSING", timestamp))
+                                       (model_name, "PROCESSING", timestamp))
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()
@@ -35,51 +34,6 @@ def start(model_name, timestamp):
         return False
 
     return True
-
-
-def create_band_table(model_name, table_name):
-    log(f"· Creating table | {table_name}", "NOTICE",
-        indentLevel=1, remote=True, model=model_name)
-    try:
-        model = models[model_name]
-        pg.ConnectionPool.curr.execute("CREATE TABLE eolus3." + table_name +
-                     " (fh text, status text, band integer, start_time timestamp with time zone, grib_var text, agent text) WITH ( OIDS = FALSE )")
-        pg.ConnectionPool.conn.commit()
-
-    except:
-        pg.reset()
-        log("Could not create table. This will probably need to be manually fixed.",
-            "ERROR", remote=True)
-        return False
-
-    fh = model["startTime"]
-    i = 1
-
-    populated = False
-
-    bands = make_model_band_array(model_name)
-    try:
-        while not populated:
-            full_fh = getfull_fh(model_name, fh)
-            if bands == None or len(bands) == 0:
-                pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + table_name +
-                             " (fh, status, band) VALUES (%s, %s, %s)", (full_fh, "WAITING", str(i)))
-                pg.ConnectionPool.conn.commit()
-            else:
-                for band in bands:
-                    pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + table_name + " (fh, status, band, grib_var) VALUES (%s, %s, %s, %s)",
-                                 (full_fh, "WAITING", str(i), band["shorthand"]))
-                    pg.ConnectionPool.conn.commit()
-            fh = model_tools.add_appropriate_fh_step(model_name, fh)
-            i += 1
-
-            if fh > model["endTime"]:
-                return
-    except:
-        pg.reset()
-        log("An error ocpg.ConnectionPool.curred while making the table (" +
-            table_name + ").", "ERROR", remote=True, model=model_name)
-        return
 
 
 def find_model_step_to_process(model_name):
@@ -104,7 +58,7 @@ def find_model_step_to_process(model_name):
     try:
         # TODO PUT LIKE WHERE fh, grib_var, band not in whatever is currently in model_processing_pool
         pg.ConnectionPool.curr.execute("SELECT fh, grib_var, band FROM eolus3." + table_name +
-                     " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
+                                       " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
         res = pg.ConnectionPool.curr.fetchone()
         if not res or len(res) == 0:
             return False
@@ -123,7 +77,7 @@ def find_model_step_to_process(model_name):
     if not grib_var:
         band = None
     else:
-        model_band_array = makeModelBandArray(model_name)
+        model_band_array = make_model_band_array(model_name)
         for bandItem in model_band_array:
             if bandItem["shorthand"] == grib_var:
                 band = bandItem
@@ -139,7 +93,7 @@ def find_model_step_to_process(model_name):
 
     try:
         pg.ConnectionPool.curr.execute("UPDATE eolus3." + table_name + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" +
-                     band_str, ("PROCESSING", datetime.utcnow(), pid, full_fh))
+                                       band_str, ("PROCESSING", datetime.utcnow(), pid, full_fh))
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()
@@ -160,20 +114,20 @@ def find_model_step_to_process(model_name):
                 remote=True, indentLevel=1, model=model_name)
             if grib_var is not None:
                 pg.ConnectionPool.curr.execute("SELECT * FROM eolus3." + table_name +
-                             " WHERE fh = '" + full_fh + "' AND grib_var = '" + grib_var + "'")
+                                               " WHERE fh = '" + full_fh + "' AND grib_var = '" + grib_var + "'")
             else:
                 pg.ConnectionPool.curr.execute("SELECT * FROM eolus3." +
-                             table_name + " WHERE fh = '" + full_fh + "'")
+                                               table_name + " WHERE fh = '" + full_fh + "'")
             res = pg.ConnectionPool.curr.fetchone()
 
             if not res or len(res) == 0:
                 pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + table_name +
-                             " (fh, status, band, grib_var) VALUES (%s,%s,%s,%s)", (full_fh, "WAITING", orig_band, grib_var))
+                                               " (fh, status, band, grib_var) VALUES (%s,%s,%s,%s)", (full_fh, "WAITING", orig_band, grib_var))
                 pg.ConnectionPool.conn.commit()
 
             else:
                 pg.ConnectionPool.curr.execute("UPDATE eolus3." + table_name + " SET (status, start_time) = (%s, %s) WHERE fh = %s" +
-                             band_str, ("WAITING", datetime.utcnow(), full_fh))
+                                               band_str, ("WAITING", datetime.utcnow(), full_fh))
                 pg.ConnectionPool.conn.commit()
         except Exception as e:
             pg.reset()
@@ -188,7 +142,7 @@ def download_band(model_name, timestamp, fh, band, table_name):
 
     try:
         pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." +
-                     table_name + " WHERE fh = %s", (fh,))
+                                       table_name + " WHERE fh = %s", (fh,))
         band_number = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
@@ -199,7 +153,7 @@ def download_band(model_name, timestamp, fh, band, table_name):
     url = model_tools.make_url(model_name, timestamp.strftime(
         "%Y%m%d"), timestamp.strftime("%H"), fh)
 
-    file_name = model_tools.get_base_file_name(model_name, timestamp, band)
+    file_name = model_tools.get_base_filename(model_name, timestamp, band)
     target_dir = config["mapfileDir"] + "/" + model_name + "/"
     target_raw_dir = config["mapfileDir"] + "/rawdata/" + model_name + "/"
     download_filename = config["tempDir"] + "/" + \
@@ -227,7 +181,7 @@ def download_band(model_name, timestamp, fh, band, table_name):
             "WARN", remote=True, indentLevel=2, model=model_name)
         try:
             pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + table_name +
-                         " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
+                                           " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
             pg.ConnectionPool.conn.commit()
         except:
             pg.reset()
@@ -398,7 +352,7 @@ def download_band(model_name, timestamp, fh, band, table_name):
 
     try:
         pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + table_name +
-                     " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
+                                       " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()
@@ -414,7 +368,7 @@ def download_band(model_name, timestamp, fh, band, table_name):
 '''
 
 
-def getbyte_range(band, idxFile, content_length):
+def get_byte_range(band, idxFile, content_length):
     log(f"· Searching for band defs in index file {idxFile}",
         "DEBUG", indentLevel=2, remote=True)
     try:
@@ -468,11 +422,11 @@ def getbyte_range(band, idxFile, content_length):
         return None
 
 
-def downloadFullFile(model_name, timestamp, fh, table_name):
+def download_full_file(model_name, timestamp, fh, table_name):
     model = models[model_name]
     try:
         pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." +
-                     table_name + " WHERE fh = %s", (fh,))
+                                       table_name + " WHERE fh = %s", (fh,))
         band_number = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
@@ -480,7 +434,7 @@ def downloadFullFile(model_name, timestamp, fh, table_name):
             table_name, "ERROR", remote=True, indentLevel=2, model=model_name)
         return False
 
-    url = makeUrl(model_name, timestamp.strftime(
+    url = model_tools.make_url(model_name, timestamp.strftime(
         "%Y%m%d"), timestamp.strftime("%H"), fh)
 
     file_name = model_tools.get_base_filename(model_name, timestamp, None)
@@ -578,9 +532,11 @@ def downloadFullFile(model_name, timestamp, fh, table_name):
                 indentLevel=2, remote=False, model=model_name)
 
         target_filename = target_dir + \
-            model_tools.get_base_filename(model_name, timestamp, None) + "_t" + fh + ".tif"
+            model_tools.get_base_filename(
+                model_name, timestamp, None) + "_t" + fh + ".tif"
         target_raw_filename = target_raw_dir + \
-            model_tools.get_base_filename(model_name, timestamp, None) + "_t" + fh + ".tif"
+            model_tools.get_base_filename(
+                model_name, timestamp, None) + "_t" + fh + ".tif"
         log("· Copying to " + target_filename, "NOTICE",
             indentLevel=2, remote=True, model=model_name)
 
@@ -599,7 +555,8 @@ def downloadFullFile(model_name, timestamp, fh, table_name):
 
         for band in bands:
             target_filename = target_dir + \
-                model_tools.get_base_filename(model_name, timestamp, band) + ".tif"
+                model_tools.get_base_filename(
+                    model_name, timestamp, band) + ".tif"
             target_raw_filename = target_raw_dir + \
                 model_tools.get_base_filename(
                     model_name, timestamp, band) + ".tif"
@@ -726,7 +683,7 @@ def downloadFullFile(model_name, timestamp, fh, table_name):
 
     try:
         pg.ConnectionPool.curr.execute("DELETE FROM eolus3." +
-                     table_name + " WHERE fh = %s", (fh,))
+                                       table_name + " WHERE fh = %s", (fh,))
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()
@@ -747,15 +704,16 @@ def process(model_name, table_name, full_fh, timestamp, band):
 
     try:
         pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." + table_name +
-                     " WHERE fh = '" + full_fh + "' " + band_str)
+                                       " WHERE fh = '" + full_fh + "' " + band_str)
         band_number = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
         log("× Some other agent finished the model.", "NOTICE",
             indentLevel=1, remote=True, model=model_name)
-        killScript(0)
+        return False
 
-    fileExists = model_tools.check_if_model_fh_available(model_name, timestamp, full_fh)
+    fileExists = model_tools.check_if_model_fh_available(
+        model_name, timestamp, full_fh)
 
     if fileExists:
         log("· Start processing fh " + full_fh + ".", "INFO",
@@ -779,10 +737,10 @@ def process(model_name, table_name, full_fh, timestamp, band):
 
         processed = True
 
-    #delete the table if all steps are done
+    # delete the table if all steps are done
     try:
         pg.ConnectionPool.curr.execute("SELECT COUNT(*) FROM eolus3." +
-                     table_name + " WHERE status != 'DONE'")
+                                       table_name + " WHERE status != 'DONE'")
         num_bandsRemaining = pg.ConnectionPool.curr.fetchone()[0]
     except:
         pg.reset()
@@ -811,24 +769,8 @@ def process(model_name, table_name, full_fh, timestamp, band):
 
         end(model_name)
 
-    # If success, return True
     return processed
 
-
-def make_model_band_array(model_name, force=False):
-    model = models[model_name]
-    if not "bands" in model.keys():
-        return None
-
-    model_band_array = []
-    if model["index"] or force:
-        for band in model["bands"]:
-            model_band_array.append({
-                "shorthand": band["var"].lower() + "_" + band["level"].lower(),
-                "band": band
-            })
-
-    return model_band_array
 
 def end(model_name):
 
