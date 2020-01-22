@@ -1,0 +1,29 @@
+MAP
+ CONFIG "MS_ERRORFILE" "./passthru_error.txt"
+ DEBUG OFF
+ DEFRESOLUTION 96
+ IMAGETYPE PNG
+ PROJECTION
+  "init=epsg:3857"
+ END
+
+ LAYER
+  NAME mapbox_passthru
+  COMPOSITE
+  END # COMPOSITE
+  DATA "./map_overlay.xml"
+  STATUS ON
+  TYPE RASTER
+  UNITS METERS
+  EXTENT -20037508.34278925 -20037508.34278924 20034926.16710471 20037508.34278925
+  PROJECTION
+   "init=epsg:3857"
+  END
+  METADATA
+   "wms_title" "mapbox_passthru"
+   "wms_srs"   "EPSG:3857"
+   "wms_extent" "-20037508.34278925 -20037508.34278924 20034926.16710471 20037508.34278925"
+   "wms_enable_request" "*"
+   "wms_formatlist" "image/png"
+  END
+ END
