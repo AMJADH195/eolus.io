@@ -20,7 +20,7 @@
             }
         },
         "tempDir": "./tempWxData",
-        "mapfileDir": "/map",
+        "mapfileDir": "/map/dev",
         "logFile": "model_update.log",
         "debug": false,
         "resampling": "cubicspline",
@@ -586,7 +586,7 @@
             ]
         },
         "href_avrg": {
-            "enabled": true,
+            "enabled": false,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 12,
@@ -856,14 +856,14 @@
             "updateFrequency": 1,
             "updateOffset": 0,
             "startTime": 0,
-            "endTime": 18,
+            "endTime": 1,
             "extEndTime": 36,
             "index": true,
             "imageWidth": 480,
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/hrrr/prod/hrrr.%D/conus/hrrr.t%Hz.wrfsfcf%T.grib2",
             "filetype": "grib2",
             "fhStep": {
-                "0": 1
+                "0": 18
             },
             "bands": [
                 {
@@ -1541,11 +1541,11 @@
             ]
         },
         "wpc_snow_12h_50pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
-            "endTime": 72,
+            "endTime": 24,
             "fhStep": {
                 "0": 6
             },

@@ -12,6 +12,7 @@ from osgeo import gdal
 import pprint
 
 agent_logged = False
+first_run = True
 processing_pool = {}
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -64,7 +65,7 @@ def init():
     if not agent_logged:
         kill_me(1)
 
-    #max_threads = config["maxThreads"]
+    # max_threads = config["maxThreads"]
     max_threads = 1
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -80,108 +81,94 @@ def init():
                 work_done(fut)
 
             if len(processing_pool) > 0:
-                for i in range(1, max_threads - len(futures)):
+                for i in range(0, max_threads - len(futures)):
                     time.sleep(config["sleepTime"])
                     futures.add(
                         executor.submit(do_work)
                     )
                     log("Adding another thread.", "DEBUG")
-                    print("")
-                    print("")
-                    print("")
-                    print(len(futures))
-                    print("")
-                    print("")
-                    print("")
 
     log("No more processing to do. Goodbye.", "DEBUG")
     kill_me(0)
 
 
 def do_work():
-    global processing_pool
+    global processing_pool, first_run
 
-    new_models = False
-    first_run = True
+    # Check only brand new models, or models that are waiting first
+    for model_name, model in models.items():
 
-    while new_models or first_run:
-        first_run = False
-        new_models = False
-        # Check only brand new models, or models that are waiting first
-        for model_name, model in models.items():
-            log("Checking " + model_name, "INFO", indentLevel=0)
+        # Flag this model as disabled in the DB
+        if not model["enabled"]:
+            pg.ConnectionPool.curr.execute(
+                "UPDATE eolus3.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
+            pg.ConnectionPool.conn.commit()
+            continue
 
-            # Flag this model as disabled in the DB
-            if not model["enabled"]:
-                pg.ConnectionPool.curr.execute(
-                    "UPDATE eolus3.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
-                pg.ConnectionPool.conn.commit()
-                log("× Disabled.", "DEBUG", indentLevel=1)
-                print()
-                continue
+        status = model_tools.get_model_status(model_name)
+        model_fh = model_tools.get_full_fh(model_name, model["startTime"])
 
-            status = model_tools.get_model_status(model_name)
-            model_fh = model_tools.get_full_fh(model_name, model["startTime"])
+        max_lookback = 3
+        lookback = 0
+        if status == None:
+            while lookback < max_lookback:
+                timestamp = model_tools.get_last_available_timestamp(
+                    model, prev=lookback)
+                if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
+                    print("POPULATING FROM NONE")
+                    if model_name not in processing_pool:
+                        print("OH SHI")
+                        processing_pool[model_name] = {
+                            'status': 'POPULATING'}
+                        processing_pool[model_name] = model_tools.make_band_dict(
+                            model_name)
+                        model_tools.add_model_to_db(model_name)
+                        processing.start(model_name, timestamp)
+                        processing_pool[model_name]["status"] = "INPROGRESS"
+                        lookback = max_lookback
 
-            log("· Status: " + str(status), "INFO", indentLevel=1)
+                    break
+
+                lookback += 1
+
+        elif status == "WAITING" or status == "DISABLED" or (status == "PROCESSING" and first_run):
 
             max_lookback = 3
             lookback = 0
-            if status == None:
-                while lookback < max_lookback:
-                    timestamp = model_tools.get_last_available_timestamp(
-                        model, prev=lookback)
+            while lookback < max_lookback:
+                timestamp = model_tools.get_last_available_timestamp(
+                    model, prev=lookback)
+                if not model_tools.model_timestamp_matches(model_name, timestamp):
+                    log("· Checking if an update is available for " + model_name + ". Looked back " + str(lookback) + " runs",
+                        "INFO", indentLevel=1)
                     if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-
+                        print("POPULATING FROM " + status)
                         if model_name not in processing_pool:
+                            print("OHSHI")
                             processing_pool[model_name] = {
                                 'status': 'POPULATING'}
                             processing_pool[model_name] = model_tools.make_band_dict(
                                 model_name)
-                            model_tools.add_model_to_db(model_name)
                             processing.start(model_name, timestamp)
                             processing_pool[model_name]["status"] = "INPROGRESS"
                             lookback = max_lookback
-                            new_models = True
 
-                    lookback += 1
-
-            elif status == "WAITING" or status == "DISABLED":
-                log("· Checking if this model needs to be processed.",
-                    "INFO", indentLevel=1)
-
-                max_lookback = 3
-                lookback = 0
-                while lookback < max_lookback:
-                    timestamp = model_tools.get_last_available_timestamp(
-                        model, prev=lookback)
-                    if not model_tools.model_timestamp_matches(model_name, timestamp):
-                        log("· It does -- checking if an update is available. Looked back " + str(lookback) + " runs",
-                            "INFO", indentLevel=1)
-                        if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-
-                            if model_name not in processing_pool:
-                                processing_pool[model_name] = {
-                                    'status': 'POPULATING'}
-                                processing_pool[model_name] = model_tools.make_band_dict(
-                                    model_name)
-                                processing.start(model_name, timestamp)
-                                processing_pool[model_name]["status"] = "INPROGRESS"
-                                lookback = max_lookback
-                                new_models = True
-
-                    else:
-                        log("· Nope.", "INFO", indentLevel=1)
                         break
 
-                    lookback += 1
+                else:
+                    log("· Nope.", "INFO", indentLevel=1)
+                    break
 
-            processed = processing.process(processing_pool)
-            return {
-                'success': processed
-            }
+                lookback += 1
 
-            print()
+    first_run = False
+    if len(processing_pool) > 0:
+        processed = processing.process(processing_pool)
+        return {
+            'success': processed
+        }
+
+    print()
 
     return {
         'success': True

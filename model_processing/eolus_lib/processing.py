@@ -13,7 +13,7 @@ def start(model_name, timestamp):
 
     formatted_timestamp = timestamp.strftime('%Y%m%d_%HZ')
 
-    log(f"· Started processing {model_name} | {formatted_timestamp}.",
+    log(f"· Initialized processing {model_name} | {formatted_timestamp}.",
         "INFO", indentLevel=1, remote=True, model=model_name)
 
     try:
@@ -40,48 +40,58 @@ def start(model_name, timestamp):
 def process(processing_pool):
 
     model_name = random.choice(list(processing_pool.keys()))
+    log("· Trying to process a step in model " + model_name, "INFO")
+
     pool_model = processing_pool[model_name]
 
     step = None
     steps = iter(pool_model)
 
-    while step != -1:
-        step = next(steps, -1)
-        if step != -1 and step['processing'] == False:
-            break
+    while True:
+        try:
+            step = next(steps, -1)
+            if step == -1:
+                log("· No available step to process.", "INFO",
+                    remote=False, indentLevel=1, model=model_name)
+                return False
 
-    if (step == -1):
-        log("· No available step to process.",
-            "INFO", remote=False, indentLevel=1, model=model_name)
-        return False
+            elif pool_model[step]['processing'] == False:
+                break
+        except:
+            log("· No available step to process.", "INFO",
+                remote=False, indentLevel=1, model=model_name)
+            return False
 
-    step['processing'] = True
+    log("· Step found,", "INFO")
+
+    pool_model[step]['processing'] = True
+    full_fh = pool_model[step]['fh']
+    band_num = pool_model[step]['band_num']
 
     try:
         pg.ConnectionPool.curr.execute(
             "SELECT timestamp FROM eolus3.models WHERE model = %s", (model_name,))
         timestamp = pg.ConnectionPool.curr.fetchone()[0]
+        log("· Timestamp retrieved", "DEBUG")
 
     except:
         pg.reset()
         log("Couldn't get the timetamp for model " +
             model_name, "ERROR", remote=True)
-        step['retries'] += 1
-        step['processing'] = False
+        pool_model[step]['retries'] += 1
+        pool_model[step]['processing'] = False
 
         if step['retries'] > config['maxRetriesPerStep']:
-            del pool_model[full_fh]
+            del pool_model[step]
             if len(pool_model) == 0:
                 del processing_pool[model_name]
 
         return False
 
-    full_fh = step['fh']
-    band_num = step['band_num']
     band = None
     band_info_str = ' | (no var/level)'
-    if 'band' in step:
-        band = step['band']
+    if 'band' in pool_model[step]:
+        band = pool_model[step]['band']
         band_info_str = ' | ' + band['shorthand']
 
     log("· Attempting to process fh " + full_fh + band_info_str,
@@ -92,7 +102,7 @@ def process(processing_pool):
 
     if not file_exists:
         log("· This fh is not available to be processed.", 'DEBUG')
-        step['processing'] = False
+        pool_model[step]['processing'] = False
         return False
 
     log("· Start processing fh " + full_fh + ".", "INFO",
@@ -100,30 +110,37 @@ def process(processing_pool):
 
     try:
         if band is None:
-            if not download_full_fh(model_name, timestamp, full_fh, band_num):
-                step['retries'] += 1
-                step['processing'] = False
+            if not download_full_file(model_name, timestamp, full_fh, band_num):
+                pool_model[step]['retries'] += 1
+                pool_model[step]['processing'] = False
+                if pool_model[step]['retries'] > config['maxRetriesPerStep']:
+                    del pool_model[step]
+                    if len(pool_model) == 0:
+                        del processing_pool[model_name]
                 return False
         else:
             if not download_band(model_name, timestamp, full_fh, band, band_num):
-                step['retries'] += 1
-                step['processing'] = False
-                if step['retries'] > config['maxRetriesPerStep']:
-                    del pool_model[full_fh]
+                pool_model[step]['retries'] += 1
+                pool_model[step]['processing'] = False
+                if pool_model[step]['retries'] > config['maxRetriesPerStep']:
+                    del pool_model[step]
                     if len(pool_model) == 0:
                         del processing_pool[model_name]
                 return False
 
-        step['processing'] = False
-        del pool_model[full_fh]
+        log("Success.", "INFO")
+        pool_model[step]['processing'] = False
+        del pool_model[step]
         if len(pool_model) == 0:
             del processing_pool[model_name]
         return True
-    except:
-        step['retries'] += 1
-        step['processing'] = False
-        if step['retries'] > config['maxRetriesPerStep']:
-            del pool_model[full_fh]
+    except Exception as e:
+        log("Failure.", "ERROR", remote=True)
+        log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
+        pool_model[step]['retries'] += 1
+        pool_model[step]['processing'] = False
+        if pool_model[step]['retries'] > config['maxRetriesPerStep']:
+            del pool_model[step]
             if len(pool_model) == 0:
                 del processing_pool[model_name]
         return False
