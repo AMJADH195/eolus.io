@@ -137,12 +137,12 @@ def update_run_status(model_name):
             indentLevel=0, remote=True, model=model_name)
 
 
-def get_base_filename(model_name, timestamp, band):
+def get_base_filename(model_name, timestamp, var_level):
     date = timestamp.strftime("%Y%m%d")
     time = timestamp.strftime("%HZ")
     file = model_name + "_" + date + "_" + time
-    if band is not None:
-        return file + "_" + band["shorthand"]
+    if var_level is not None:
+        return file + "_" + var_level
     else:
         return file
 
@@ -183,7 +183,7 @@ def make_band_dict(model_name):
                 full_fh: {
                     'retries': 0,
                     'fh': full_fh,
-                    'band': str(i),
+                    'band_num': i,
                     'processing': False
                 }
             })
@@ -193,8 +193,8 @@ def make_band_dict(model_name):
                     band["shorthand"] + "_" + full_fh: {
                         'retries': 0,
                         'fh': full_fh,
-                        'band': str(i),
-                        'varLevel': band['shorthand'],
+                        'band_num': i,
+                        'band': band,
                         'processing': False
                     }
                 })

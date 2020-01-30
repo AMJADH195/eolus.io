@@ -42,13 +42,7 @@ def kill_me(exit_code):
 def work_done(future):
     global processing_pool
     log("Thread finished.", "DEBUG")
-    result = future.result()
-    if result['success'] or processing_pool[result.model][result.id]['retries'] > 3:
-        if 'id' in result:
-            del processing_pool[result.model][result.id]
-    else:
-        if len(processing_pool) and 'id' in result:
-            processing_pool[result.model][result.id].retries += 1
+    pprint.pprint(processing_pool)
 
 
 def init():
@@ -87,7 +81,7 @@ def init():
 
             if len(processing_pool) > 0:
                 for i in range(1, max_threads - len(futures)):
-                    time.sleep(1)
+                    time.sleep(config["sleepTime"])
                     futures.add(
                         executor.submit(do_work)
                     )
@@ -182,17 +176,10 @@ def do_work():
 
                     lookback += 1
 
-            elif status == "PROCESSING":
-                print("YEAH DELETING " + model_name)
-                del processing_pool[model_name]
-
-                '''processed = processing.find_model_step_to_process(
-                model_name, processing_pool)
-                return {
-                    'success': processed,
-                    'id': processed_id,
-                    'model': processed_model
-                }'''
+            processed = processing.process(processing_pool)
+            return {
+                'success': processed
+            }
 
             print()
 

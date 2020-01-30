@@ -24,10 +24,11 @@
         "logFile": "model_update.log",
         "debug": false,
         "resampling": "cubicspline",
-        "sleepTime": 1,
+        "sleepTime": 3,
         "maxTime": 0,
         "retentionDays": 2,
-        "maxThreads": 3
+        "maxThreads": 3,
+        "maxRetriesPerStep": 5
     },
     "levelMaps": {
         "sfc": {

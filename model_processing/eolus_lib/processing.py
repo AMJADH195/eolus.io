@@ -6,6 +6,7 @@ from . import pg_connection_manager as pg
 
 from datetime import datetime, timedelta, tzinfo, time
 import os
+import random
 
 
 def start(model_name, timestamp):
@@ -36,119 +37,105 @@ def start(model_name, timestamp):
     return True
 
 
-def find_model_step_to_process(model_name):
-    found = False
-    model = models[model_name]
-    fh = model["startTime"]
-    orig_band = -1
+def process(processing_pool):
+
+    model_name = random.choice(list(processing_pool.keys()))
+    pool_model = processing_pool[model_name]
+
+    step = None
+    steps = iter(pool_model)
+
+    while step != -1:
+        step = next(steps, -1)
+        if step != -1 and step['processing'] == False:
+            break
+
+    if (step == -1):
+        log("· No available step to process.",
+            "INFO", remote=False, indentLevel=1, model=model_name)
+        return False
+
+    step['processing'] = True
 
     try:
         pg.ConnectionPool.curr.execute(
             "SELECT timestamp FROM eolus3.models WHERE model = %s", (model_name,))
         timestamp = pg.ConnectionPool.curr.fetchone()[0]
 
-        formatted_timestamp = timestamp.strftime('%Y%m%d_%HZ')
-        table_name = model_name + "_" + formatted_timestamp
-
     except:
         pg.reset()
         log("Couldn't get the timetamp for model " +
             model_name, "ERROR", remote=True)
+        step['retries'] += 1
+        step['processing'] = False
 
-    try:
-        # TODO PUT LIKE WHERE fh, grib_var, band not in whatever is currently in model_processing_pool
-        pg.ConnectionPool.curr.execute("SELECT fh, grib_var, band FROM eolus3." + table_name +
-                                       " WHERE status = 'WAITING' ORDER BY band ASC LIMIT 1")
-        res = pg.ConnectionPool.curr.fetchone()
-        if not res or len(res) == 0:
-            return False
-        full_fh = res[0]
-        grib_var = res[1]
-        orig_band = res[2]
+        if step['retries'] > config['maxRetriesPerStep']:
+            del pool_model[full_fh]
+            if len(pool_model) == 0:
+                del processing_pool[model_name]
 
-    except:
-        pg.reset()
-        log("Couldn't get the status of a timestep from " +
-            table_name, "ERROR", remote=True)
         return False
 
+    full_fh = step['fh']
+    band_num = step['band_num']
     band = None
-
-    if not grib_var:
-        band = None
-    else:
-        model_band_array = make_model_band_array(model_name)
-        for bandItem in model_band_array:
-            if bandItem["shorthand"] == grib_var:
-                band = bandItem
-                break
-
-    band_str = ""
-    if band:
-        band_str = " AND grib_var = '" + band["shorthand"] + "'"
-
-    band_info_str = ""
-    if band is not None:
-        band_info_str = " | Band: " + band["shorthand"]
-
-    try:
-        pg.ConnectionPool.curr.execute("UPDATE eolus3." + table_name + " SET (status, start_time, agent) = (%s, %s, %s) WHERE fh = %s" +
-                                       band_str, ("PROCESSING", datetime.utcnow(), pid, full_fh))
-        pg.ConnectionPool.conn.commit()
-    except:
-        pg.reset()
-        log("Couldn't set a status to processing in " +
-            table_name, "ERROR", remote=True)
+    band_info_str = ' | (no var/level)'
+    if 'band' in step:
+        band = step['band']
+        band_info_str = ' | ' + band['shorthand']
 
     log("· Attempting to process fh " + full_fh + band_info_str,
         "INFO", remote=True, indentLevel=1, model=model_name)
-    processed = process(model_name, table_name, full_fh, timestamp, band)
 
-    if processed:
-        log("✓ Done.", "INFO", remote=True, indentLevel=1, model=model_name)
-        return True
+    file_exists = model_tools.check_if_model_fh_available(
+        model_name, timestamp, full_fh)
 
-    else:
-        try:
-            log("· Setting back to waiting.", "INFO",
-                remote=True, indentLevel=1, model=model_name)
-            if grib_var is not None:
-                pg.ConnectionPool.curr.execute("SELECT * FROM eolus3." + table_name +
-                                               " WHERE fh = '" + full_fh + "' AND grib_var = '" + grib_var + "'")
-            else:
-                pg.ConnectionPool.curr.execute("SELECT * FROM eolus3." +
-                                               table_name + " WHERE fh = '" + full_fh + "'")
-            res = pg.ConnectionPool.curr.fetchone()
-
-            if not res or len(res) == 0:
-                pg.ConnectionPool.curr.execute("INSERT INTO eolus3." + table_name +
-                                               " (fh, status, band, grib_var) VALUES (%s,%s,%s,%s)", (full_fh, "WAITING", orig_band, grib_var))
-                pg.ConnectionPool.conn.commit()
-
-            else:
-                pg.ConnectionPool.curr.execute("UPDATE eolus3." + table_name + " SET (status, start_time) = (%s, %s) WHERE fh = %s" +
-                                               band_str, ("WAITING", datetime.utcnow(), full_fh))
-                pg.ConnectionPool.conn.commit()
-        except Exception as e:
-            pg.reset()
-            log("Couldn't set a status to back to waiting in " + table_name +
-                "... This will need manual intervention.", "ERROR", remote=True)
-            log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
+    if not file_exists:
+        log("· This fh is not available to be processed.", 'DEBUG')
+        step['processing'] = False
         return False
 
-
-def download_band(model_name, timestamp, fh, band, table_name):
-    model = models[model_name]
+    log("· Start processing fh " + full_fh + ".", "INFO",
+        remote=True, model=model_name, indentLevel=1)
 
     try:
-        pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." +
-                                       table_name + " WHERE fh = %s", (fh,))
-        band_number = pg.ConnectionPool.curr.fetchone()[0]
+        if band is None:
+            if not download_full_fh(model_name, timestamp, full_fh, band_num):
+                step['retries'] += 1
+                step['processing'] = False
+                return False
+        else:
+            if not download_band(model_name, timestamp, full_fh, band, band_num):
+                step['retries'] += 1
+                step['processing'] = False
+                if step['retries'] > config['maxRetriesPerStep']:
+                    del pool_model[full_fh]
+                    if len(pool_model) == 0:
+                        del processing_pool[model_name]
+                return False
+
+        step['processing'] = False
+        del pool_model[full_fh]
+        if len(pool_model) == 0:
+            del processing_pool[model_name]
+        return True
     except:
-        pg.reset()
-        log("Couldn't get the next band to process, fh " + fh + ", table " +
-            table_name, "ERROR", remote=True, indentLevel=2, model=model_name)
+        step['retries'] += 1
+        step['processing'] = False
+        if step['retries'] > config['maxRetriesPerStep']:
+            del pool_model[full_fh]
+            if len(pool_model) == 0:
+                del processing_pool[model_name]
         return False
+
+
+'''
+    Uses an .idx file to download an individual band and convert it to a TIF library.
+'''
+
+
+def download_band(model_name, timestamp, fh, band, band_num):
+    model = models[model_name]
 
     url = model_tools.make_url(model_name, timestamp.strftime(
         "%Y%m%d"), timestamp.strftime("%H"), fh)
@@ -174,20 +161,12 @@ def download_band(model_name, timestamp, fh, band, table_name):
             remote=True, indentLevel=2, model=model_name)
         return False
 
-    byte_range = getbyte_range(band, url + ".idx", content_length)
+    byte_range = get_byte_range(band, url + ".idx", content_length)
 
     if not byte_range or byte_range == None:
         log(f"· Band {band['shorthand']} doesn't exist for fh {fh}.",
             "WARN", remote=True, indentLevel=2, model=model_name)
-        try:
-            pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + table_name +
-                                           " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
-            pg.ConnectionPool.conn.commit()
-        except:
-            pg.reset()
-            log("Couldn't delete an unusable band from the table. " + fh + ", table " +
-                table_name, "ERROR", remote=True, indentLevel=2, model=model_name)
-        return True
+        return False
 
     log(f"↓ Downloading band {band['shorthand']} for fh {fh}.",
         "NOTICE", indentLevel=2, remote=True, model=model_name)
@@ -202,8 +181,8 @@ def download_band(model_name, timestamp, fh, band, table_name):
         f.write(response.data)
         f.close()
     except:
-        log("Couldn't read the band -- the request likely timed out. " + fh +
-            ", table " + table_name, "ERROR", indentLevel=2, remote=True, model=model_name)
+        log("Couldn't read the band -- the request likely timed out. " +
+            fh, "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     log(f"✓ Downloaded band {band['shorthand']} for fh {fh}.",
@@ -313,7 +292,7 @@ def download_band(model_name, timestamp, fh, band, table_name):
             log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
             return False
 
-    log(f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | band_number: {str(band_number)}",
+    log(f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | band_number: {str(band_num)}",
         "NOTICE", indentLevel=2, remote=True, model=model_name)
 
     try:
@@ -322,14 +301,14 @@ def download_band(model_name, timestamp, fh, band, table_name):
         data = grib_file.GetRasterBand(1).ReadAsArray()
 
         tif = gdal.Open(target_filename, gdalconst.GA_Update)
-        tif.GetRasterBand(band_number).WriteArray(data)
+        tif.GetRasterBand(band_num).WriteArray(data)
         tif.FlushCache()
 
         grib_file = gdal.Open(download_filename + "_unscaled.tif")
         data = grib_file.GetRasterBand(1).ReadAsArray()
 
         tif = gdal.Open(target_raw_filename, gdalconst.GA_Update)
-        tif.GetRasterBand(band_number).WriteArray(data)
+        tif.GetRasterBand(band_num).WriteArray(data)
         tif.FlushCache()
 
         grib_file = None
@@ -364,75 +343,13 @@ def download_band(model_name, timestamp, fh, band, table_name):
 
 
 '''
-    Copied a bit from https://github.com/cacraig/grib-inventory/ - thanks!
+    Downloads a full GRIB2 file for a timestamp, then extracts each var/level
+    to convert to separate TIF libraries.
 '''
 
 
-def get_byte_range(band, idxFile, content_length):
-    log(f"· Searching for band defs in index file {idxFile}",
-        "DEBUG", indentLevel=2, remote=True)
-    try:
-        response = http.request('GET', idxFile)
-        data = response.data.decode('utf-8')
-        var_name_to_find = band["band"]["var"]
-        level_to_find = getLevelNameForLevel(band["band"]["level"], "idxName")
-        found = False
-        start_byte = None
-        end_byte = None
-
-        for line in data.splitlines():
-            line = str(line)
-            parts = line.split(':')
-            var_name = parts[3]
-            level = parts[4]
-            time = parts[5]
-
-            if found:
-                end_byte = parts[1]
-                break
-
-            if var_name == var_name_to_find and level == level_to_find:
-                if "timeRange" in band["band"].keys():
-                    range_val = time.split(" ", 1)[0]
-                    ranges = range_val.split("-")
-                    if (int(ranges[1]) - int(ranges[0])) != band["band"]["timeRange"]:
-                        continue
-
-                log("✓ Found.", "DEBUG", indentLevel=2, remote=False)
-                found = True
-                start_byte = parts[1]
-                continue
-
-        if found:
-            if end_byte == None:
-                end_byte = content_length
-
-            log(f"· Bytes {start_byte} to {end_byte}", "DEBUG", indentLevel=2)
-            if start_byte == end_byte:
-                return None
-
-            return start_byte + "-" + end_byte
-        else:
-            log(f"· Couldn't find band def in index file.",
-                "WARN", indentLevel=2, remote=True)
-        return None
-
-    except:
-        log(f"Band def retrieval failed.", "ERROR", indentLevel=2, remote=True)
-        return None
-
-
-def download_full_file(model_name, timestamp, fh, table_name):
+def download_full_file(model_name, timestamp, fh, band_num):
     model = models[model_name]
-    try:
-        pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." +
-                                       table_name + " WHERE fh = %s", (fh,))
-        band_number = pg.ConnectionPool.curr.fetchone()[0]
-    except:
-        pg.reset()
-        log("Couldn't get the next fh to process, fh " + fh + ", table " +
-            table_name, "ERROR", remote=True, indentLevel=2, model=model_name)
-        return False
 
     url = model_tools.make_url(model_name, timestamp.strftime(
         "%Y%m%d"), timestamp.strftime("%H"), fh)
@@ -466,8 +383,8 @@ def download_full_file(model_name, timestamp, fh, table_name):
         log(f"✓ Downloaded band fh {fh}.", "NOTICE",
             indentLevel=2, remote=True, model=model_name)
     except:
-        log("Couldn't read the fh -- the request likely timed out. " + fh +
-            ", table " + table_name, "ERROR", indentLevel=2, remote=True, model=model_name)
+        log("Couldn't read the fh -- the request likely timed out. " +
+            fh, "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     bounds = config["bounds"][model["bounds"]]
@@ -517,7 +434,7 @@ def download_full_file(model_name, timestamp, fh, table_name):
 
     num_bands = model_tools.get_number_of_hours(model_name)
 
-    bands = make_model_band_array(model_name, force=True)
+    bands = model_tools.make_model_band_array(model_name, force=True)
     if bands == None:
         try:
             os.makedirs(target_dir)
@@ -637,7 +554,7 @@ def download_full_file(model_name, timestamp, fh, table_name):
                             log("· Band " + band["band"]["var"] + " found.",
                                 "DEBUG", indentLevel=2, remote=False)
                             data = fileBand.ReadAsArray()
-                            tif.GetRasterBand(band_number).WriteArray(data)
+                            tif.GetRasterBand(band_num).WriteArray(data)
                             break
 
                     except:
@@ -656,7 +573,7 @@ def download_full_file(model_name, timestamp, fh, table_name):
                             log("· Band " + band["band"]["var"] + " found.",
                                 "DEBUG", indentLevel=2, remote=False)
                             data = fileBand.ReadAsArray()
-                            tif.GetRasterBand(band_number).WriteArray(data)
+                            tif.GetRasterBand(band_num).WriteArray(data)
                             break
 
                     except:
@@ -667,10 +584,6 @@ def download_full_file(model_name, timestamp, fh, table_name):
                 grib_file = None
                 tif = None
             except Exception as e:
-                log("Couldn't write bands to the tiff. " + fh + ", table " +
-                    table_name, "ERROR", indentLevel=2, remote=True, model=model_name)
-                log(repr(e), "ERROR", indentLevel=2,
-                    remote=True, model=model_name)
                 return False
 
     try:
@@ -694,84 +607,6 @@ def download_full_file(model_name, timestamp, fh, table_name):
     return True
 
 
-def process(model_name, table_name, full_fh, timestamp, band):
-    model = models[model_name]
-    processed = False
-
-    band_str = ""
-    if band:
-        band_str = " AND grib_var = '" + band["shorthand"] + "'"
-
-    try:
-        pg.ConnectionPool.curr.execute("SELECT band FROM eolus3." + table_name +
-                                       " WHERE fh = '" + full_fh + "' " + band_str)
-        band_number = pg.ConnectionPool.curr.fetchone()[0]
-    except:
-        pg.reset()
-        log("× Some other agent finished the model.", "NOTICE",
-            indentLevel=1, remote=True, model=model_name)
-        return False
-
-    fileExists = model_tools.check_if_model_fh_available(
-        model_name, timestamp, full_fh)
-
-    if fileExists:
-        log("· Start processing fh " + full_fh + ".", "INFO",
-            remote=True, model=model_name, indentLevel=1)
-        if band is None:
-            try:
-                success = download_full_file(
-                    model_name, timestamp, full_fh, table_name)
-                if not success:
-                    return False
-            except:
-                return False
-        else:
-            try:
-                success = download_band(
-                    model_name, timestamp, full_fh, band, table_name)
-                if not success:
-                    return False
-            except:
-                return False
-
-        processed = True
-
-    # delete the table if all steps are done
-    try:
-        pg.ConnectionPool.curr.execute("SELECT COUNT(*) FROM eolus3." +
-                                       table_name + " WHERE status != 'DONE'")
-        num_bandsRemaining = pg.ConnectionPool.curr.fetchone()[0]
-    except:
-        pg.reset()
-        log("Couldn't get remaining count from table " + table_name +
-            ".", "ERROR", indentLevel=1, remote=True, model=model_name)
-        return False
-
-    noun = "bands"
-    if band is None:
-        noun = "forecast hours"
-
-    log("· There are " + str(num_bandsRemaining) + " remaining " +
-        noun + " to process.", "DEBUG", indentLevel=1)
-
-    if num_bandsRemaining == 0:
-        log("· Deleting table " + table_name + ".", "NOTICE",
-            indentLevel=1, remote=True, model=model_name)
-        try:
-            pg.ConnectionPool.curr.execute("DROP TABLE eolus3." + table_name)
-            pg.ConnectionPool.conn.commit()
-        except:
-            pg.reset()
-            log("Couldn't remove the table " + table_name + ".",
-                "ERROR", indentLevel=1, remote=True, model=model_name)
-            return False
-
-        end(model_name)
-
-    return processed
-
-
 def end(model_name):
 
     file_tools.clean()
@@ -787,3 +622,63 @@ def end(model_name):
         pg.reset()
         log("Couldn't mark model as complete.",
             "ERROR", remote=True, model=model_name)
+
+
+'''
+    Copied a bit from https://github.com/cacraig/grib-inventory/ - thanks!
+'''
+
+
+def get_byte_range(band, idx_file, content_length):
+    log(f"· Searching for band defs in index file {idx_file}",
+        "DEBUG", indentLevel=2, remote=True)
+    try:
+        response = http.request('GET', idx_file)
+        data = response.data.decode('utf-8')
+        var_name_to_find = band["band"]["var"]
+        level_to_find = model_tools.get_level_name_for_level(
+            band["band"]["level"], "idx_name")
+        found = False
+        start_byte = None
+        end_byte = None
+
+        for line in data.splitlines():
+            line = str(line)
+            parts = line.split(':')
+            var_name = parts[3]
+            level = parts[4]
+            time = parts[5]
+
+            if found:
+                end_byte = parts[1]
+                break
+
+            if var_name == var_name_to_find and level == level_to_find:
+                if "time_range" in band["band"].keys():
+                    range_val = time.split(" ", 1)[0]
+                    ranges = range_val.split("-")
+                    if (int(ranges[1]) - int(ranges[0])) != band["band"]["time_range"]:
+                        continue
+
+                log("✓ Found.", "DEBUG", indentLevel=2, remote=False)
+                found = True
+                start_byte = parts[1]
+                continue
+
+        if found:
+            if end_byte == None:
+                end_byte = content_length
+
+            log(f"· Bytes {start_byte} to {end_byte}", "DEBUG", indentLevel=2)
+            if start_byte == end_byte:
+                return None
+
+            return start_byte + "-" + end_byte
+        else:
+            log(f"· Couldn't find band def in index file.",
+                "WARN", indentLevel=2, remote=True)
+        return None
+
+    except:
+        log(f"Band def retrieval failed.", "ERROR", indentLevel=2, remote=True)
+        return None
