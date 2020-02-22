@@ -863,7 +863,7 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/hrrr/prod/hrrr.%D/conus/hrrr.t%Hz.wrfsfcf%T.grib2",
             "filetype": "grib2",
             "fhStep": {
-                "0": 18
+                "0": 1
             },
             "bands": [
                 {
@@ -1541,7 +1541,7 @@
             ]
         },
         "wpc_snow_12h_50pct": {
-            "enabled": true,
+            "enabled": false,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,

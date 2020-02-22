@@ -43,7 +43,7 @@ def kill_me(exit_code):
 def work_done(future):
     global processing_pool
     log("Thread finished.", "DEBUG")
-    pprint.pprint(processing_pool)
+    # pprint.pprint(processing_pool)
 
 
 def init():
@@ -115,16 +115,15 @@ def do_work():
                 timestamp = model_tools.get_last_available_timestamp(
                     model, prev=lookback)
                 if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-                    print("POPULATING FROM NONE")
                     if model_name not in processing_pool:
-                        print("OH SHI")
                         processing_pool[model_name] = {
                             'status': 'POPULATING'}
                         processing_pool[model_name] = model_tools.make_band_dict(
                             model_name)
                         model_tools.add_model_to_db(model_name)
+                        print("YO")
+                        pprint.pprint(processing_pool)
                         processing.start(model_name, timestamp)
-                        processing_pool[model_name]["status"] = "INPROGRESS"
                         lookback = max_lookback
 
                     break
@@ -142,15 +141,13 @@ def do_work():
                     log("· Checking if an update is available for " + model_name + ". Looked back " + str(lookback) + " runs",
                         "INFO", indentLevel=1)
                     if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-                        print("POPULATING FROM " + status)
                         if model_name not in processing_pool:
-                            print("OHSHI")
                             processing_pool[model_name] = {
                                 'status': 'POPULATING'}
                             processing_pool[model_name] = model_tools.make_band_dict(
                                 model_name)
                             processing.start(model_name, timestamp)
-                            processing_pool[model_name]["status"] = "INPROGRESS"
+                            pprint.pprint(processing_pool)
                             lookback = max_lookback
 
                         break

@@ -3,10 +3,14 @@ from .logger import log
 from . import file_tools as file_tools
 from . import model_tools as model_tools
 from . import pg_connection_manager as pg
+from .http_manager import http
 
 from datetime import datetime, timedelta, tzinfo, time
 import os
 import random
+import requests
+
+from osgeo import ogr, gdal, osr, gdalconst
 
 
 def start(model_name, timestamp):
@@ -46,20 +50,26 @@ def process(processing_pool):
 
     step = None
     steps = iter(pool_model)
+    print(steps)
 
     while True:
         try:
             step = next(steps, -1)
-            if step == -1:
+            print(step)
+            if step == -1 or step == "status":
                 log("· No available step to process.", "INFO",
                     remote=False, indentLevel=1, model=model_name)
+
+                del processing_pool[model_name]
+                end(model_name)
                 return False
 
             elif pool_model[step]['processing'] == False:
                 break
-        except:
-            log("· No available step to process.", "INFO",
+        except Exception as e:
+            log("· (err) No available step to process.", "INFO",
                 remote=False, indentLevel=1, model=model_name)
+            print(repr(e))
             return False
 
     log("· Step found,", "INFO")
@@ -157,7 +167,8 @@ def download_band(model_name, timestamp, fh, band, band_num):
     url = model_tools.make_url(model_name, timestamp.strftime(
         "%Y%m%d"), timestamp.strftime("%H"), fh)
 
-    file_name = model_tools.get_base_filename(model_name, timestamp, band)
+    file_name = model_tools.get_base_filename(
+        model_name, timestamp, band["shorthand"])
     target_dir = config["mapfileDir"] + "/" + model_name + "/"
     target_raw_dir = config["mapfileDir"] + "/rawdata/" + model_name + "/"
     download_filename = config["tempDir"] + "/" + \
@@ -173,9 +184,10 @@ def download_band(model_name, timestamp, fh, band, band_num):
             return False
 
         content_length = str(response.headers["Content-Length"])
-    except:
+    except Exception as e:
         log(f"· Couldn't get header of " + url, "ERROR",
             remote=True, indentLevel=2, model=model_name)
+        print(repr(e))
         return False
 
     byte_range = get_byte_range(band, url + ".idx", content_length)
@@ -346,16 +358,6 @@ def download_band(model_name, timestamp, fh, band, band_num):
         log(f"× Could not delete a temp file ({download_filename}).",
             "WARN", indentLevel=2, remote=True, model=model_name)
 
-    try:
-        pg.ConnectionPool.curr.execute("DELETE FROM eolus3." + table_name +
-                                       " WHERE fh = %s AND grib_var = %s", (fh, band["shorthand"]))
-        pg.ConnectionPool.conn.commit()
-    except:
-        pg.reset()
-        log("Couldn't update the DB that this band was processed.",
-            "ERROR", indentLevel=2, remote=True, model=model_name)
-        return False
-
     return True
 
 
@@ -393,15 +395,18 @@ def download_full_file(model_name, timestamp, fh, band_num):
         indentLevel=2, remote=True, model=model_name)
     try:
         response = http.request('GET', url, retries=5)
+        log("Url: " + url, "DEBUG", indentLevel=2)
+        log("Download: " + download_filename, "DEBUG", indentLevel=2)
 
         f = open(download_filename, 'wb')
         f.write(response.data)
         f.close()
         log(f"✓ Downloaded band fh {fh}.", "NOTICE",
             indentLevel=2, remote=True, model=model_name)
-    except:
+    except Exception as e:
         log("Couldn't read the fh -- the request likely timed out. " +
             fh, "ERROR", indentLevel=2, remote=True, model=model_name)
+        log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     bounds = config["bounds"][model["bounds"]]
@@ -444,9 +449,10 @@ def download_full_file(model_name, timestamp, fh, band_num):
         out_file = None
         grib_file = None
 
-    except:
+    except Exception as e:
         log("Warping failed -- " + download_filename, "ERROR",
             indentLevel=2, remote=True, model=model_name)
+        log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
         return False
 
     num_bands = model_tools.get_number_of_hours(model_name)
@@ -490,10 +496,10 @@ def download_full_file(model_name, timestamp, fh, band_num):
         for band in bands:
             target_filename = target_dir + \
                 model_tools.get_base_filename(
-                    model_name, timestamp, band) + ".tif"
+                    model_name, timestamp, band["shorthand"]) + ".tif"
             target_raw_filename = target_raw_dir + \
                 model_tools.get_base_filename(
-                    model_name, timestamp, band) + ".tif"
+                    model_name, timestamp, band["shorthand"]) + ".tif"
             if not os.path.exists(target_filename):
                 log(f"· Creating output master TIF with {str(num_bands) } bands | {target_filename}",
                     "NOTICE", indentLevel=2, remote=True, model=model_name)
@@ -611,16 +617,6 @@ def download_full_file(model_name, timestamp, fh, band_num):
         log(f"× Could not delete a temp file ({download_filename}).",
             "WARN", indentLevel=2, remote=True, model=model_name)
 
-    try:
-        pg.ConnectionPool.curr.execute("DELETE FROM eolus3." +
-                                       table_name + " WHERE fh = %s", (fh,))
-        pg.ConnectionPool.conn.commit()
-    except:
-        pg.reset()
-        log("Couldn't update the DB that this band was processed.",
-            "ERROR", indentLevel=2, remote=True, model=model_name)
-        return False
-
     return True
 
 
@@ -634,8 +630,9 @@ def end(model_name):
         pg.ConnectionPool.curr.execute(
             "UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", model_name))
         pg.ConnectionPool.conn.commit()
-        update_run_status(model_name)
-    except:
+        model_tools.update_run_status(model_name)
+    except Exception as e:
+        print(repr(e))
         pg.reset()
         log("Couldn't mark model as complete.",
             "ERROR", remote=True, model=model_name)
@@ -654,7 +651,7 @@ def get_byte_range(band, idx_file, content_length):
         data = response.data.decode('utf-8')
         var_name_to_find = band["band"]["var"]
         level_to_find = model_tools.get_level_name_for_level(
-            band["band"]["level"], "idx_name")
+            band["band"]["level"], "idxName")
         found = False
         start_byte = None
         end_byte = None
@@ -696,6 +693,7 @@ def get_byte_range(band, idx_file, content_length):
                 "WARN", indentLevel=2, remote=True)
         return None
 
-    except:
+    except Exception as e:
         log(f"Band def retrieval failed.", "ERROR", indentLevel=2, remote=True)
+        print(repr(e))
         return None
