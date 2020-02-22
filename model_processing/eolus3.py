@@ -8,6 +8,7 @@ import eolus_lib.processing as processing
 import os
 import concurrent.futures
 import time
+import pytz
 from osgeo import gdal
 import pprint
 
@@ -15,6 +16,7 @@ agent_logged = False
 first_run = True
 processing_pool = {}
 pp = pprint.PrettyPrinter(indent=4)
+utc = pytz.UTC
 
 gdal.UseExceptions()
 
@@ -42,7 +44,7 @@ def kill_me(exit_code):
 
 def work_done(future):
     global processing_pool
-    log("Thread finished.", "DEBUG")
+    log("Thread finished. " + str(future), "DEBUG")
     # pprint.pprint(processing_pool)
 
 
@@ -65,8 +67,7 @@ def init():
     if not agent_logged:
         kill_me(1)
 
-    # max_threads = config["maxThreads"]
-    max_threads = 1
+    max_threads = config["maxThreads"]
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = {
@@ -83,10 +84,11 @@ def init():
             if len(processing_pool) > 0:
                 for i in range(0, max_threads - len(futures)):
                     time.sleep(config["sleepTime"])
+                    executr = executor.submit(do_work)
                     futures.add(
-                        executor.submit(do_work)
+                        executr
                     )
-                    log("Adding another thread.", "DEBUG")
+                    log("Adding another thread. " + str(executr), "DEBUG")
 
     log("No more processing to do. Goodbye.", "DEBUG")
     kill_me(0)
@@ -107,6 +109,7 @@ def do_work():
 
         status = model_tools.get_model_status(model_name)
         model_fh = model_tools.get_full_fh(model_name, model["startTime"])
+        log("Model: " + model_name, "INFO")
 
         max_lookback = 3
         lookback = 0
@@ -121,8 +124,6 @@ def do_work():
                         processing_pool[model_name] = model_tools.make_band_dict(
                             model_name)
                         model_tools.add_model_to_db(model_name)
-                        print("YO")
-                        pprint.pprint(processing_pool)
                         processing.start(model_name, timestamp)
                         lookback = max_lookback
 
@@ -132,31 +133,47 @@ def do_work():
 
         elif status == "WAITING" or status == "DISABLED" or (status == "PROCESSING" and first_run):
 
+            log("Status: " + status, "INFO")
+
+            prev_timestamp = model_tools.get_model_timestamp(
+                model_name).replace(tzinfo=utc)
+
+            log("Prev timestamp: " + str(prev_timestamp), "INFO")
+
             max_lookback = 3
             lookback = 0
             while lookback < max_lookback:
-                timestamp = model_tools.get_last_available_timestamp(
-                    model, prev=lookback)
-                if not model_tools.model_timestamp_matches(model_name, timestamp):
-                    log("· Checking if an update is available for " + model_name + ". Looked back " + str(lookback) + " runs",
-                        "INFO", indentLevel=1)
-                    if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
-                        if model_name not in processing_pool:
-                            processing_pool[model_name] = {
-                                'status': 'POPULATING'}
-                            processing_pool[model_name] = model_tools.make_band_dict(
-                                model_name)
-                            processing.start(model_name, timestamp)
-                            pprint.pprint(processing_pool)
-                            lookback = max_lookback
+                try:
+                    timestamp = model_tools.get_last_available_timestamp(
+                        model, prev=lookback)
 
+                    if timestamp <= prev_timestamp:
+                        log("· No newer runs exist.", "INFO", indentLevel=1)
                         break
 
-                else:
-                    log("· Nope.", "INFO", indentLevel=1)
-                    break
+                    if not model_tools.model_timestamp_matches(model_name, timestamp):
+                        log("· Checking if an update is available for " + model_name + ". Looked back " + str(lookback) + " runs",
+                            "INFO", indentLevel=1)
+                        if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
+                            if model_name not in processing_pool:
+                                processing_pool[model_name] = {
+                                    'status': 'POPULATING'}
+                                processing_pool[model_name] = model_tools.make_band_dict(
+                                    model_name)
+                                processing.start(model_name, timestamp)
+                                lookback = max_lookback
 
-                lookback += 1
+                            break
+
+                    else:
+                        log("· Nope.", "INFO", indentLevel=1)
+                        break
+
+                    lookback += 1
+
+                except Exception as e:
+                    log(repr(e), "ERROR")
+                    break
 
     first_run = False
     if len(processing_pool) > 0:

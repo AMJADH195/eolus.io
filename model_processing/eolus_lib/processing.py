@@ -50,12 +50,10 @@ def process(processing_pool):
 
     step = None
     steps = iter(pool_model)
-    print(steps)
 
     while True:
         try:
             step = next(steps, -1)
-            print(step)
             if step == -1 or step == "status":
                 log("· No available step to process.", "INFO",
                     remote=False, indentLevel=1, model=model_name)
@@ -66,6 +64,7 @@ def process(processing_pool):
 
             elif pool_model[step]['processing'] == False:
                 break
+
         except Exception as e:
             log("· (err) No available step to process.", "INFO",
                 remote=False, indentLevel=1, model=model_name)
@@ -142,6 +141,7 @@ def process(processing_pool):
         pool_model[step]['processing'] = False
         del pool_model[step]
         if len(pool_model) == 0:
+            end(model_name)
             del processing_pool[model_name]
         return True
     except Exception as e:
@@ -580,9 +580,10 @@ def download_full_file(model_name, timestamp, fh, band_num):
                             tif.GetRasterBand(band_num).WriteArray(data)
                             break
 
-                    except:
+                    except Exception as e:
                         log(f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}",
                             "WARN", indentLevel=2, remote=True, model=model_name)
+                        print(repr(e))
 
                 tif.FlushCache()
 
@@ -599,9 +600,10 @@ def download_full_file(model_name, timestamp, fh, band_num):
                             tif.GetRasterBand(band_num).WriteArray(data)
                             break
 
-                    except:
+                    except Exception as e:
                         log(f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}",
                             "WARN", indentLevel=2, remote=True, model=model_name)
+                        print(repr(e))
 
                 tif.FlushCache()
                 grib_file = None

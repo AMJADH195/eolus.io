@@ -5,6 +5,9 @@ from . import pg_connection_manager as pg
 
 from datetime import datetime, timedelta, tzinfo, time
 import requests
+import pytz
+
+utc = pytz.UTC
 
 
 def make_url(model_name, model_date, model_hour, fh):
@@ -27,32 +30,36 @@ def add_model_to_db(model_name):
 
 
 def get_last_available_timestamp(model, prev=0):
-    now = datetime.utcnow()
-    start_of_day = now - timedelta(
-        hours=now.hour,
-        minutes=now.minute,
-        seconds=now.second,
-        microseconds=now.microsecond
-    )
-    yesterday_midnight = start_of_day - timedelta(days=1)
+    try:
+        now = datetime.utcnow()
+        start_of_day = now - timedelta(
+            hours=now.hour,
+            minutes=now.minute,
+            seconds=now.second,
+            microseconds=now.microsecond
+        )
+        yesterday_midnight = start_of_day - timedelta(days=1)
 
-    start_of_day_checker = yesterday_midnight + \
-        timedelta(hours=model["updateOffset"])
+        start_of_day_checker = yesterday_midnight + \
+            timedelta(hours=model["updateOffset"])
 
-    max_time = now - timedelta(hours=prev*model["updateFrequency"])
-    now_not_exceeded = True
-    checked_time = start_of_day_checker
-    while now_not_exceeded:
-        if checked_time + timedelta(hours=(model["updateFrequency"])) > max_time:
-            break
-        else:
-            checked_time = checked_time + \
-                timedelta(hours=(model["updateFrequency"]))
+        max_time = now - timedelta(hours=prev*model["updateFrequency"])
+        now_not_exceeded = True
+        checked_time = start_of_day_checker
+        while now_not_exceeded:
+            if checked_time + timedelta(hours=(model["updateFrequency"])) > max_time:
+                break
+            else:
+                checked_time = checked_time + \
+                    timedelta(hours=(model["updateFrequency"]))
 
-    log(f"· Last available timestamp, {str(prev)} runs ago: {str(checked_time)}",
-        "DEBUG", indentLevel=1)
+        log(f"· Last available timestamp, {str(prev)} runs ago: {str(checked_time)}",
+            "DEBUG", indentLevel=1)
 
-    return checked_time
+        return checked_time.replace(tzinfo=utc)
+
+    except Exception as e:
+        log(repr(e), "ERROR")
 
 
 def get_number_of_hours(model_name):
@@ -71,6 +78,19 @@ def get_model_status(model_name):
     try:
         pg.ConnectionPool.curr.execute(
             "SELECT status FROM eolus3.models WHERE model LIKE '" + model_name + "'")
+        result = pg.ConnectionPool.curr.fetchone()
+
+        return result[0]
+
+    except:
+        pg.reset()
+        return None
+
+
+def get_model_timestamp(model_name):
+    try:
+        pg.ConnectionPool.curr.execute(
+            "SELECT timestamp FROM eolus3.models WHERE model LIKE '" + model_name + "'")
         result = pg.ConnectionPool.curr.fetchone()
 
         return result[0]
