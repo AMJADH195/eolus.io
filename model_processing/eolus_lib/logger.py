@@ -1,16 +1,21 @@
 from . import pg_connection_manager as pg
+from .config import config
 from datetime import datetime, timedelta, tzinfo, time
 
 
 def log(text, level, indentLevel=0, remote=False, model=''):
+
+    if level not in config["logLevels"]:
+        return
+
     timestamp = datetime.utcnow()
-    timeStr = timestamp.strftime("%H:%M:%S")
+    time_str = timestamp.strftime("%H:%M:%S")
     indents = ""
 
     for i in range(0, indentLevel):
         indents += "   "
 
-    print(f"[{level}\t| {timeStr}] {indents}{text}")
+    print(f"[{level}\t| {time_str}] {indents}{text}")
 
     if remote:
         try:

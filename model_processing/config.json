@@ -19,6 +19,11 @@
                 "left": "-180"
             }
         },
+        "logLevels": [
+            "NOTICE",
+            "WARN",
+            "ERROR"
+        ],
         "tempDir": "./tempWxData",
         "mapfileDir": "/map/dev",
         "logFile": "model_update.log",
