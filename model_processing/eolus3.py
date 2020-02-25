@@ -175,6 +175,28 @@ def do_work():
                     log(repr(e), "ERROR")
                     break
 
+        elif status == "PAUSED":
+            try:
+                log("Attempting to resume PAUSED model.", "INFO")
+                processing_pool[model_name] = {
+                    'status': 'POPULATING'}
+                processing_pool[model_name] = model_tools.make_band_dict(
+                    model_name)
+
+                last_fh = 0
+                pg.ConnectionPool.curr.execute(
+                    "SELECT lastfh FROM eolus3.models WHERE model = %s", (model_name,))
+                last_fh = int(pg.ConnectionPool.curr.fetchone()[0])
+
+                for step in processing_pool[model]:
+                    if int(step) < last_fh:
+                        del processing_pool[model][step]
+
+                processing.start(model_name, timestamp)
+
+            except Exception as e:
+                log(repr(e), "ERROR")
+
     first_run = False
     if len(processing_pool) > 0:
         processed = processing.process(processing_pool)

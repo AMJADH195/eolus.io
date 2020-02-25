@@ -21,8 +21,8 @@ def start(model_name, timestamp):
         "INFO", indentLevel=1, remote=True, model=model_name)
 
     try:
-        pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status, timestamp) = (%s, %s) WHERE model = %s",
-                                       ("PROCESSING", timestamp, model_name))
+        pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status, timestamp, lastfh) = (%s, %s, %s) WHERE model = %s",
+                                       ("PROCESSING", timestamp, "0", model_name))
         pg.ConnectionPool.conn.commit()
 
         pg.ConnectionPool.curr.execute(
@@ -85,7 +85,7 @@ def process(processing_pool):
 
     except:
         pg.reset()
-        log("Couldn't get the timetamp for model " +
+        log("Couldn't get the timestamp for model " +
             model_name, "ERROR", remote=True)
         pool_model[step]['retries'] += 1
         pool_model[step]['processing'] = False
@@ -112,6 +112,15 @@ def process(processing_pool):
     if not file_exists:
         log("· This fh is not available to be processed.", 'DEBUG')
         pool_model[step]['processing'] = False
+        del pool_model
+        try:
+            pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status,lastfh) = (%s, %s) WHERE model = %s",
+                                           ("PAUSED", full_fh, model_name))
+            pg.ConnectionPool.conn.commit()
+
+        except Exception as e:
+            log(repr(e), "ERROR")
+
         return False
 
     log("· Start processing fh " + full_fh + ".", "INFO",

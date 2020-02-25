@@ -102,7 +102,7 @@ def get_model_timestamp(model_name):
 
 def get_full_fh(model_name, fh):
     model = models[model_name]
-    return str(fh).rjust(len(str(model["fhStep"][list(model["fhStep"].keys())[-1]])), '0')
+    return str(fh).rjust(len(str(model["endTime"])), '0')
 
 
 def get_level_name_for_level(level_shorthand, name_type):

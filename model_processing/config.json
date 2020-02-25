@@ -28,7 +28,8 @@
         "maxTime": 0,
         "retentionDays": 2,
         "maxThreads": 3,
-        "maxRetriesPerStep": 5
+        "maxRetriesPerStep": 5,
+        "maxDownloadRetries": 100
     },
     "levelMaps": {
         "sfc": {
@@ -850,13 +851,13 @@
             ]
         },
         "hrrr": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 1,
             "updateOffset": 0,
             "startTime": 0,
-            "endTime": 1,
+            "endTime": 18,
             "extEndTime": 36,
             "index": true,
             "imageWidth": 480,
