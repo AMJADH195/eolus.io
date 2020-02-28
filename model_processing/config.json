@@ -1525,7 +1525,7 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.spread_ds_3hrly.grib2"
         },
         "wpc_snow_12h_25pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1569,7 +1569,7 @@
             ]
         },
         "wpc_snow_12h_75pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1591,7 +1591,7 @@
             ]
         },
         "wpc_snow_12h_sigma": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1613,7 +1613,7 @@
             ]
         },
         "wpc_snow_72h_25pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
@@ -1657,7 +1657,7 @@
             ]
         },
         "wpc_snow_72h_75pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
@@ -1679,7 +1679,7 @@
             ]
         },
         "wpc_snow_72h_sigma": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,

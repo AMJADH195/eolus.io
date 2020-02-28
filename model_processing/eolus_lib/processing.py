@@ -17,7 +17,7 @@ def start(model_name, timestamp):
 
     formatted_timestamp = timestamp.strftime('%Y%m%d_%HZ')
 
-    log(f"· Initialized processing {model_name} | {formatted_timestamp}.",
+    log(f"· Start processing {model_name} | {formatted_timestamp}.",
         "INFO", indentLevel=1, remote=True, model=model_name)
 
     try:
@@ -103,14 +103,14 @@ def process(processing_pool):
     band_info_str = ' | (no var/level)'
     if 'band' in pool_model[step]:
         band = pool_model[step]['band']
-        band_info_str = ' | ' + band['shorthand']
+        band_info_str = ' | band ' + band['shorthand']
 
     file_exists = model_tools.check_if_model_fh_available(
         model_name, timestamp, full_fh)
 
     if not file_exists:
-        log("Remote data not ready yet. " + model_name + " | fh: " + full_fh +
-            " | band " + band_info_str, 'NOTICE', remote=True, model=model_name)
+        log("Remote data not ready yet. " + model_name + " | fh: " +
+            full_fh + band_info_str, 'NOTICE', remote=True, model=model_name)
 
         pool_model[step]['processing'] = False
         del pool_model
@@ -124,8 +124,8 @@ def process(processing_pool):
 
         return False
 
-    log("Starting processing for " + model_name + " | fh: " + full_fh +
-        " | band " + band_info_str, "NOTICE", remote=True, model=model_name)
+    log("Processing for " + model_name + " | fh: " + full_fh +
+        band_info_str, "NOTICE", remote=True, model=model_name)
 
     try:
         if band is None:
@@ -147,8 +147,8 @@ def process(processing_pool):
                         del processing_pool[model_name]
                 return False
 
-        log("Successfully processed " + model_name + " | fh: " + full_fh +
-            " | band " + band_info_str, "NOTICE")
+        log("Successfully processed " + model_name +
+            " | fh: " + full_fh + band_info_str, "NOTICE")
         pool_model[step]['processing'] = False
         del pool_model[step]
         if len(pool_model) == 0:
@@ -292,11 +292,11 @@ def download_band(model_name, timestamp, fh, band, band_num):
             new_raster.SetGeoTransform(list(geo_transform))
             gdal.GetDriverByName('GTiff').CreateCopy(
                 target_filename, new_raster, 0)
-            log("✓ Output master TIF created.", "NOTICE",
-                indentLevel=2, remote=True, model=model_name)
+            log("✓ Output master TIF created --> " + target_filename, "NOTICE",
+                indentLevel=1, remote=True, model=model_name)
         except Exception as e:
             log("Couldn't create the new master TIF: " + target_filename,
-                "ERROR", indentLevel=2, remote=True, model=model_name)
+                "ERROR", indentLevel=1, remote=True, model=model_name)
             log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
             return False
 
@@ -324,8 +324,8 @@ def download_band(model_name, timestamp, fh, band, band_num):
             new_raster.SetGeoTransform(list(geo_transform))
             gdal.GetDriverByName('GTiff').CreateCopy(
                 target_raw_filename, new_raster, 0)
-            log("✓ Output master TIF created.", "NOTICE",
-                indentLevel=2, remote=True, model=model_name)
+            log("✓ Output master TIF created --> " + target_raw_filename, "NOTICE",
+                indentLevel=1, remote=True, model=model_name)
         except Exception as e:
             log("Couldn't create the new master TIF: " + target_raw_filename,
                 "ERROR", indentLevel=2, remote=True, model=model_name)
@@ -534,11 +534,11 @@ def download_full_file(model_name, timestamp, fh, band_num):
                         target_filename, new_raster, 0)
                     grib_file = None
                     new_raster = None
-                    log("✓ Output master TIF created.", "NOTICE",
-                        indentLevel=2, remote=True, model=model_name)
+                    log("✓ Output master TIF created. --> " + target_filename, "NOTICE",
+                        indentLevel=1, remote=True, model=model_name)
                 except:
-                    log("Couldn't create the new master TIF.", "ERROR",
-                        indentLevel=2, remote=True, model=model_name)
+                    log("Couldn't create the new master TIF. --> " + target_filename, "ERROR",
+                        indentLevel=1, remote=True, model=model_name)
                     return False
 
             if not os.path.exists(target_raw_filename):
@@ -564,11 +564,11 @@ def download_full_file(model_name, timestamp, fh, band_num):
                         target_raw_filename, new_raster, 0)
                     grib_file = None
                     new_raster = None
-                    log("✓ Output master TIF created.", "NOTICE",
-                        indentLevel=2, remote=True, model=model_name)
+                    log("✓ Output master TIF created.  --> " + target_raw_filename, "NOTICE",
+                        indentLevel=1, remote=True, model=model_name)
                 except:
-                    log("Couldn't create the new master TIF.", "ERROR",
-                        indentLevel=2, remote=True, model=model_name)
+                    log("Couldn't create the new master TIF. --> " + target_raw_filename, "ERROR",
+                        indentLevel=1, remote=True, model=model_name)
                     return False
 
             log(f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh}",

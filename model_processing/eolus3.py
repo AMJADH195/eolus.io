@@ -119,6 +119,9 @@ def do_work():
                     model, prev=lookback)
                 if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
                     if model_name not in processing_pool:
+
+                        log(f"· Initializing new run for {model_name} | {timestamp}.",
+                            "NOTICE", indentLevel=1, remote=True, model=model_name)
                         processing_pool[model_name] = {
                             'status': 'POPULATING'}
                         processing_pool[model_name] = model_tools.make_band_dict(
@@ -156,6 +159,9 @@ def do_work():
                             "INFO", indentLevel=1)
                         if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
                             if model_name not in processing_pool:
+
+                                log(f"· Initializing new run for {model_name} | {timestamp}.",
+                                    "NOTICE", indentLevel=1, remote=True, model=model_name)
                                 processing_pool[model_name] = {
                                     'status': 'POPULATING'}
                                 processing_pool[model_name] = model_tools.make_band_dict(
