@@ -151,8 +151,8 @@ def process(processing_pool):
 
         log("Successfully processed " + model_name +
             " | fh: " + full_fh + band_info_str, "NOTICE")
-        print("------------")"""  """
-        print("")
+        print("------------")
+
         pool_model[step]['processing'] = False
         del pool_model[step]
         if len(pool_model) == 0:
