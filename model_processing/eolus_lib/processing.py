@@ -341,7 +341,7 @@ def download_band(model_name, timestamp, fh, band, band_num):
 
     sub_band_num = 1
     if "subBandNum" in band["band"]:
-        band_num = band["band"]["subBandNum"]
+        sub_band_num = band["band"]["subBandNum"]
 
     try:
         # Copy the downloaded band to this temp file
