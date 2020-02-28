@@ -71,7 +71,7 @@ def process(processing_pool):
             print(repr(e))
             return False
 
-    log("· Step found,", "INFO")
+    log("· Step found.", "INFO")
 
     pool_model[step]['processing'] = True
     full_fh = pool_model[step]['fh']

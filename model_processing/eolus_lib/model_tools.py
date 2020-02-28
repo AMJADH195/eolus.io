@@ -223,7 +223,7 @@ def make_band_dict(model_name):
 
         if fh > model["endTime"]:
             log(f"Band dict created.", "NOTICE",
-                indentLevel=, remote=True, model=model_name)
+                indentLevel=0, remote=True, model=model_name)
             return band_dict
 
 

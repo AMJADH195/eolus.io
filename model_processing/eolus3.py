@@ -190,17 +190,23 @@ def do_work():
 
                 last_fh = 0
                 pg.ConnectionPool.curr.execute(
-                    "SELECT lastfh FROM eolus3.models WHERE model = %s", (model_name,))
-                last_fh = int(pg.ConnectionPool.curr.fetchone()[0])
+                    "SELECT lastfh, timestamp FROM eolus3.models WHERE model = %s", (model_name,))
+                result = pg.ConnectionPool.curr.fetchone()
+                last_fh = int(result[0])
+                timestamp = result[1]
 
-                for step in processing_pool[model]:
-                    if int(step) < last_fh:
-                        del processing_pool[model][step]
+                log("Restarting paused model from fh " + str(last_fh) +
+                    " | timestamp: " + str(timestamp), "NOTICE")
+
+                for step in list(processing_pool[model_name]):
+                    step_fh = processing_pool[model_name][step]['fh']
+                    if int(step_fh) < last_fh:
+                        del processing_pool[model_name][step]
 
                 processing.start(model_name, timestamp)
 
             except Exception as e:
-                log(repr(e), "ERROR")
+                log("Error in pause resumption -- " + repr(e), "ERROR")
 
     first_run = False
     if len(processing_pool) > 0:
