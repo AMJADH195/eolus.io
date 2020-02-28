@@ -184,7 +184,7 @@ def add_appropriate_fh_step(model_name, fh):
 
 
 def make_band_dict(model_name):
-    log(f"· Creating band dict.", "NOTICE",
+    log(f"· Creating band dict.", "DEBUG",
         indentLevel=1, remote=True, model=model_name)
 
     band_dict = {}
@@ -222,6 +222,8 @@ def make_band_dict(model_name):
         i += 1
 
         if fh > model["endTime"]:
+            log(f"Band dict created.", "NOTICE",
+                indentLevel=, remote=True, model=model_name)
             return band_dict
 
 
