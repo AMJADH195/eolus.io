@@ -30,6 +30,7 @@
         "debug": false,
         "resampling": "cubicspline",
         "sleepTime": 3,
+        "version": "4.0.0",
         "maxTime": 0,
         "retentionDays": 2,
         "maxThreads": 3,
