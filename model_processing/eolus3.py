@@ -5,6 +5,7 @@ from eolus_lib.logger import log, say_hello, print_line
 import eolus_lib.model_tools as model_tools
 import eolus_lib.processing as processing
 
+from datetime import datetime, timedelta
 import os
 import concurrent.futures
 import time
@@ -182,28 +183,40 @@ def do_work():
 
         elif status == "PAUSED":
             try:
-                log("Attempting to resume PAUSED model.", "INFO")
-                processing_pool[model_name] = {
-                    'status': 'POPULATING'}
-                processing_pool[model_name] = model_tools.make_band_dict(
-                    model_name)
-
-                last_fh = 0
                 pg.ConnectionPool.curr.execute(
-                    "SELECT lastfh, timestamp FROM eolus3.models WHERE model = %s", (model_name,))
-                result = pg.ConnectionPool.curr.fetchone()
-                last_fh = int(result[0])
-                timestamp = result[1]
+                    "SELECT paused_at FROM eolus3.models WHERE model LIKE '" + model_name + "'")
+                paused_at = pg.ConnectionPool.curr.fetchone()[0]
 
-                log("Restarting paused model from fh " + str(last_fh) +
-                    " | timestamp: " + str(timestamp), "NOTICE")
+                log(model_name + " is PAUSED.", "NOTICE")
 
-                for step in list(processing_pool[model_name]):
-                    step_fh = processing_pool[model_name][step]['fh']
-                    if int(step_fh) < last_fh:
-                        del processing_pool[model_name][step]
+                if abs(datetime.now().replace(tzinfo=utc) - paused_at.replace(tzinfo=utc)) >= timedelta(minutes=config["pausedResumeMinutes"]):
 
-                processing.start(model_name, timestamp)
+                    log("Attempting to resume.", "INFO")
+                    processing_pool[model_name] = {
+                        'status': 'POPULATING'}
+                    processing_pool[model_name] = model_tools.make_band_dict(
+                        model_name)
+
+                    last_fh = 0
+                    pg.ConnectionPool.curr.execute(
+                        "SELECT lastfh, timestamp FROM eolus3.models WHERE model = %s", (model_name,))
+                    result = pg.ConnectionPool.curr.fetchone()
+                    last_fh = int(result[0])
+                    timestamp = result[1]
+
+                    log("Restarting paused model from fh " + str(last_fh) +
+                        " | timestamp: " + str(timestamp), "NOTICE")
+
+                    for step in list(processing_pool[model_name]):
+                        step_fh = processing_pool[model_name][step]['fh']
+                        if int(step_fh) < last_fh:
+                            del processing_pool[model_name][step]
+
+                    processing.start(model_name, timestamp)
+
+                else:
+                    log("Not resuming yet until the threshold of " +
+                        str(config["pausedResumeMinutes"]) + " minutes is met.", "NOTICE")
 
             except Exception as e:
                 log("Error in pause resumption -- " + repr(e), "ERROR")

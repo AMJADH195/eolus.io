@@ -117,8 +117,8 @@ def process(processing_pool):
         pool_model[step]['processing'] = False
         del pool_model
         try:
-            pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status,lastfh) = (%s, %s) WHERE model = %s",
-                                           ("PAUSED", full_fh, model_name))
+            pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status,lastfh,paused_at) = (%s, %s, %s) WHERE model = %s",
+                                           ("PAUSED", full_fh, datetime.now().isoformat(), model_name))
             pg.ConnectionPool.conn.commit()
 
         except Exception as e:

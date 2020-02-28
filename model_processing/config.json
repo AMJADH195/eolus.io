@@ -34,6 +34,7 @@
         "maxTime": 0,
         "retentionDays": 2,
         "maxThreads": 3,
+        "pausedResumeMinutes": 2,
         "maxRetriesPerStep": 5,
         "maxDownloadRetries": 100
     },
