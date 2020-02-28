@@ -62,6 +62,10 @@
             "idxName": "180-0 mb above ground",
             "gribName": "18000-0-SPDL"
         },
+        "300mb": {
+            "idxName": "300 mb",
+            "gribName": "30000-ISBL"
+        },
         "500mb": {
             "idxName": "500 mb",
             "gribName": "50000-ISBL"
@@ -960,35 +964,53 @@
                 },
                 {
                     "var": "UGRD",
-                    "level": "10m"
+                    "level": "10m",
+                    "subBandNum": 1
                 },
                 {
                     "var": "VGRD",
-                    "level": "10m"
+                    "level": "10m",
+                    "subBandNum": 2
                 },
                 {
                     "var": "UGRD",
-                    "level": "500mb"
+                    "level": "80m",
+                    "subBandNum": 1
                 },
                 {
                     "var": "VGRD",
-                    "level": "500mb"
+                    "level": "80m",
+                    "subBandNum": 2
                 },
                 {
                     "var": "UGRD",
-                    "level": "700mb"
+                    "level": "500mb",
+                    "subBandNum": 1
                 },
                 {
                     "var": "VGRD",
-                    "level": "700mb"
+                    "level": "500mb",
+                    "subBandNum": 2
                 },
                 {
                     "var": "UGRD",
-                    "level": "850mb"
+                    "level": "700mb",
+                    "subBandNum": 1
                 },
                 {
                     "var": "VGRD",
-                    "level": "850mb"
+                    "level": "700mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb",
+                    "subBandNum": 2
                 },
                 {
                     "var": "USTM",
@@ -1248,6 +1270,76 @@
                     "level": "2m"
                 },
                 {
+                    "var": "UGRD",
+                    "level": "300mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "300mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "500mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "500mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "600mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "600mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "80m",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "80m",
+                    "subBandNum": 2
+                },
+                {
                     "var": "GUST",
                     "level": "sfc"
                 },
@@ -1385,6 +1477,76 @@
                 {
                     "var": "RH",
                     "level": "2m"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "300mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "300mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "500mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "500mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "600mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "600mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m",
+                    "subBandNum": 2
+                },
+                {
+                    "var": "UGRD",
+                    "level": "80m",
+                    "subBandNum": 1
+                },
+                {
+                    "var": "VGRD",
+                    "level": "80m",
+                    "subBandNum": 2
                 },
                 {
                     "var": "GUST",
