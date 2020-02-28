@@ -56,11 +56,10 @@ def init():
         kill_me(1)
 
     log("✓ Connected.", "DEBUG")
-    print_line()
     print()
 
     if not pg.can_do_work():
-        log("Another agent is running already. Goodbye.", "DEBUG")
+        log("Another agent is running already. Goodbye.", "NOTICE")
         kill_me(0)
 
     agent_logged = pg.add_agent()
@@ -90,7 +89,7 @@ def init():
                     )
                     log("Adding another thread. " + str(executr), "DEBUG")
 
-    log("No more processing to do. Goodbye.", "DEBUG")
+    log("No more processing to do. Goodbye.", "NOTICE")
     kill_me(0)
 
 
@@ -120,8 +119,8 @@ def do_work():
                 if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
                     if model_name not in processing_pool:
 
-                        log(f"· Initializing new run for {model_name} | {timestamp}.",
-                            "NOTICE", indentLevel=1, remote=True, model=model_name)
+                        log(f"Initializing new run for {model_name} | {timestamp}.",
+                            "NOTICE", indentLevel=0, remote=True, model=model_name)
                         processing_pool[model_name] = {
                             'status': 'POPULATING'}
                         processing_pool[model_name] = model_tools.make_band_dict(
@@ -150,18 +149,18 @@ def do_work():
                     timestamp = model_tools.get_last_available_timestamp(
                         model, prev=lookback)
 
-                    if timestamp <= prev_timestamp:
+                    if timestamp <= prev_timestamp and not (status == "PROCESSING" and first_run):
                         log("· No newer runs exist.", "INFO", indentLevel=1)
                         break
 
-                    if not model_tools.model_timestamp_matches(model_name, timestamp):
+                    if not model_tools.model_timestamp_matches(model_name, timestamp) or (status == "PROCESSING" and first_run):
                         log("· Checking if an update is available for " + model_name + ". Looked back " + str(lookback) + " runs",
                             "INFO", indentLevel=1)
-                        if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
+                        if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh) or (status == "PROCESSING" and first_run):
                             if model_name not in processing_pool:
 
-                                log(f"· Initializing new run for {model_name} | {timestamp}.",
-                                    "NOTICE", indentLevel=1, remote=True, model=model_name)
+                                log(f"Initializing new run for {model_name} | {timestamp}.",
+                                    "NOTICE", indentLevel=0, remote=True, model=model_name)
                                 processing_pool[model_name] = {
                                     'status': 'POPULATING'}
                                 processing_pool[model_name] = model_tools.make_band_dict(

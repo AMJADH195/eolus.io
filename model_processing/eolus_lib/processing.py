@@ -335,17 +335,21 @@ def download_band(model_name, timestamp, fh, band, band_num):
     log(f"· Writing data to the GTiff | band: {band['shorthand']} | fh: {fh} | band_number: {str(band_num)}",
         "INFO", indentLevel=2, remote=True, model=model_name)
 
+    sub_band_num = 1
+    if "subBandNum" in band["band"]:
+        band_num = band["band"]["subBandNum"]
+
     try:
         # Copy the downloaded band to this temp file
         grib_file = gdal.Open(download_filename + ".tif")
-        data = grib_file.GetRasterBand(1).ReadAsArray()
+        data = grib_file.GetRasterBand(sub_band_num).ReadAsArray()
 
         tif = gdal.Open(target_filename, gdalconst.GA_Update)
         tif.GetRasterBand(band_num).WriteArray(data)
         tif.FlushCache()
 
         grib_file = gdal.Open(download_filename + "_unscaled.tif")
-        data = grib_file.GetRasterBand(1).ReadAsArray()
+        data = grib_file.GetRasterBand(sub_band_num).ReadAsArray()
 
         tif = gdal.Open(target_raw_filename, gdalconst.GA_Update)
         tif.GetRasterBand(band_num).WriteArray(data)
@@ -668,6 +672,7 @@ def get_byte_range(band, idx_file, content_length):
         found = False
         start_byte = None
         end_byte = None
+        skipped_for_subband = False
 
         for line in data.splitlines():
             line = str(line)
@@ -677,8 +682,11 @@ def get_byte_range(band, idx_file, content_length):
             time = parts[5]
 
             if found:
-                end_byte = parts[1]
-                break
+                if "subBandNum" in band["band"] and band["band"]["subBandNum"] and not skipped_for_subband:
+                    skipped_for_subband = True
+                else:
+                    end_byte = parts[1]
+                    break
 
             if var_name == var_name_to_find and level == level_to_find:
                 if "time_range" in band["band"].keys():

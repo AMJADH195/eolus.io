@@ -1422,7 +1422,7 @@
             ]
         },
         "nam12": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 6,
