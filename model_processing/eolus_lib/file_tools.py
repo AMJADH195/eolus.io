@@ -20,9 +20,3 @@ def clean():
 
     log(f"· Cleaning logs older than {retention_days} days.",
         "DEBUG", indentLevel=0)
-    try:
-        pg.clean()
-    except:
-        pg.reset()
-        log(f"· Couldn't delete old logs.",
-            "WARN", indentLevel=0, remote=True)

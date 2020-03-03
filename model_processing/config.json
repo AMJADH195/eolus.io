@@ -33,7 +33,7 @@
         "version": "4.0.0",
         "maxTime": 0,
         "retentionDays": 2,
-        "maxThreads": 3,
+        "maxThreads": 6,
         "pausedResumeMinutes": 2,
         "maxRetriesPerStep": 2
     },
@@ -101,7 +101,7 @@
     },
     "models": {
         "gefs_pgrb2ap5_avg": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "readTimeout": 300,
             "updateFrequency": 6,
@@ -212,7 +212,7 @@
             ]
         },
         "gefs_pgrb2ap5_spr": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "readTimeout": 300,
             "updateFrequency": 6,
@@ -323,7 +323,7 @@
             ]
         },
         "hiresw_arw_2p5": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "imageWidth": 480,
@@ -418,7 +418,7 @@
             ]
         },
         "hiresw_arw_5": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "imageWidth": 480,
@@ -460,7 +460,7 @@
             ]
         },
         "hiresw_nmmb_2p5": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "imageWidth": 480,
@@ -555,7 +555,7 @@
             ]
         },
         "hiresw_nmmb_5": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "imageWidth": 480,
@@ -1136,7 +1136,7 @@
             ]
         },
         "naefs_ndgd_avg": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -1175,7 +1175,7 @@
             ]
         },
         "naefs_ndgd_spr": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -1214,7 +1214,7 @@
             ]
         },
         "nam3": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 6,

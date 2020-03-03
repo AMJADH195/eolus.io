@@ -19,12 +19,14 @@ def add_model_to_db(model_name):
     try:
         log("✓ Added model to models table.", "INFO",
             indentLevel=1, remote=True, model=model_name)
-        pg.ConnectionPool.curr.execute(
+        conn, curr = pg.ConnectionPool.connect()
+        curr.execute(
             "INSERT INTO eolus4.models (model, status) VALUES (%s, %s)", (model_name, "WAITING"))
-        pg.ConnectionPool.conn.commit()
+        conn.commit()
+        pg.ConnectionPool.close(conn, curr)
         return True
     except:
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         log("Couldn't add model to db.", "ERROR", remote=True, model=model_name)
         return False
 
@@ -76,30 +78,33 @@ def get_number_of_hours(model_name):
 
 def get_model_status(model_name):
     try:
-        pg.ConnectionPool.curr.execute(
+        conn, curr = pg.ConnectionPool.connect()
+        curr.execute(
             "SELECT status FROM eolus4.models WHERE model LIKE '" + model_name + "'")
 
-        if pg.ConnectionPool.curr.rowcount == 0:
+        if curr.rowcount == 0:
             return None
-        result = pg.ConnectionPool.curr.fetchone()
+        result = curr.fetchone()
+        pg.ConnectionPool.close(conn, curr)
         return result[0]
 
     except Exception as e:
         log(repr(e), "ERROR")
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         return "ERROR"
 
 
 def get_model_timestamp(model_name):
     try:
-        pg.ConnectionPool.curr.execute(
+        conn, curr = pg.ConnectionPool.connect()
+        curr.execute(
             "SELECT timestamp FROM eolus4.models WHERE model LIKE '" + model_name + "'")
-        result = pg.ConnectionPool.curr.fetchone()
-
+        result = curr.fetchone()
+        pg.ConnectionPool.close(conn, curr)
         return result[0]
 
     except:
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         return None
 
 
@@ -139,23 +144,27 @@ def check_if_model_fh_available(model_name, timestamp, fh):
 
 def model_timestamp_matches(model_name, timestamp):
     try:
-        pg.ConnectionPool.curr.execute(
+        conn, curr = pg.ConnectionPool.connect()
+        curr.execute(
             "SELECT timestamp FROM eolus4.models WHERE model = %s", (model_name,))
         model_time = str(curr.fetchone()[0])[0:16]
         t_time = str(timestamp)[0:16]
+        pg.ConnectionPool.close(conn, curr)
         return model_time == t_time
     except:
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         return False
 
 
 def update_run_status(model_name):
     try:
-        pg.ConnectionPool.curr.execute(
+        conn, curr = pg.ConnectionPool.connect()
+        curr.execute(
             "UPDATE eolus4.run_status SET status = 'COMPLETE' WHERE model = '" + model_name + "'")
-        pg.ConnectionPool.conn.commit()
+        conn.commit()
+        pg.ConnectionPool.close(conn, curr)
     except:
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         log(f"!!! Could not update run_status!", "ERROR",
             indentLevel=0, remote=True, model=model_name)
 

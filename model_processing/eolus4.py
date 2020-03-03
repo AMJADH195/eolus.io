@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import os
 import concurrent.futures
 import time
+import random
 import pytz
 from osgeo import gdal
 import pprint
@@ -24,7 +25,6 @@ gdal.UseExceptions()
 
 def kill_me(exit_code):
     if exit_code != 0:
-        pg.reset()
         log("Exiting on failure.", "ERROR")
 
     if agent_logged:
@@ -32,12 +32,11 @@ def kill_me(exit_code):
         if not removed:
             log("Could not remove agent, trying again.", "ERROR", remote=True)
             try:
-                pg.connect()
                 pg.remove_agent()
             except:
                 os._exit(exit_code)
     try:
-        pg.close()
+        pg.ConnectionPool.kill()
     except:
         log("Couldn't close connection.", "ERROR")
     os._exit(exit_code)
@@ -98,12 +97,16 @@ def do_work():
 
     # Check only brand new models, or models that are waiting first
     for model_name, model in models.items():
-
         # Flag this model as disabled in the DB
         if not model["enabled"]:
-            pg.ConnectionPool.curr.execute(
-                "UPDATE eolus4.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
-            pg.ConnectionPool.conn.commit()
+            try:
+                conn, curr = pg.ConnectionPool.connect()
+                curr.execute(
+                    "UPDATE eolus4.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
+                conn.commit()
+                pg.ConnectionPool.close(conn, curr)
+            except Exception as e:
+                log("Couldn't update the models table: " + repr(e), "ERROR")
             continue
 
         status = model_tools.get_model_status(model_name)
@@ -184,9 +187,10 @@ def do_work():
 
         elif status == "PAUSED":
             try:
-                pg.ConnectionPool.curr.execute(
+                conn, curr = pg.ConnectionPool.connect()
+                curr.execute(
                     "SELECT paused_at FROM eolus4.models WHERE model LIKE '" + model_name + "'")
-                paused_at = pg.ConnectionPool.curr.fetchone()[0]
+                paused_at = curr.fetchone()[0]
 
                 log(model_name + " is PAUSED.", "NOTICE")
 
@@ -199,11 +203,12 @@ def do_work():
                         model_name)
 
                     last_fh = 0
-                    pg.ConnectionPool.curr.execute(
+                    curr.execute(
                         "SELECT lastfh, timestamp FROM eolus4.models WHERE model = %s", (model_name,))
-                    result = pg.ConnectionPool.curr.fetchone()
+                    result = curr.fetchone()
                     last_fh = int(result[0])
                     timestamp = result[1]
+                    pg.ConnectionPool.close(conn, curr)
 
                     log("Restarting paused model from fh " + str(last_fh) +
                         " | timestamp: " + str(timestamp), "NOTICE")
@@ -220,6 +225,7 @@ def do_work():
                         str(config["pausedResumeMinutes"]) + " minutes is met.", "NOTICE")
 
             except Exception as e:
+                pg.ConnectionPool.close(conn, curr)
                 log("Error in pause resumption -- " + repr(e), "ERROR")
 
         elif status == "ERROR":
@@ -227,6 +233,7 @@ def do_work():
 
     first_run = False
     if len(processing_pool) > 0:
+        time.sleep(random.random() / 4)
         processed = processing.process(processing_pool)
         return {
             'success': processed

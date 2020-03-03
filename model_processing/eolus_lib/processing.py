@@ -21,19 +21,21 @@ def start(model_name, timestamp):
         "INFO", indentLevel=1, remote=True, model=model_name)
 
     try:
-        pg.ConnectionPool.curr.execute("UPDATE eolus4.models SET (status, timestamp, lastfh) = (%s, %s, %s) WHERE model = %s",
-                                       ("PROCESSING", timestamp, "0", model_name))
-        pg.ConnectionPool.conn.commit()
+        conn, curr = pg.ConnectionPool.connect()
+        curr.execute("UPDATE eolus4.models SET (status, timestamp, lastfh) = (%s, %s, %s) WHERE model = %s",
+                     ("PROCESSING", timestamp, "0", model_name))
+        conn.commit()
 
-        pg.ConnectionPool.curr.execute(
+        curr.execute(
             "DELETE FROM eolus4.run_status WHERE model = %s AND timestamp = %s", (model_name, timestamp))
-        pg.ConnectionPool.conn.commit()
+        conn.commit()
 
-        pg.ConnectionPool.curr.execute("INSERT INTO eolus4.run_status (model, status, timestamp) VALUES (%s, %s, %s)",
-                                       (model_name, "PROCESSING", timestamp))
-        pg.ConnectionPool.conn.commit()
+        curr.execute("INSERT INTO eolus4.run_status (model, status, timestamp) VALUES (%s, %s, %s)",
+                     (model_name, "PROCESSING", timestamp))
+        conn.commit()
+        pg.ConnectionPool.close(conn, curr)
     except:
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         log("Could not set the model status back to processing! This requires manual intervention.",
             "ERROR", remote=True)
         return False
@@ -41,9 +43,32 @@ def start(model_name, timestamp):
     return True
 
 
+def model_can_be_processed(pool):
+    for value in pool.values():
+        if 'processing' in value and value['processing'] == True:
+            return False
+
+    return True
+
+
 def process(processing_pool):
 
-    model_name = random.choice(list(processing_pool.keys()))
+    choices = list(processing_pool.keys())
+    random.shuffle(choices)
+    model_name = None
+
+    while len(choices) > 0:
+        test_model_name = choices.pop()
+
+        if model_can_be_processed(processing_pool[test_model_name]):
+            model_name = test_model_name
+            break
+
+    if model_name == None:
+        log("Not enough non-processing models right now.", "DEBUG")
+        time.sleep(2)
+        return False
+
     log("· Trying to process a step in model " + model_name, "INFO")
 
     pool_model = processing_pool[model_name]
@@ -52,22 +77,23 @@ def process(processing_pool):
     steps = iter(pool_model)
     step = next(steps)
 
-    log("· Step found.", "INFO")
-
     pool_model[step]['processing'] = True
     full_fh = pool_model[step]['fh']
     band_num = pool_model[step]['band_num']
 
     log("Preparing to process " + model_name + " | fh: " + full_fh, "NOTICE")
+    conn = None
+    curr = None
 
     try:
-        pg.ConnectionPool.curr.execute(
+        conn, curr = pg.ConnectionPool.connect()
+        curr.execute(
             "SELECT timestamp FROM eolus4.models WHERE model = %s", (model_name,))
-        timestamp = pg.ConnectionPool.curr.fetchone()[0]
+        timestamp = curr.fetchone()[0]
         log("· Timestamp retrieved", "DEBUG")
 
     except:
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         log("Couldn't get the timestamp for model " +
             model_name, "ERROR", remote=True)
         pool_model[step]['retries'] += 1
@@ -96,17 +122,20 @@ def process(processing_pool):
         pool_model[step]['processing'] = False
         del pool_model
         try:
-            pg.ConnectionPool.curr.execute("UPDATE eolus4.models SET (status,lastfh,paused_at) = (%s, %s, %s) WHERE model = %s",
-                                           ("PAUSED", full_fh, datetime.now().isoformat(), model_name))
-            pg.ConnectionPool.conn.commit()
+            curr.execute("UPDATE eolus4.models SET (status,lastfh,paused_at) = (%s, %s, %s) WHERE model = %s",
+                         ("PAUSED", full_fh, datetime.now().isoformat(), model_name))
+            conn.commit()
 
         except Exception as e:
             log(repr(e), "ERROR")
 
+        pg.ConnectionPool.close(conn, curr)
         return False
 
     log("Processing for " + model_name + " | fh: " + full_fh +
         band_info_str, "NOTICE", remote=True, model=model_name)
+
+    pg.ConnectionPool.close(conn, curr)
 
     try:
         if band is None:
@@ -133,7 +162,8 @@ def process(processing_pool):
         log("Successfully processed " + model_name +
             " | fh: " + full_fh + band_info_str, "NOTICE")
 
-        del pool_model[step]
+        if step in pool_model:
+            del pool_model[step]
         if len(pool_model) == 0:
             end(model_name)
             del processing_pool[model_name]
@@ -141,12 +171,13 @@ def process(processing_pool):
     except Exception as e:
         log("Failure.", "ERROR", remote=True)
         log(repr(e), "ERROR", indentLevel=2, remote=True, model=model_name)
-        pool_model[step]['retries'] += 1
-        pool_model[step]['processing'] = False
-        if pool_model[step]['retries'] > config['maxRetriesPerStep']:
-            del pool_model[step]
-            if len(pool_model) == 0:
-                del processing_pool[model_name]
+        if step in pool_model:
+            pool_model[step]['retries'] += 1
+            pool_model[step]['processing'] = False
+            if pool_model[step]['retries'] > config['maxRetriesPerStep']:
+                del pool_model[step]
+                if len(pool_model) == 0:
+                    del processing_pool[model_name]
         return False
 
 
@@ -631,15 +662,17 @@ def end(model_name):
     file_tools.clean()
 
     try:
+        conn, curr = pg.ConnectionPool.connect()
         log("✓ " + model_name + " is completely finished processing.",
             "NOTICE", remote=True, model=model_name)
-        pg.ConnectionPool.curr.execute(
+        curr.execute(
             "UPDATE eolus4.models SET status = %s WHERE model = %s", ("WAITING", model_name))
-        pg.ConnectionPool.conn.commit()
+        conn.commit()
         model_tools.update_run_status(model_name)
+        pg.ConnectionPool.close(conn, curr)
     except Exception as e:
         log(repr(e), "ERROR")
-        pg.reset()
+        pg.ConnectionPool.close(conn, curr)
         log("Couldn't mark model as complete.",
             "ERROR", remote=True, model=model_name)
 
