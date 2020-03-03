@@ -193,7 +193,7 @@ def do_work():
                     "SELECT paused_at FROM eolus4.models WHERE model LIKE '" + model_name + "'")
                 paused_at = curr.fetchone()[0]
 
-                log(model_name + " is PAUSED.", "NOTICE")
+                log(model_name + " is PAUSED.", "INFO")
 
                 if abs(datetime.now().replace(tzinfo=utc) - paused_at.replace(tzinfo=utc)) >= timedelta(minutes=config["pausedResumeMinutes"]):
 
@@ -222,7 +222,7 @@ def do_work():
 
                 else:
                     log("Not resuming yet until the threshold of " +
-                        str(config["pausedResumeMinutes"]) + " minutes is met.", "NOTICE")
+                        str(config["pausedResumeMinutes"]) + " minutes is met.", "INFO")
 
                 pg.ConnectionPool.close(conn, curr)
 
