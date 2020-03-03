@@ -106,6 +106,7 @@ def do_work():
                 conn.commit()
                 pg.ConnectionPool.close(conn, curr)
             except Exception as e:
+                pg.ConnectionPool.close(conn, curr)
                 log("Couldn't update the models table: " + repr(e), "ERROR")
             continue
 
@@ -208,7 +209,6 @@ def do_work():
                     result = curr.fetchone()
                     last_fh = int(result[0])
                     timestamp = result[1]
-                    pg.ConnectionPool.close(conn, curr)
 
                     log("Restarting paused model from fh " + str(last_fh) +
                         " | timestamp: " + str(timestamp), "NOTICE")
@@ -223,6 +223,8 @@ def do_work():
                 else:
                     log("Not resuming yet until the threshold of " +
                         str(config["pausedResumeMinutes"]) + " minutes is met.", "NOTICE")
+
+                pg.ConnectionPool.close(conn, curr)
 
             except Exception as e:
                 pg.ConnectionPool.close(conn, curr)

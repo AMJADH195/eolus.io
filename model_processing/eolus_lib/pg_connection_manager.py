@@ -54,6 +54,7 @@ def add_agent():
         conn.commit()
         ConnectionPool.close(conn, curr)
     except Exception as e:
+        pg.ConnectionPool.close(conn, curr)
         log("Couldn't add agent.", "ERROR")
         log(repr(e), "ERROR", indentLevel=1, remote=True)
         return False
