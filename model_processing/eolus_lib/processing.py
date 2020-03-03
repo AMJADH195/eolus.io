@@ -81,7 +81,7 @@ def process(processing_pool):
     full_fh = pool_model[step]['fh']
     band_num = pool_model[step]['band_num']
 
-    log("Preparing to process " + model_name + " | fh: " + full_fh, "NOTICE")
+    log("Preparing to process " + model_name + " | fh: " + full_fh, "INFO")
     conn = None
     curr = None
 
