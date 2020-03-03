@@ -117,7 +117,7 @@ def process(processing_pool):
 
     if not file_exists:
         log("Remote data not ready yet. " + model_name + " | fh: " +
-            full_fh + band_info_str, 'INFO', remote=True, model=model_name)
+            full_fh + band_info_str, 'NOTICE', remote=True, model=model_name)
 
         pool_model[step]['processing'] = False
         del processing_pool[model_name]
