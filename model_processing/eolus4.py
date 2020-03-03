@@ -80,8 +80,7 @@ def init():
                 del fut
 
             if len(processing_pool) > 0:
-                for i in range(0, max_threads - len(futures)):
-                    # time.sleep(config["sleepTime"])
+                for i in range(0, min(max_threads - len(futures), processable_model_count())):
                     executr = executor.submit(do_work)
                     futures.add(
                         executr
@@ -244,6 +243,13 @@ def do_work():
     return {
         'success': True
     }
+
+
+def processable_model_count():
+    if not processing_pool or len(processing_pool) == 0:
+        return 9999
+
+    return len(processing_pool)
 
 
 if __name__ == "__main__":
