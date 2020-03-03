@@ -20,7 +20,7 @@ def log(text, level, indentLevel=0, remote=False, model=''):
     if remote:
         try:
             pg.ConnectionPool.curr.execute(
-                "INSERT INTO eolus3.log (model, level, timestamp, agent, message) VALUES (%s, %s, %s, %s, %s)", (model, level, timestamp, '0', text))
+                "INSERT INTO eolus4.log (model, level, timestamp, agent, message) VALUES (%s, %s, %s, %s, %s)", (model, level, timestamp, '0', text))
             pg.ConnectionPool.conn.commit()
         except:
             print("Wasn't logged remotely :(")

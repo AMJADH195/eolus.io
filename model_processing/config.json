@@ -2,7 +2,7 @@
     "config": {
         "postgres": {
             "host": "localhost",
-            "db": "eolus_dev",
+            "db": "eolus",
             "user": "eolus"
         },
         "bounds": {
@@ -25,7 +25,7 @@
             "ERROR"
         ],
         "tempDir": "./tempWxData",
-        "mapfileDir": "/map/dev",
+        "mapfileDir": "/map",
         "logFile": "model_update.log",
         "debug": false,
         "resampling": "cubicspline",
@@ -35,8 +35,7 @@
         "retentionDays": 2,
         "maxThreads": 3,
         "pausedResumeMinutes": 2,
-        "maxRetriesPerStep": 5,
-        "maxDownloadRetries": 100
+        "maxRetriesPerStep": 2
     },
     "levelMaps": {
         "sfc": {
@@ -598,7 +597,7 @@
             ]
         },
         "href_avrg": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 12,
@@ -628,7 +627,7 @@
             ]
         },
         "href_mean": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 12,
@@ -730,7 +729,7 @@
             ]
         },
         "href_pmmn": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 12,
@@ -760,7 +759,7 @@
             ]
         },
         "href_sprd": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 12,
@@ -862,7 +861,7 @@
             ]
         },
         "hrrr": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "colorado",
             "readTimeout": 300,
             "updateFrequency": 1,
@@ -1056,7 +1055,7 @@
             ]
         },
         "naefs_anom": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -1083,7 +1082,7 @@
             ]
         },
         "naefs_bc_avg": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -1110,7 +1109,7 @@
             ]
         },
         "naefs_bc_spr": {
-            "enabled": false,
+            "enabled": true,
             "bounds": "na",
             "updateFrequency": 6,
             "updateOffset": 0,
@@ -1689,7 +1688,7 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.spread_ds_3hrly.grib2"
         },
         "wpc_snow_12h_25pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1711,7 +1710,7 @@
             ]
         },
         "wpc_snow_12h_50pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1733,7 +1732,7 @@
             ]
         },
         "wpc_snow_12h_75pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1755,7 +1754,7 @@
             ]
         },
         "wpc_snow_12h_sigma": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 12,
@@ -1777,7 +1776,7 @@
             ]
         },
         "wpc_snow_72h_25pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
@@ -1799,7 +1798,7 @@
             ]
         },
         "wpc_snow_72h_50pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
@@ -1821,7 +1820,7 @@
             ]
         },
         "wpc_snow_72h_75pct": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,
@@ -1843,7 +1842,7 @@
             ]
         },
         "wpc_snow_72h_sigma": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 12,
             "updateOffset": 0,
             "startTime": 72,

@@ -20,7 +20,7 @@ def add_model_to_db(model_name):
         log("✓ Added model to models table.", "INFO",
             indentLevel=1, remote=True, model=model_name)
         pg.ConnectionPool.curr.execute(
-            "INSERT INTO eolus3.models (model, status) VALUES (%s, %s)", (model_name, "WAITING"))
+            "INSERT INTO eolus4.models (model, status) VALUES (%s, %s)", (model_name, "WAITING"))
         pg.ConnectionPool.conn.commit()
         return True
     except:
@@ -77,20 +77,23 @@ def get_number_of_hours(model_name):
 def get_model_status(model_name):
     try:
         pg.ConnectionPool.curr.execute(
-            "SELECT status FROM eolus3.models WHERE model LIKE '" + model_name + "'")
-        result = pg.ConnectionPool.curr.fetchone()
+            "SELECT status FROM eolus4.models WHERE model LIKE '" + model_name + "'")
 
+        if pg.ConnectionPool.curr.rowcount == 0:
+            return None
+        result = pg.ConnectionPool.curr.fetchone()
         return result[0]
 
-    except:
+    except Exception as e:
+        log(repr(e), "ERROR")
         pg.reset()
-        return None
+        return "ERROR"
 
 
 def get_model_timestamp(model_name):
     try:
         pg.ConnectionPool.curr.execute(
-            "SELECT timestamp FROM eolus3.models WHERE model LIKE '" + model_name + "'")
+            "SELECT timestamp FROM eolus4.models WHERE model LIKE '" + model_name + "'")
         result = pg.ConnectionPool.curr.fetchone()
 
         return result[0]
@@ -137,7 +140,7 @@ def check_if_model_fh_available(model_name, timestamp, fh):
 def model_timestamp_matches(model_name, timestamp):
     try:
         pg.ConnectionPool.curr.execute(
-            "SELECT timestamp FROM eolus3.models WHERE model = %s", (model_name,))
+            "SELECT timestamp FROM eolus4.models WHERE model = %s", (model_name,))
         model_time = str(curr.fetchone()[0])[0:16]
         t_time = str(timestamp)[0:16]
         return model_time == t_time
@@ -149,7 +152,7 @@ def model_timestamp_matches(model_name, timestamp):
 def update_run_status(model_name):
     try:
         pg.ConnectionPool.curr.execute(
-            "UPDATE eolus3.run_status SET status = 'COMPLETE' WHERE model = '" + model_name + "'")
+            "UPDATE eolus4.run_status SET status = 'COMPLETE' WHERE model = '" + model_name + "'")
         pg.ConnectionPool.conn.commit()
     except:
         pg.reset()

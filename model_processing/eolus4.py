@@ -46,7 +46,6 @@ def kill_me(exit_code):
 def work_done(future):
     global processing_pool
     log("Thread finished. " + str(future), "DEBUG")
-    # pprint.pprint(processing_pool)
 
 
 def init():
@@ -57,7 +56,6 @@ def init():
         kill_me(1)
 
     log("✓ Connected.", "DEBUG")
-    print()
 
     if not pg.can_do_work():
         log("Another agent is running already. Goodbye.", "NOTICE")
@@ -80,10 +78,11 @@ def init():
 
             for fut in done:
                 work_done(fut)
+                del fut
 
             if len(processing_pool) > 0:
                 for i in range(0, max_threads - len(futures)):
-                    time.sleep(config["sleepTime"])
+                    # time.sleep(config["sleepTime"])
                     executr = executor.submit(do_work)
                     futures.add(
                         executr
@@ -103,7 +102,7 @@ def do_work():
         # Flag this model as disabled in the DB
         if not model["enabled"]:
             pg.ConnectionPool.curr.execute(
-                "UPDATE eolus3.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
+                "UPDATE eolus4.models SET status = %s WHERE model = %s", ("DISABLED", model_name))
             pg.ConnectionPool.conn.commit()
             continue
 
@@ -119,7 +118,6 @@ def do_work():
                     model, prev=lookback)
                 if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh):
                     if model_name not in processing_pool:
-
                         log(f"Initializing new run for {model_name} | {timestamp}.",
                             "NOTICE", indentLevel=0, remote=True, model=model_name)
                         processing_pool[model_name] = {
@@ -141,6 +139,10 @@ def do_work():
             prev_timestamp = model_tools.get_model_timestamp(
                 model_name).replace(tzinfo=utc)
 
+            if prev_timestamp == None:
+                log("Couldn't get previous timestamp, continuing.", "WARN")
+                continue
+
             log("Prev timestamp: " + str(prev_timestamp), "INFO")
 
             max_lookback = 3
@@ -159,7 +161,6 @@ def do_work():
                             "INFO", indentLevel=1)
                         if model_tools.check_if_model_fh_available(model_name, timestamp, model_fh) or (status == "PROCESSING" and first_run):
                             if model_name not in processing_pool:
-
                                 log(f"Initializing new run for {model_name} | {timestamp}.",
                                     "NOTICE", indentLevel=0, remote=True, model=model_name)
                                 processing_pool[model_name] = {
@@ -184,7 +185,7 @@ def do_work():
         elif status == "PAUSED":
             try:
                 pg.ConnectionPool.curr.execute(
-                    "SELECT paused_at FROM eolus3.models WHERE model LIKE '" + model_name + "'")
+                    "SELECT paused_at FROM eolus4.models WHERE model LIKE '" + model_name + "'")
                 paused_at = pg.ConnectionPool.curr.fetchone()[0]
 
                 log(model_name + " is PAUSED.", "NOTICE")
@@ -199,7 +200,7 @@ def do_work():
 
                     last_fh = 0
                     pg.ConnectionPool.curr.execute(
-                        "SELECT lastfh, timestamp FROM eolus3.models WHERE model = %s", (model_name,))
+                        "SELECT lastfh, timestamp FROM eolus4.models WHERE model = %s", (model_name,))
                     result = pg.ConnectionPool.curr.fetchone()
                     last_fh = int(result[0])
                     timestamp = result[1]
@@ -221,14 +222,15 @@ def do_work():
             except Exception as e:
                 log("Error in pause resumption -- " + repr(e), "ERROR")
 
+        elif status == "ERROR":
+            log("Couldn't retrieve the status for some reason.", "WARN")
+
     first_run = False
     if len(processing_pool) > 0:
         processed = processing.process(processing_pool)
         return {
             'success': processed
         }
-
-    print()
 
     return {
         'success': True

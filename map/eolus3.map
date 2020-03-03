@@ -1,5 +1,5 @@
 MAP
- CONFIG "MS_ERRORFILE" "/map/eolus3_error.txt"
+ CONFIG "MS_ERRORFILE" "/map/eolus4_error.txt"
  DEBUG OFF
  FONTSET "./fonts.list"
  OUTPUTFORMAT
@@ -17,7 +17,7 @@ MAP
   "init=epsg:4326"
  END
  LAYER
-  NAME eolus3
+  NAME eolus4
   TYPE RASTER
   STATUS ON
   VALIDATION
@@ -32,7 +32,7 @@ MAP
    "init=epsg:4326"
   END
   METADATA
-   "wms_title" "eolus3"
+   "wms_title" "eolus4"
    "wms_srs"   "EPSG:4326 EPSG:3857"
    "wms_extent" "-180 80 -60 20"
    "wms_enable_request" "*"
@@ -45,7 +45,7 @@ MAP
  END
 
  LAYER
-  NAME eolus3_contours
+  NAME eolus4_contours
   TYPE LINE
   STATUS OFF
   VALIDATION
@@ -64,7 +64,7 @@ MAP
    "init=epsg:4326"
   END
   METADATA
-   "wms_title" "eolus3_contours"
+   "wms_title" "eolus4_contours"
    "wms_srs"   "EPSG:4326 EPSG:3857"
    "wms_extent" "-180 80 -60 20"
    "wms_enable_request" "*"

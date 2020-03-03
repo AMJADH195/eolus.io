@@ -21,15 +21,15 @@ def start(model_name, timestamp):
         "INFO", indentLevel=1, remote=True, model=model_name)
 
     try:
-        pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status, timestamp, lastfh) = (%s, %s, %s) WHERE model = %s",
+        pg.ConnectionPool.curr.execute("UPDATE eolus4.models SET (status, timestamp, lastfh) = (%s, %s, %s) WHERE model = %s",
                                        ("PROCESSING", timestamp, "0", model_name))
         pg.ConnectionPool.conn.commit()
 
         pg.ConnectionPool.curr.execute(
-            "DELETE FROM eolus3.run_status WHERE model = %s AND timestamp = %s", (model_name, timestamp))
+            "DELETE FROM eolus4.run_status WHERE model = %s AND timestamp = %s", (model_name, timestamp))
         pg.ConnectionPool.conn.commit()
 
-        pg.ConnectionPool.curr.execute("INSERT INTO eolus3.run_status (model, status, timestamp) VALUES (%s, %s, %s)",
+        pg.ConnectionPool.curr.execute("INSERT INTO eolus4.run_status (model, status, timestamp) VALUES (%s, %s, %s)",
                                        (model_name, "PROCESSING", timestamp))
         pg.ConnectionPool.conn.commit()
     except:
@@ -50,26 +50,7 @@ def process(processing_pool):
 
     step = None
     steps = iter(pool_model)
-
-    while True:
-        try:
-            step = next(steps, -1)
-            if step == -1 or step == "status":
-                log("· No available step to process.", "INFO",
-                    remote=False, indentLevel=1, model=model_name)
-
-                del processing_pool[model_name]
-                end(model_name)
-                return False
-
-            elif pool_model[step]['processing'] == False:
-                break
-
-        except Exception as e:
-            log("· (err) No available step to process.", "INFO",
-                remote=False, indentLevel=1, model=model_name)
-            print(repr(e))
-            return False
+    step = next(steps)
 
     log("· Step found.", "INFO")
 
@@ -77,13 +58,11 @@ def process(processing_pool):
     full_fh = pool_model[step]['fh']
     band_num = pool_model[step]['band_num']
 
-    print("")
-    print("------------")
     log("Preparing to process " + model_name + " | fh: " + full_fh, "NOTICE")
 
     try:
         pg.ConnectionPool.curr.execute(
-            "SELECT timestamp FROM eolus3.models WHERE model = %s", (model_name,))
+            "SELECT timestamp FROM eolus4.models WHERE model = %s", (model_name,))
         timestamp = pg.ConnectionPool.curr.fetchone()[0]
         log("· Timestamp retrieved", "DEBUG")
 
@@ -117,7 +96,7 @@ def process(processing_pool):
         pool_model[step]['processing'] = False
         del pool_model
         try:
-            pg.ConnectionPool.curr.execute("UPDATE eolus3.models SET (status,lastfh,paused_at) = (%s, %s, %s) WHERE model = %s",
+            pg.ConnectionPool.curr.execute("UPDATE eolus4.models SET (status,lastfh,paused_at) = (%s, %s, %s) WHERE model = %s",
                                            ("PAUSED", full_fh, datetime.now().isoformat(), model_name))
             pg.ConnectionPool.conn.commit()
 
@@ -137,6 +116,7 @@ def process(processing_pool):
                 if pool_model[step]['retries'] > config['maxRetriesPerStep']:
                     del pool_model[step]
                     if len(pool_model) == 0:
+                        end(model_name)
                         del processing_pool[model_name]
                 return False
         else:
@@ -146,14 +126,13 @@ def process(processing_pool):
                 if pool_model[step]['retries'] > config['maxRetriesPerStep']:
                     del pool_model[step]
                     if len(pool_model) == 0:
+                        end(model_name)
                         del processing_pool[model_name]
                 return False
 
         log("Successfully processed " + model_name +
             " | fh: " + full_fh + band_info_str, "NOTICE")
-        print("------------")
 
-        pool_model[step]['processing'] = False
         del pool_model[step]
         if len(pool_model) == 0:
             end(model_name)
@@ -202,7 +181,7 @@ def download_band(model_name, timestamp, fh, band, band_num):
     except Exception as e:
         log(f"· Couldn't get header of " + url, "ERROR",
             remote=True, indentLevel=2, model=model_name)
-        print(repr(e))
+        log(repr(e), "ERROR")
         return False
 
     byte_range = get_byte_range(band, url + ".idx", content_length)
@@ -298,6 +277,8 @@ def download_band(model_name, timestamp, fh, band, band_num):
                 target_filename, new_raster, 0)
             log("✓ Output master TIF created --> " + target_filename, "NOTICE",
                 indentLevel=1, remote=True, model=model_name)
+            new_raster = None
+            grib_file = None
         except Exception as e:
             log("Couldn't create the new master TIF: " + target_filename,
                 "ERROR", indentLevel=1, remote=True, model=model_name)
@@ -330,6 +311,8 @@ def download_band(model_name, timestamp, fh, band, band_num):
                 target_raw_filename, new_raster, 0)
             log("✓ Output master TIF created --> " + target_raw_filename, "NOTICE",
                 indentLevel=1, remote=True, model=model_name)
+            new_raster = None
+            grib_file = None
         except Exception as e:
             log("Couldn't create the new master TIF: " + target_raw_filename,
                 "ERROR", indentLevel=2, remote=True, model=model_name)
@@ -361,6 +344,7 @@ def download_band(model_name, timestamp, fh, band, band_num):
 
         grib_file = None
         tif = None
+        data = None
         log(f"✓ Data written to the GTiff | band: {band['shorthand']} | fh: {fh}.",
             "INFO", indentLevel=2, remote=True, model=model_name)
     except Exception as e:
@@ -585,24 +569,24 @@ def download_full_file(model_name, timestamp, fh, band_num):
             try:
                 grib_file = gdal.Open(download_filename + ".tif")
                 gribnum_bands = grib_file.RasterCount
-                bandLevel = model_tools.get_level_name_for_level(
+                band_level = model_tools.get_level_name_for_level(
                     band["band"]["level"], "gribName")
                 tif = gdal.Open(target_filename, gdalconst.GA_Update)
                 for i in range(1, gribnum_bands + 1):
                     try:
-                        fileBand = grib_file.GetRasterBand(i)
-                        metadata = fileBand.GetMetadata()
-                        if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
+                        file_band = grib_file.GetRasterBand(i)
+                        metadata = file_band.GetMetadata()
+                        if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == band_level.lower():
                             log("· Band " + band["band"]["var"] + " found.",
                                 "DEBUG", indentLevel=2, remote=False)
-                            data = fileBand.ReadAsArray()
+                            data = file_band.ReadAsArray()
                             tif.GetRasterBand(band_num).WriteArray(data)
                             break
 
                     except Exception as e:
                         log(f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}",
                             "WARN", indentLevel=2, remote=True, model=model_name)
-                        print(repr(e))
+                        log(repr(e), "ERROR")
 
                 tif.FlushCache()
 
@@ -610,23 +594,24 @@ def download_full_file(model_name, timestamp, fh, band_num):
                 tif = gdal.Open(target_raw_filename, gdalconst.GA_Update)
                 for i in range(1, gribnum_bands + 1):
                     try:
-                        fileBand = grib_file.GetRasterBand(i)
-                        metadata = fileBand.GetMetadata()
-                        if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == bandLevel.lower():
+                        file_band = grib_file.GetRasterBand(i)
+                        metadata = file_band.GetMetadata()
+                        if metadata["GRIB_ELEMENT"].lower() == band["band"]["var"].lower() and metadata["GRIB_SHORT_NAME"].lower() == band_level.lower():
                             log("· Band " + band["band"]["var"] + " found.",
                                 "DEBUG", indentLevel=2, remote=False)
-                            data = fileBand.ReadAsArray()
+                            data = file_band.ReadAsArray()
                             tif.GetRasterBand(band_num).WriteArray(data)
                             break
 
                     except Exception as e:
                         log(f"× Couldn't read GTiff band: #{str(i)} | fh: {fh}",
                             "WARN", indentLevel=2, remote=True, model=model_name)
-                        print(repr(e))
+                        log(repr(e), "ERROR")
 
                 tif.FlushCache()
                 grib_file = None
                 tif = None
+                data = None
             except Exception as e:
                 return False
 
@@ -649,11 +634,11 @@ def end(model_name):
         log("✓ " + model_name + " is completely finished processing.",
             "NOTICE", remote=True, model=model_name)
         pg.ConnectionPool.curr.execute(
-            "UPDATE eolus3.models SET status = %s WHERE model = %s", ("WAITING", model_name))
+            "UPDATE eolus4.models SET status = %s WHERE model = %s", ("WAITING", model_name))
         pg.ConnectionPool.conn.commit()
         model_tools.update_run_status(model_name)
     except Exception as e:
-        print(repr(e))
+        log(repr(e), "ERROR")
         pg.reset()
         log("Couldn't mark model as complete.",
             "ERROR", remote=True, model=model_name)
@@ -720,5 +705,5 @@ def get_byte_range(band, idx_file, content_length):
 
     except Exception as e:
         log(f"Band def retrieval failed.", "ERROR", indentLevel=2, remote=True)
-        print(repr(e))
+        log(repr(e), "ERROR")
         return None
