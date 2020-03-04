@@ -2016,10 +2016,6 @@
             "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_biasc/sref.t%Hz.pgrb212.spread_3hrly.grib2",
             "bands": [
                 {
-                    "var": "APCP",
-                    "level": "sfc"
-                },
-                {
                     "var": "PRMSL",
                     "level": "msl"
                 }
