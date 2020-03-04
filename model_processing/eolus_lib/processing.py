@@ -711,10 +711,18 @@ def get_byte_range(band, idx_file, content_length):
                     break
 
             if var_name == var_name_to_find and level == level_to_find:
-                if "time_range" in band["band"].keys():
+                if "time_range" in band["band"]:
                     range_val = time.split(" ", 1)[0]
                     ranges = range_val.split("-")
                     if (int(ranges[1]) - int(ranges[0])) != band["band"]["time_range"]:
+                        continue
+
+                if "time" in band:
+                    hr = time.split(" ", 1)[0]
+                    if "-" in hr:
+                        hr = hr.split("-")[1]
+
+                    if hr != band["time"]:
                         continue
 
                 log("✓ Found.", "DEBUG", indentLevel=2, remote=False)

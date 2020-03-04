@@ -36,9 +36,17 @@
         "maxRetriesPerStep": 2
     },
     "levelMaps": {
+        "msl": {
+            "idxName": "mean sea level",
+            "gribName": "MSL"
+        },
         "sfc": {
             "idxName": "surface",
             "gribName": "0-SFC"
+        },
+        "0m": {
+            "idxName": "0 m above ground",
+            "gribName": "0-HTGL"
         },
         "2m": {
             "idxName": "2 m above ground",
@@ -51,6 +59,10 @@
         "80m": {
             "idxName": "80 m above ground",
             "gribName": "80-HTGL"
+        },
+        "0to3000m": {
+            "idxName": "3000-0 m above ground",
+            "gribName": "3000-0-HTGL"
         },
         "0to6000m": {
             "idxName": "0-6000 m above ground",
@@ -91,6 +103,10 @@
         "ctl": {
             "idxName": "cloud top",
             "gribName": "0-CTL"
+        },
+        "ceil": {
+            "idxName": "cloud ceiling",
+            "gribName": "todo"
         },
         "base": {
             "idxName": "cloud base",
@@ -1622,68 +1638,428 @@
             ]
         },
         "sref_mean": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 1,
-            "endTime": 1,
             "imageWidth": 240,
+            "startTime": 0,
+            "endTime": 87,
             "fhStep": {
-                "0": 1
+                "0": 3
             },
             "bounds": "colorado",
+            "flatTime": true,
+            "anl": true,
             "readTimeout": 3600,
-            "index": false,
+            "index": true,
             "filetype": "grib2",
-            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2"
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.mean_3hrly.grib2",
+            "bands": [
+                {
+                    "var": "UGRD",
+                    "level": "300mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "300mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "600mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "600mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "HGT",
+                    "level": "500mb"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "850mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "700mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "600mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "500mb"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "HLCY",
+                    "level": "0to3000m"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "HGT",
+                    "level": "ceil"
+                },
+                {
+                    "var": "HGT",
+                    "level": "ctl"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CWORK",
+                    "level": "0m"
+                }
+            ]
+        },
+        "sref_mean_bc": {
+            "enabled": true,
+            "updateFrequency": 6,
+            "updateOffset": 3,
+            "imageWidth": 240,
+            "startTime": 0,
+            "endTime": 87,
+            "fhStep": {
+                "0": 3
+            },
+            "bounds": "colorado",
+            "flatTime": true,
+            "anl": true,
+            "readTimeout": 3600,
+            "index": true,
+            "filetype": "grib2",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_biasc/sref.t%Hz.pgrb212.mean_3hrly.grib2",
+            "bands": [
+                {
+                    "var": "APCP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PRMSL",
+                    "level": "msl"
+                }
+            ]
         },
         "sref_mean_ndgd": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 1,
-            "endTime": 1,
             "imageWidth": 480,
+            "startTime": 0,
+            "endTime": 87,
             "fhStep": {
-                "0": 1
+                "0": 3
             },
             "bounds": "colorado",
             "readTimeout": 3600,
-            "index": false,
+            "flatTime": true,
+            "anl": true,
+            "index": true,
             "filetype": "grib2",
-            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.mean_ds_3hrly.grib2"
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.mean_ds_3hrly.grib2",
+            "bands": [
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "SPFH",
+                    "level": "2m"
+                }
+            ]
         },
         "sref_spread": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 1,
-            "endTime": 1,
-            "imageWidth": 240,
+            "startTime": 0,
+            "endTime": 87,
             "fhStep": {
-                "0": 1
+                "0": 3
             },
+            "imageWidth": 240,
             "bounds": "colorado",
             "readTimeout": 3600,
-            "index": false,
+            "flatTime": true,
+            "anl": true,
+            "index": true,
             "filetype": "grib2",
-            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.spread_3hrly.grib2"
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod/sref.t%Hz.pgrb132.spread_3hrly.grib2",
+            "bands": [
+                {
+                    "var": "UGRD",
+                    "level": "300mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "300mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "500mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "600mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "600mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "700mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "850mb"
+                },
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "HGT",
+                    "level": "500mb"
+                },
+                {
+                    "var": "RH",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "850mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "700mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "600mb"
+                },
+                {
+                    "var": "TMP",
+                    "level": "500mb"
+                },
+                {
+                    "var": "DPT",
+                    "level": "2m"
+                },
+                {
+                    "var": "CAPE",
+                    "level": "sfc"
+                },
+                {
+                    "var": "HLCY",
+                    "level": "0to3000m"
+                },
+                {
+                    "var": "CIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PWAT",
+                    "level": "eatmcsl"
+                },
+                {
+                    "var": "VIS",
+                    "level": "sfc"
+                },
+                {
+                    "var": "HGT",
+                    "level": "ceil"
+                },
+                {
+                    "var": "HGT",
+                    "level": "ctl"
+                },
+                {
+                    "var": "CRAIN",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CSNOW",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CFRZR",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CICEP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "CWORK",
+                    "level": "0m"
+                }
+            ]
+        },
+        "sref_spread_bc": {
+            "enabled": true,
+            "updateFrequency": 6,
+            "updateOffset": 3,
+            "imageWidth": 240,
+            "startTime": 0,
+            "endTime": 87,
+            "fhStep": {
+                "0": 3
+            },
+            "bounds": "colorado",
+            "flatTime": true,
+            "anl": true,
+            "readTimeout": 3600,
+            "index": true,
+            "filetype": "grib2",
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_biasc/sref.t%Hz.pgrb212.spread_3hrly.grib2",
+            "bands": [
+                {
+                    "var": "APCP",
+                    "level": "sfc"
+                },
+                {
+                    "var": "PRMSL",
+                    "level": "msl"
+                }
+            ]
         },
         "sref_spread_ndgd": {
-            "enabled": false,
+            "enabled": true,
             "updateFrequency": 6,
             "updateOffset": 3,
-            "startTime": 1,
-            "endTime": 1,
-            "imageWidth": 480,
+            "startTime": 0,
+            "endTime": 87,
             "fhStep": {
-                "0": 1
+                "0": 3
             },
+            "imageWidth": 480,
             "bounds": "colorado",
             "readTimeout": 3600,
-            "index": false,
+            "flatTime": true,
+            "anl": true,
+            "index": true,
             "filetype": "grib2",
-            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.spread_ds_3hrly.grib2"
+            "url": "https://www.ftp.ncep.noaa.gov/data/nccf/com/sref/prod/sref.%D/%H/ensprod_ndgd/sref.t%Hz.pgrb197.spread_ds_3hrly.grib2",
+            "bands": [
+                {
+                    "var": "UGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "VGRD",
+                    "level": "10m"
+                },
+                {
+                    "var": "TMP",
+                    "level": "2m"
+                },
+                {
+                    "var": "SPFH",
+                    "level": "2m"
+                }
+            ]
         },
         "wpc_snow_12h_25pct": {
             "enabled": true,

@@ -221,14 +221,26 @@ def make_band_dict(model_name):
             })
         else:
             for band in bands:
+
+                band_copy = band.copy()
+
+                vals = {
+                    'retries': 0,
+                    'fh': full_fh,
+                    'band_num': i,
+                    'band': band_copy,
+                    'processing': False
+                }
+
+                if "flatTime" in model:
+                    time_val = fh
+                    if "anl" in model and fh == model["startTime"]:
+                        time_val = "anl"
+
+                    band_copy["time"] = str(time_val)
+
                 band_dict.update({
-                    band["shorthand"] + "_" + full_fh: {
-                        'retries': 0,
-                        'fh': full_fh,
-                        'band_num': i,
-                        'band': band,
-                        'processing': False
-                    }
+                    band["shorthand"] + "_" + full_fh: vals
                 })
         fh = add_appropriate_fh_step(model_name, fh)
         i += 1
@@ -236,17 +248,19 @@ def make_band_dict(model_name):
         if fh > model["endTime"]:
             log(f"Band dict created.", "NOTICE",
                 indentLevel=0, remote=True, model=model_name)
+
             return band_dict
 
 
 def make_model_band_array(model_name, force=False):
     model = models[model_name]
-    if not "bands" in model.keys():
+    if not "bands" in model:
         return None
 
     model_band_array = []
     if model["index"] or force:
         for band in model["bands"]:
+
             model_band_array.append({
                 "shorthand": band["var"].lower() + "_" + band["level"].lower(),
                 "band": band
