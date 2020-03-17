@@ -660,6 +660,7 @@ def download_full_file(model_name, timestamp, fh, band_num):
 def end(model_name):
 
     file_tools.clean()
+    pg.clean()
 
     try:
         conn, curr = pg.ConnectionPool.connect()
